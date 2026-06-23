@@ -1,0 +1,72 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = "Personal Blog" } = Astro.props;
+
+const categories = [
+  { name: '日常生活', slug: 'daily', icon: '🏠' },
+  { name: '音乐分析', slug: 'music', icon: '🎵' },
+  { name: '读书鉴赏', slug: 'books', icon: '📚' },
+  { name: '电商运营', slug: 'ecommerce', icon: '🛒' },
+  { name: '宝可梦', slug: 'pokemon', icon: '⚡' },
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+  </head>
+  <body class="bg-gray-50 text-gray-800 min-h-screen">
+    <div class="flex">
+      <!-- Sidebar -->
+      <aside class="fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 p-6 overflow-y-auto">
+        <div class="mb-8">
+          <a href="/" class="text-2xl font-bold text-gray-900 hover:text-indigo-600 transition-colors">
+            我的博客
+          </a>
+          <p class="text-sm text-gray-500 mt-1">记录生活点滴</p>
+        </div>
+
+        <nav>
+          <ul class="space-y-2">
+            {categories.map((cat) => (
+              <li>
+                <a
+                  href={`/category/${cat.slug}`}
+                  class={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                    currentPath.includes(cat.slug)
+                      ? 'bg-indigo-50 text-indigo-600 font-medium'
+                      : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  <span class="text-xl">{cat.icon}</span>
+                  <span>{cat.name}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <div class="mt-8 pt-8 border-t border-gray-200">
+          <a href="/about" class="text-gray-500 hover:text-indigo-600 transition-colors text-sm">
+            关于我
+          </a>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="ml-64 flex-1 min-h-screen">
+        <slot />
+      </main>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,61 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+export function getStaticPaths() {
+  return [
+    { params: { slug: 'daily' } },
+    { params: { slug: 'music' } },
+    { params: { slug: 'books' } },
+    { params: { slug: 'ecommerce' } },
+    { params: { slug: 'pokemon' } },
+  ];
+}
+
+const { slug } = Astro.params;
+
+const categoryInfo: Record<string, { name: string; icon: string; description: string }> = {
+  daily: { name: '日常生活', icon: '🏠', description: '记录生活的点滴' },
+  music: { name: '音乐分析', icon: '🎵', description: '分享音乐心得' },
+  books: { name: '读书鉴赏', icon: '📚', description: '读书笔记与感悟' },
+  ecommerce: { name: '电商运营', icon: '🛒', description: '电商运营知识与实践' },
+  pokemon: { name: '宝可梦', icon: '⚡', description: '宝可梦相关内容' },
+};
+
+const info = categoryInfo[slug] || { name: '未知', icon: '📁', description: '' };
+
+// Sample posts - in real app these would come from content collections
+const posts = [
+  { title: '欢迎来到我的博客', date: '2026-06-24', excerpt: '这是第一篇文章...' },
+];
+---
+
+<Layout title={`${info.name} | 我的博客`}>
+  <div class="p-8">
+    <div class="mb-8">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="text-4xl">{info.icon}</span>
+        <h1 class="text-3xl font-bold text-gray-900">{info.name}</h1>
+      </div>
+      <p class="text-gray-600">{info.description}</p>
+    </div>
+
+    <div class="space-y-4">
+      {posts.length > 0 ? (
+        posts.map((post) => (
+          <article class="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-shadow">
+            <div class="text-sm text-gray-500 mb-2">{post.date}</div>
+            <h2 class="text-xl font-bold text-gray-900 mb-2">
+              <a href="#" class="hover:text-indigo-600 transition-colors">{post.title}</a>
+            </h2>
+            <p class="text-gray-600">{post.excerpt}</p>
+          </article>
+        ))
+      ) : (
+        <div class="bg-white rounded-xl border border-gray-200 p-12 text-center">
+          <p class="text-gray-500">暂无文章</p>
+          <p class="text-gray-400 text-sm mt-2">敬请期待...</p>
+        </div>
+      )}
+    </div>
+  </div>
+</Layout>
