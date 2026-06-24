@@ -74,7 +74,7 @@ const latestPosts = posts.slice(0, 3);
             <div class="flex items-start gap-6">
               {post.data.cover ? (
                 <div class="hidden md:flex w-20 h-20 rounded-xl overflow-hidden border-2 border-dashed border-[#c4a882] flex-shrink-0">
-                  <img src={post.data.cover} alt="" class="w-full h-full" style="object-fit: contain;" />
+                  <img src={post.data.cover} alt="" class="w-full h-full" />
                 </div>
               ) : (
                 <div class={`hidden md:flex w-12 h-12 rounded-xl items-center justify-center text-2xl border-2 border-dashed border-[#c4a882]`}>
