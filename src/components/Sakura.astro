@@ -1,0 +1,71 @@
+---
+// Sakura animation - 樱花飘落动画（亮色模式）
+---
+
+<div id="sakura-container" class="fixed inset-0 w-full h-full pointer-events-none z-10 overflow-hidden">
+  <style>
+    @keyframes sakuraFall {
+      0% { transform: translate(0, -10vh) rotate(0deg); opacity: 0; }
+      10% { opacity: 1; }
+      80% { opacity: 1; }
+      100% { transform: translate(15vw, 110vh) rotate(360deg); opacity: 0; }
+    }
+    .sakura-petal {
+      position: absolute;
+      top: 0;
+      background: linear-gradient(135deg, rgba(255, 182, 193, 0.8), rgba(255, 192, 203, 0.6));
+      border-radius: 100% 0 100% 0;
+      box-shadow: 0 0 5px rgba(255, 182, 193, 0.6);
+    }
+  </style>
+</div>
+
+<script>
+  interface Petal {
+    id: number;
+    left: string;
+    size: number;
+    duration: number;
+    delay: number;
+  }
+
+  function createSakura() {
+    const container = document.getElementById('sakura-container');
+    if (!container) return;
+
+    const petals: Petal[] = Array.from({ length: 25 }).map((_, i) => ({
+      id: i,
+      left: `${Math.random() * 100}%`,
+      size: 8 + Math.random() * 12,
+      duration: 6 + Math.random() * 8,
+      delay: Math.random() * -15,
+    }));
+
+    petals.forEach(p => {
+      const petal = document.createElement('div');
+      petal.className = 'sakura-petal';
+      petal.style.cssText = `
+        left: ${p.left};
+        width: ${p.size}px;
+        height: ${p.size * 1.2}px;
+        animation: sakuraFall ${p.duration}s linear infinite;
+        animation-delay: ${p.delay}s;
+      `;
+      container.appendChild(petal);
+    });
+  }
+
+  function updateSakuraVisibility() {
+    const container = document.getElementById('sakura-container');
+    if (container) {
+      const isDark = document.documentElement.classList.contains('dark');
+      container.style.display = isDark ? 'none' : 'block';
+    }
+  }
+
+  createSakura();
+  updateSakuraVisibility();
+
+  const observer = new MutationObserver(updateSakuraVisibility);
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+</script>

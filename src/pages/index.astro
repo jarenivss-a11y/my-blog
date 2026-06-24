@@ -35,28 +35,26 @@ const categoryCounts = categories.map(cat => ({
 <Layout title="首页 | 我的博客">
   <!-- Hero -->
   <section class="mb-16">
-    <h1 class="text-3xl font-serif font-semibold text-gray-900 mb-3 tracking-tight">
+    <h1 class="text-4xl font-serif font-black text-slate-900 dark:text-white mb-4 tracking-tight">
       你好，欢迎来访
     </h1>
-    <p class="text-gray-500 text-lg">
+    <p class="text-lg text-slate-500 dark:text-slate-400">
       在这里记录生活的点滴，分享关于音乐、读书、电商运营和宝可梦的思考
     </p>
   </section>
 
   <!-- Categories -->
   <section class="mb-16">
-    <h2 class="text-xs font-medium text-gray-400 uppercase tracking-widest mb-6">探索分类</h2>
-    <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+    <h2 class="text-xs font-medium text-slate-400 uppercase tracking-widest mb-6">探索分类</h2>
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
       {categoryCounts.map((cat) => (
         <a
           href={`${BASE}/category/${cat.slug}`}
-          class="flex flex-col items-center gap-2 p-4 rounded-xl border border-gray-200 hover:border-gray-400 hover:bg-gray-50 transition-all duration-200 text-center"
+          class="group relative p-6 rounded-2xl backdrop-blur-xl bg-white/70 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50 shadow-sm hover:shadow-lg hover:border-primary/30 dark:hover:border-primary/50 transition-all duration-300"
         >
-          <span class="text-2xl">{cat.icon}</span>
-          <div>
-            <div class="font-medium text-gray-800 text-sm">{cat.name}</div>
-            <div class="text-xs text-gray-400">{cat.count} 篇</div>
-          </div>
+          <span class="text-3xl mb-3 block">{cat.icon}</span>
+          <div class="font-medium text-slate-800 dark:text-slate-100 text-sm group-hover:text-primary transition-colors">{cat.name}</div>
+          <div class="text-xs text-slate-400 dark:text-slate-500 mt-1">{cat.count} 篇</div>
         </a>
       ))}
     </div>
@@ -64,27 +62,32 @@ const categoryCounts = categories.map(cat => ({
 
   <!-- Latest Posts -->
   <section>
-    <h2 class="text-xs font-medium text-gray-400 uppercase tracking-widest mb-6">最新文章</h2>
+    <h2 class="text-xs font-medium text-slate-400 uppercase tracking-widest mb-6">最新文章</h2>
     <div class="space-y-4">
       {posts.length > 0 ? (
         posts.map((post) => (
           <article class="group">
-            <a href={`${BASE}/post/${post.id}`} class="block p-5 -mx-5 rounded-xl hover:bg-gray-50 transition-all duration-200">
-              <div class="flex items-center gap-3 mb-2">
-                <span class="text-xs text-gray-400">{post.data.published.toLocaleDateString('zh-CN')}</span>
-                <span class="px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded">
+            <a
+              href={`${BASE}/post/${post.id}`}
+              class="block p-6 rounded-2xl backdrop-blur-xl bg-white/70 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50 hover:bg-white dark:hover:bg-slate-800 hover:border-primary/30 dark:hover:border-primary/50 hover:shadow-lg transition-all duration-300"
+            >
+              <div class="flex items-center gap-3 mb-3">
+                <span class="text-xs text-slate-400">{post.data.published.toLocaleDateString('zh-CN')}</span>
+                <span class="px-2 py-0.5 text-xs bg-primary/10 text-primary dark:bg-primary/20 rounded-full">
                   {categoryInfo[post.data.category]?.name || '未知'}
                 </span>
               </div>
-              <h3 class="text-lg font-medium text-gray-900 group-hover:text-gray-600 transition-colors mb-2">
+              <h3 class="text-lg font-serif font-semibold text-slate-900 dark:text-white group-hover:text-primary transition-colors mb-2">
                 {post.data.title}
               </h3>
-              <p class="text-sm text-gray-500 line-clamp-2">{post.body.slice(0, 120)}...</p>
+              <p class="text-sm text-slate-500 dark:text-slate-400 line-clamp-2">{post.body.slice(0, 120)}...</p>
             </a>
           </article>
         ))
       ) : (
-        <p class="text-gray-500 text-center py-12">暂无文章</p>
+        <div class="text-center py-16">
+          <p class="text-slate-400 dark:text-slate-500">暂无文章</p>
+        </div>
       )}
     </div>
   </section>

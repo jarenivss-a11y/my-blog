@@ -1,0 +1,114 @@
+---
+// Fireflies animation - 萤火虫动画（暗色模式）
+---
+
+<div id="fireflies-container" class="fixed inset-0 w-full h-full pointer-events-none z-10 overflow-hidden mix-blend-screen" style="display: none;">
+</div>
+
+<script>
+  interface Firefly {
+    id: number;
+    top: string;
+    left: string;
+    size: number;
+    breatheDuration: number;
+    breatheDelay: number;
+    floatDuration: number;
+    floatDelay: number;
+    floatPath: string;
+  }
+
+  function createFireflies() {
+    const container = document.getElementById('fireflies-container');
+    if (!container) return;
+
+    const flies: Firefly[] = Array.from({ length: 30 }).map((_, i) => ({
+      id: i,
+      top: `${Math.random() * 100}%`,
+      left: `${Math.random() * 100}%`,
+      size: 3 + Math.random() * 4,
+      breatheDuration: 3 + Math.random() * 5,
+      breatheDelay: Math.random() * -10,
+      floatDuration: 15 + Math.random() * 20,
+      floatDelay: Math.random() * -20,
+      floatPath: `float${Math.floor(Math.random() * 4) + 1}`,
+    }));
+
+    const styleEl = document.createElement('style');
+    styleEl.textContent = `
+      @keyframes fireflyBreathe {
+        0%, 100% { opacity: 0; transform: scale(0.3); }
+        50% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 10px 3px rgba(100, 255, 150, 0.8), 0 0 20px 6px rgba(50, 255, 100, 0.4); }
+      }
+      @keyframes float1 {
+        0%, 100% { transform: translate(0, 0); }
+        33% { transform: translate(10vw, -15vh); }
+        66% { transform: translate(-5vw, -20vh); }
+      }
+      @keyframes float2 {
+        0%, 100% { transform: translate(0, 0); }
+        33% { transform: translate(-12vw, 10vh); }
+        66% { transform: translate(8vw, 15vh); }
+      }
+      @keyframes float3 {
+        0%, 100% { transform: translate(0, 0); }
+        33% { transform: translate(15vw, 15vh); }
+        66% { transform: translate(-10vw, 5vh); }
+      }
+      @keyframes float4 {
+        0%, 100% { transform: translate(0, 0); }
+        33% { transform: translate(-15vw, -10vh); }
+        66% { transform: translate(10vw, -15vh); }
+      }
+      .firefly {
+        position: absolute;
+        animation-duration: inherit;
+      }
+      .firefly-glow {
+        width: 4px;
+        height: 4px;
+        background-color: rgba(200, 255, 200, 0.9);
+        border-radius: 50%;
+        animation: fireflyBreathe 4s ease-in-out infinite;
+      }
+    `;
+    container.appendChild(styleEl);
+
+    flies.forEach(fly => {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'firefly';
+      wrapper.style.cssText = `
+        top: ${fly.top};
+        left: ${fly.left};
+        animation: ${fly.floatPath} ${fly.floatDuration}s ease-in-out infinite;
+        animation-delay: ${fly.floatDelay}s;
+      `;
+
+      const glow = document.createElement('div');
+      glow.className = 'firefly-glow';
+      glow.style.cssText = `
+        width: ${fly.size}px;
+        height: ${fly.size}px;
+        animation: fireflyBreathe ${fly.breatheDuration}s ease-in-out infinite;
+        animation-delay: ${fly.breatheDelay}s;
+      `;
+
+      wrapper.appendChild(glow);
+      container.appendChild(wrapper);
+    });
+  }
+
+  function updateFirefliesVisibility() {
+    const container = document.getElementById('fireflies-container');
+    if (container) {
+      const isDark = document.documentElement.classList.contains('dark');
+      container.style.display = isDark ? 'block' : 'none';
+    }
+  }
+
+  createFireflies();
+  updateFirefliesVisibility();
+
+  const observer = new MutationObserver(updateFirefliesVisibility);
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+</script>

@@ -27,25 +27,25 @@ const category = categoryInfo[post.data.category] || { name: '未知', icon: '�
 ---
 
 <Layout title={`${post.data.title} | 我的博客`}>
-  <article>
+  <article class="max-w-3xl mx-auto">
     <!-- Header -->
-    <header class="mb-12 pb-8 border-b border-gray-200">
+    <header class="mb-12 p-8 rounded-3xl backdrop-blur-xl bg-white/70 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50">
       <a
         href={`${BASE}/category/${post.data.category}`}
-        class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 transition-colors mb-6"
+        class="inline-flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors mb-6"
       >
         <span>{category.icon}</span>
         <span>{category.name}</span>
       </a>
-      <h1 class="text-3xl font-serif font-semibold text-gray-900 mb-4 leading-tight">
+      <h1 class="text-3xl font-serif font-black text-slate-900 dark:text-white mb-6 leading-tight">
         {post.data.title}
       </h1>
-      <div class="flex items-center gap-4 text-sm text-gray-400">
+      <div class="flex items-center gap-4 text-sm text-slate-400 dark:text-slate-500">
         <span>{post.data.published.toLocaleDateString('zh-CN')}</span>
         {post.data.tags && (
           <div class="flex gap-2">
             {post.data.tags.map((tag) => (
-              <span class="px-2 py-0.5 text-xs bg-gray-100 text-gray-500 rounded">
+              <span class="px-2 py-0.5 text-xs bg-primary/10 text-primary dark:bg-primary/20 rounded-full">
                 {tag}
               </span>
             ))}
@@ -55,15 +55,15 @@ const category = categoryInfo[post.data.category] || { name: '未知', icon: '�
     </header>
 
     <!-- Content -->
-    <div class="prose prose-lg max-w-none prose-gray prose-headings:font-serif prose-headings:text-gray-900 prose-p:text-gray-600 prose-li:text-gray-600 prose-a:text-gray-900 prose-strong:text-gray-900">
+    <div class="p-8 rounded-3xl backdrop-blur-xl bg-white/70 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50 prose prose-lg max-w-none prose-slate dark:prose-invert prose-headings:font-serif prose-headings:text-slate-900 dark:prose-headings:text-white prose-p:text-slate-600 dark:prose-p:text-slate-300 prose-li:text-slate-600 dark:prose-li:text-slate-300 prose-a:text-primary prose-strong:text-slate-900 dark:prose-strong:text-white">
       <Content />
     </div>
 
     <!-- Footer -->
-    <footer class="mt-16 pt-8 border-t border-gray-200">
+    <footer class="mt-8 p-6 rounded-2xl backdrop-blur-xl bg-white/50 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50 text-center">
       <a
         href={`${BASE}/category/${post.data.category}`}
-        class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 transition-colors"
+        class="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-primary transition-colors"
       >
         ← 返回{category.name}
       </a>
@@ -71,38 +71,38 @@ const category = categoryInfo[post.data.category] || { name: '未知', icon: '�
   </article>
 </Layout>
 
-<style>
+<style is:global>
   .prose h2 {
-    @apply text-xl font-semibold text-gray-900 mt-12 mb-4;
+    @apply text-xl font-bold text-slate-900 dark:text-white mt-12 mb-4;
   }
   .prose h3 {
-    @apply text-lg font-semibold text-gray-900 mt-8 mb-3;
+    @apply text-lg font-bold text-slate-900 dark:text-white mt-8 mb-3;
   }
   .prose p {
-    @apply text-gray-600 leading-relaxed mb-6;
+    @apply text-slate-600 dark:text-slate-300 leading-relaxed mb-6;
   }
   .prose ul, .prose ol {
-    @apply text-gray-600 mb-6 pl-6;
+    @apply text-slate-600 dark:text-slate-300 mb-6 pl-6;
   }
   .prose li {
     @apply mb-2;
   }
   .prose strong {
-    @apply font-semibold text-gray-900;
+    @apply font-semibold text-slate-900 dark:text-white;
   }
   .prose a {
-    @apply text-gray-900 underline decoration-gray-300 hover:decoration-gray-900 transition-colors;
+    @apply text-primary underline decoration-primary/30 hover:decoration-primary transition-colors;
   }
   .prose blockquote {
-    @apply border-l-4 border-gray-300 pl-4 italic text-gray-500 my-8;
+    @apply border-l-4 border-primary/50 pl-4 italic text-slate-500 dark:text-slate-400 my-8;
   }
   .prose code {
-    @apply bg-gray-100 px-1.5 py-0.5 rounded text-sm text-gray-800;
+    @apply bg-primary/10 px-1.5 py-0.5 rounded text-sm text-primary dark:bg-primary/20;
   }
   .prose pre {
-    @apply bg-gray-900 text-gray-100 p-4 rounded-xl overflow-x-auto my-8;
+    @apply bg-slate-900 dark:bg-slate-950 text-slate-100 p-4 rounded-xl overflow-x-auto my-8;
   }
   .prose pre code {
-    @apply bg-transparent p-0 text-gray-100;
+    @apply bg-transparent p-0 text-slate-100;
   }
 </style>

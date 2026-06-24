@@ -1,4 +1,8 @@
 ---
+import Fireflies from '../components/Fireflies.astro';
+import Sakura from '../components/Sakura.astro';
+import ThemeToggle from '../components/ThemeToggle.astro';
+
 interface Props {
   title: string;
   description?: string;
@@ -29,55 +33,59 @@ const currentPath = Astro.url.pathname;
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600&display=swap" rel="stylesheet">
   </head>
-  <body class="bg-white text-gray-800 min-h-screen font-sans antialiased">
-    <div class="max-w-5xl mx-auto px-6 py-12">
-      <!-- Header -->
-      <header class="mb-16 pb-8 border-b border-gray-200">
-        <a href={BASE} class="block group">
-          <h1 class="text-4xl font-serif font-semibold text-gray-900 group-hover:text-gray-600 transition-colors tracking-tight">
-            我的博客
-          </h1>
-          <p class="text-sm text-gray-500 mt-2 tracking-wide">记录生活，分享思考</p>
+  <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen font-sans antialiased transition-colors duration-500">
+    <!-- Background Effects -->
+    <Sakura />
+    <Fireflies />
+
+    <!-- Navigation -->
+    <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 border-b border-white/20 dark:border-white/10 backdrop-blur-xl bg-white/60 dark:bg-slate-900/60 shadow-sm">
+      <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+        <a href={BASE} class="text-xl font-black text-slate-800 dark:text-white tracking-tighter hover:text-primary transition-colors">
+          我的博客
+          <span class="text-primary mx-1">の</span>
+          <span class="text-slate-400 dark:text-slate-500 font-normal text-sm">宝藏之地</span>
         </a>
-      </header>
 
-      <!-- Main Layout -->
-      <div class="flex gap-16">
-        <!-- Sidebar Navigation -->
-        <aside class="flex-shrink-0">
-          <nav>
-            <ul class="space-y-2">
-              {categories.map((cat) => (
-                <li>
-                  <a
-                    href={`${BASE}/category/${cat.slug}`}
-                    class={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 text-sm font-medium ${
-                      currentPath.includes(cat.slug)
-                        ? 'bg-gray-900 text-white'
-                        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-                    }`}
-                  >
-                    <span>{cat.icon}</span>
-                    <span>{cat.name}</span>
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </aside>
+        <nav class="hidden md:flex items-center gap-8">
+          {categories.map((cat) => (
+            <a
+              href={`${BASE}/category/${cat.slug}`}
+              class={`relative py-1 text-sm font-medium transition-colors ${
+                currentPath.includes(cat.slug)
+                  ? 'text-primary dark:text-primary'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary'
+              }`}
+            >
+              {cat.name}
+              {currentPath.includes(cat.slug) && (
+                <span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-primary rounded-full animate-pulse"></span>
+              )}
+            </a>
+          ))}
+        </nav>
 
-        <!-- Main Content -->
-        <main class="flex-1 min-w-0">
+        <div class="flex items-center gap-4">
+          <ThemeToggle />
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="pt-24 pb-20">
+      <div class="max-w-6xl mx-auto px-6">
+        <main>
           <slot />
         </main>
       </div>
-
-      <!-- Footer -->
-      <footer class="mt-20 pt-8 border-t border-gray-200 text-center">
-        <p class="text-sm text-gray-400">© 2026 我的博客</p>
-      </footer>
     </div>
 
+    <!-- Footer -->
+    <footer class="py-8 border-t border-slate-200/50 dark:border-slate-800/50 text-center">
+      <p class="text-sm text-slate-400 dark:text-slate-500">© 2026 我的博客 · 用心记录每一天</p>
+    </footer>
+
+    <!-- Scrollbar Styles -->
     <style is:global>
       * {
         font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -89,8 +97,22 @@ const currentPath = Astro.url.pathname;
         text-decoration: none;
       }
       ::selection {
-        background: #f3f4f6;
-        color: #111827;
+        background: rgba(99, 102, 241, 0.2);
+        color: inherit;
+      }
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(99, 102, 241, 0.3);
+        border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(99, 102, 241, 0.6);
       }
     </style>
   </body>

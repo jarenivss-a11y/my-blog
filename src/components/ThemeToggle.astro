@@ -1,0 +1,36 @@
+---
+// Theme Toggle - 暗色/亮色模式切换
+---
+
+<button id="theme-toggle" class="relative w-14 h-7 rounded-full bg-slate-200 dark:bg-slate-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary/50">
+  <span id="toggle-indicator" class="absolute top-1 left-1 w-5 h-5 rounded-full bg-white shadow-md transform transition-transform duration-300 dark:translate-x-7">
+  </span>
+  <span class="sr-only">切换主题</span>
+</button>
+
+<script>
+  function initThemeToggle() {
+    const toggle = document.getElementById('theme-toggle');
+    const indicator = document.getElementById('toggle-indicator');
+
+    if (!toggle || !indicator) return;
+
+    // Check for saved theme preference or system preference
+    const savedTheme = localStorage.getItem('theme');
+    const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const isDark = savedTheme === 'dark' || (!savedTheme && systemDark);
+
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+
+    toggle.addEventListener('click', () => {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    });
+  }
+
+  initThemeToggle();
+</script>
