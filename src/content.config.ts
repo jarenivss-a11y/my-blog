@@ -9,6 +9,7 @@ const blog = defineCollection({
     category: z.enum(['daily', 'music', 'books', 'ecommerce', 'pokemon']),
     tags: z.array(z.string()).optional(),
     draft: z.boolean().optional().default(false),
+    cover: z.string().optional(),
   }),
 });
 
