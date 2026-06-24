@@ -25,49 +25,71 @@ const currentPath = Astro.url.pathname;
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   </head>
-  <body class="bg-gray-50 text-gray-800 min-h-screen">
-    <div class="flex">
+  <body class="bg-gradient-to-br from-slate-50 via-white to-indigo-50 text-slate-800 min-h-screen font-sans">
+    <div class="flex min-h-screen">
       <!-- Sidebar -->
-      <aside class="fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 p-6 overflow-y-auto">
-        <div class="mb-8">
-          <a href={BASE} class="text-2xl font-bold text-gray-900 hover:text-indigo-600 transition-colors">
-            我的博客
+      <aside class="fixed left-0 top-0 h-full w-72 bg-white/80 backdrop-blur-xl border-r border-slate-200/50 p-8 flex flex-col">
+        <!-- Logo -->
+        <div class="mb-12">
+          <a href={BASE} class="block group">
+            <h1 class="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent group-hover:from-violet-600 group-hover:to-indigo-600 transition-all duration-300">
+              我的博客
+            </h1>
+            <p class="text-sm text-slate-500 mt-1 font-light">记录生活，分享思考</p>
           </a>
-          <p class="text-sm text-gray-500 mt-1">记录生活点滴</p>
         </div>
 
-        <nav>
+        <!-- Navigation -->
+        <nav class="flex-1">
           <ul class="space-y-2">
             {categories.map((cat) => (
               <li>
                 <a
                   href={`${BASE}/category/${cat.slug}`}
-                  class={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                  class={`flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 ${
                     currentPath.includes(cat.slug)
-                      ? 'bg-indigo-50 text-indigo-600 font-medium'
-                      : 'text-gray-600 hover:bg-gray-100'
+                      ? 'bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/25'
+                      : 'text-slate-600 hover:bg-slate-100 hover:text-indigo-600'
                   }`}
                 >
                   <span class="text-xl">{cat.icon}</span>
-                  <span>{cat.name}</span>
+                  <span class="font-medium">{cat.name}</span>
                 </a>
               </li>
             ))}
           </ul>
         </nav>
 
-        <div class="mt-8 pt-8 border-t border-gray-200">
-          <a href={`${BASE}/about`} class="text-gray-500 hover:text-indigo-600 transition-colors text-sm">
-            关于我
+        <!-- About -->
+        <div class="pt-8 border-t border-slate-200/50">
+          <a href={`${BASE}/about`} class="flex items-center gap-3 text-slate-500 hover:text-indigo-600 transition-colors">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-400 to-violet-500 flex items-center justify-center text-white font-medium">
+              M
+            </div>
+            <div>
+              <p class="text-sm font-medium">关于我</p>
+              <p class="text-xs text-slate-400">了解更多信息</p>
+            </div>
           </a>
         </div>
       </aside>
 
       <!-- Main Content -->
-      <main class="ml-64 flex-1 min-h-screen">
-        <slot />
+      <main class="ml-72 flex-1 p-12">
+        <div class="max-w-4xl mx-auto">
+          <slot />
+        </div>
       </main>
     </div>
+
+    <style is:global>
+      * {
+        font-family: 'Noto Sans SC', 'Space Grotesk', sans-serif;
+      }
+    </style>
   </body>
 </html>

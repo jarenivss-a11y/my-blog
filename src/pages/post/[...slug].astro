@@ -15,67 +15,89 @@ export async function getStaticPaths() {
 const { post } = Astro.props;
 const { Content } = await render(post);
 
-const categoryInfo: Record<string, { name: string; icon: string }> = {
-  daily: { name: '日常生活', icon: '🏠' },
-  music: { name: '音乐分析', icon: '🎵' },
-  books: { name: '读书鉴赏', icon: '📚' },
-  ecommerce: { name: '电商运营', icon: '🛒' },
-  pokemon: { name: '宝可梦', icon: '⚡' },
+const categoryInfo: Record<string, { name: string; icon: string; color: string }> = {
+  daily: { name: '日常生活', icon: '🏠', color: 'from-rose-500 to-pink-500' },
+  music: { name: '音乐分析', icon: '🎵', color: 'from-violet-500 to-purple-500' },
+  books: { name: '读书鉴赏', icon: '📚', color: 'from-amber-500 to-orange-500' },
+  ecommerce: { name: '电商运营', icon: '🛒', color: 'from-emerald-500 to-teal-500' },
+  pokemon: { name: '宝可梦', icon: '⚡', color: 'from-blue-500 to-cyan-500' },
 };
 
-const category = categoryInfo[post.data.category] || { name: '未知', icon: '📁' };
+const category = categoryInfo[post.data.category] || { name: '未知', icon: '📁', color: 'from-slate-500 to-gray-500' };
 ---
 
 <Layout title={`${post.data.title} | 我的博客`}>
-  <div class="p-8 max-w-3xl">
-    <article class="bg-white rounded-xl border border-gray-200 p-8">
-      <header class="mb-8 pb-8 border-b border-gray-200">
-        <div class="flex items-center gap-3 text-sm text-gray-500 mb-4">
-          <span class="bg-gray-100 px-2 py-1 rounded flex items-center gap-1">
-            <span>{category.icon}</span>
-            <span>{category.name}</span>
-          </span>
+  <article class="bg-white rounded-3xl border border-slate-200/50 overflow-hidden">
+    <!-- Header -->
+    <header class="relative px-10 py-12 border-b border-slate-100">
+      <div class="absolute top-0 left-0 right-0 h-32 bg-gradient-to-br from-indigo-500 via-violet-500 to-purple-500"></div>
+      <div class="relative">
+        <a href={`${BASE}/category/${post.data.category}`} class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 text-sm text-slate-600 hover:bg-white transition-colors mb-6">
+          <span>{category.icon}</span>
+          <span>{category.name}</span>
+        </a>
+        <h1 class="text-4xl font-bold text-slate-800 mb-4 leading-tight">{post.data.title}</h1>
+        <div class="flex items-center gap-4 text-sm text-slate-500">
           <span>{post.data.published.toLocaleDateString('zh-CN')}</span>
+          {post.data.tags && (
+            <div class="flex gap-2">
+              {post.data.tags.map((tag) => (
+                <span class="px-2 py-1 rounded-md bg-slate-100 text-slate-600">{tag}</span>
+              ))}
+            </div>
+          )}
         </div>
-        <h1 class="text-3xl font-bold text-gray-900">{post.data.title}</h1>
-        {post.data.tags && (
-          <div class="flex gap-2 mt-4">
-            {post.data.tags.map((tag) => (
-              <span class="bg-indigo-50 text-indigo-600 px-2 py-1 rounded text-sm">
-                {tag}
-              </span>
-            ))}
-          </div>
-        )}
-      </header>
+      </div>
+    </header>
 
-      <div class="prose prose-gray max-w-none">
+    <!-- Content -->
+    <div class="px-10 py-10">
+      <div class="prose prose-lg max-w-none prose-slate prose-headings:font-bold prose-headings:text-slate-800 prose-p:text-slate-600 prose-li:text-slate-600 prose-a:text-indigo-600 prose-strong:text-slate-800">
         <Content />
       </div>
+    </div>
 
-      <footer class="mt-12 pt-8 border-t border-gray-200">
-        <a href={`${BASE}/category/${post.data.category}`} class="text-indigo-600 hover:underline">
-          ← 返回{category.name}
-        </a>
-      </footer>
-    </article>
-  </div>
+    <!-- Footer -->
+    <footer class="px-10 py-6 border-t border-slate-100 bg-slate-50/50">
+      <a href={`${BASE}/category/${post.data.category}`} class="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-700 font-medium">
+        ← 返回{category.name}
+      </a>
+    </footer>
+  </article>
 </Layout>
 
 <style>
   .prose h2 {
-    @apply text-xl font-bold text-gray-900 mt-8 mb-4;
+    @apply text-2xl font-bold text-slate-800 mt-10 mb-4;
+  }
+  .prose h3 {
+    @apply text-xl font-bold text-slate-800 mt-8 mb-3;
   }
   .prose p {
-    @apply text-gray-700 leading-relaxed mb-4;
+    @apply text-slate-600 leading-relaxed mb-4;
   }
-  .prose ul {
-    @apply list-disc list-inside text-gray-700 mb-4 space-y-1;
+  .prose ul, .prose ol {
+    @apply text-slate-600 mb-4 pl-6;
   }
-  .prose ol {
-    @apply list-decimal list-inside text-gray-700 mb-4 space-y-1;
+  .prose li {
+    @apply mb-2;
   }
   .prose strong {
-    @apply font-bold text-gray-900;
+    @apply font-bold text-slate-800;
+  }
+  .prose a {
+    @apply text-indigo-600 hover:underline;
+  }
+  .prose blockquote {
+    @apply border-l-4 border-indigo-500 pl-4 italic text-slate-500 my-6;
+  }
+  .prose code {
+    @apply bg-slate-100 px-1 py-0.5 rounded text-sm text-indigo-600;
+  }
+  .prose pre {
+    @apply bg-slate-800 text-slate-100 p-4 rounded-xl overflow-x-auto my-6;
+  }
+  .prose pre code {
+    @apply bg-transparent p-0 text-slate-100;
   }
 </style>
