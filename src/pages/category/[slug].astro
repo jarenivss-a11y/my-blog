@@ -16,68 +16,60 @@ export function getStaticPaths() {
 
 const { slug } = Astro.params;
 
-const categoryInfo: Record<string, { name: string; icon: string; description: string; color: string }> = {
-  daily: { name: '日常生活', icon: '🏠', description: '记录生活的点滴', color: 'from-rose-500 to-pink-500' },
-  music: { name: '音乐分析', icon: '🎵', description: '分享音乐心得', color: 'from-violet-500 to-purple-500' },
-  books: { name: '读书鉴赏', icon: '📚', description: '读书笔记与感悟', color: 'from-amber-500 to-orange-500' },
-  ecommerce: { name: '电商运营', icon: '🛒', description: '电商运营知识与实践', color: 'from-emerald-500 to-teal-500' },
-  pokemon: { name: '宝可梦', icon: '⚡', description: '宝可梦相关内容', color: 'from-blue-500 to-cyan-500' },
+const categoryInfo: Record<string, { name: string; icon: string; description: string }> = {
+  daily: { name: '日常生活', icon: '🏠', description: '记录生活的点滴' },
+  music: { name: '音乐分析', icon: '🎵', description: '分享音乐心得' },
+  books: { name: '读书鉴赏', icon: '📚', description: '读书笔记与感悟' },
+  ecommerce: { name: '电商运营', icon: '🛒', description: '电商运营知识与实践' },
+  pokemon: { name: '宝可梦', icon: '⚡', description: '宝可梦相关内容' },
 };
 
-const info = categoryInfo[slug as string] || { name: '未知', icon: '📁', description: '', color: 'from-slate-500 to-gray-500' };
+const info = categoryInfo[slug as string] || { name: '未知', icon: '📁', description: '' };
 const allPosts = await getCollection('blog');
 const posts = allPosts.filter(post => post.data.category === slug).sort((a, b) => b.data.published.getTime() - a.data.published.getTime());
 ---
 
 <Layout title={`${info.name} | 我的博客`}>
   <!-- Header -->
-  <div class="mb-12 text-center py-8">
-    <div class={`inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-[#fff9f0] text-4xl mb-6 shadow-lg border-2 border-dashed border-[#c4a882]`}>
-      {info.icon}
+  <header class="mb-12">
+    <div class="flex items-center gap-4 mb-4">
+      <span class="text-4xl">{info.icon}</span>
+      <h1 class="text-3xl font-serif font-semibold text-gray-900">{info.name}</h1>
     </div>
-    <h1 class="text-4xl font-bold text-[#5c4a3a] mb-3">{info.name}</h1>
-    <p class="text-lg text-[#8b7355]">{info.description}</p>
-    <div class="mt-4 text-sm text-[#a08060]">{posts.length} 篇文章</div>
-  </div>
+    <p class="text-gray-500">{info.description}</p>
+    <p class="text-sm text-gray-400 mt-2">{posts.length} 篇文章</p>
+  </header>
 
   <!-- Posts -->
-  <div class="grid gap-6">
+  <div class="space-y-1">
     {posts.length > 0 ? (
       posts.map((post) => (
-        <article class="group bg-[#fff9f0] rounded-2xl border-2 border-dashed border-[#c4a882] p-8 hover:border-[#8b6b4a] hover:shadow-lg transition-all duration-300">
-          <div class="flex items-start justify-between gap-4">
-            {post.data.cover && (
-              <div class="flex-shrink-0 w-24 h-24 rounded-xl overflow-hidden border border-[#c4a882]">
-                <img src={post.data.cover} alt="" class="w-full h-full" />
+        <article class="group">
+          <a href={`${BASE}/post/${post.id}`} class="block py-5 border-b border-gray-100 hover:border-gray-300 transition-all duration-200">
+            <div class="flex items-baseline justify-between gap-4 mb-2">
+              <h2 class="text-lg font-medium text-gray-900 group-hover:text-gray-600 transition-colors">
+                {post.data.title}
+              </h2>
+              <span class="text-sm text-gray-400 flex-shrink-0">
+                {post.data.published.toLocaleDateString('zh-CN')}
+              </span>
+            </div>
+            <p class="text-sm text-gray-500 line-clamp-2">{post.body.slice(0, 150)}...</p>
+            {post.data.tags && (
+              <div class="flex gap-2 mt-3">
+                {post.data.tags.map((tag) => (
+                  <span class="px-2 py-0.5 text-xs bg-gray-100 text-gray-500 rounded">
+                    {tag}
+                  </span>
+                ))}
               </div>
             )}
-            <div class="flex-1">
-              <div class="text-sm text-[#a08060] mb-3 font-['Caveat']">{post.data.published.toLocaleDateString('zh-CN')}</div>
-              <h2 class="text-2xl font-bold text-[#5c4a3a] mb-3 group-hover:text-[#8b6b4a] transition-colors">
-                <a href={`${BASE}/post/${post.id}`}>{post.data.title}</a>
-              </h2>
-              <p class="text-[#8b7355] line-clamp-3 mb-4">{post.body.slice(0, 200)}...</p>
-              {post.data.tags && (
-                <div class="flex gap-2">
-                  {post.data.tags.map((tag) => (
-                    <span class="px-3 py-1 rounded-full text-xs bg-[#ffe4c4] text-[#8b6b4a] border border-[#c4a882]">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-            <a href={`${BASE}/post/${post.id}`} class="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-xl bg-[#ffe4c4] text-[#8b6b4a] group-hover:bg-[#c4a882] group-hover:text-[#fff9f0] transition-all duration-300 border border-[#c4a882]">
-              →
-            </a>
-          </div>
+          </a>
         </article>
       ))
     ) : (
-      <div class="bg-[#fff9f0] rounded-2xl border-2 border-dashed border-[#c4a882] p-12 text-center">
-        <div class="text-4xl mb-4">{info.icon}</div>
-        <p class="text-[#8b7355] mb-2">暂无文章</p>
-        <p class="text-sm text-[#a08060]">敬请期待...</p>
+      <div class="py-16 text-center">
+        <p class="text-gray-400">{info.icon} 暂无文章</p>
       </div>
     )}
   </div>

@@ -11,11 +11,11 @@ const posts = allPosts
   .slice(0, 10);
 
 const categories = [
-  { name: '日常生活', slug: 'daily', icon: '🏠', color: 'from-rose-400 to-pink-500' },
-  { name: '音乐分析', slug: 'music', icon: '🎵', color: 'from-violet-400 to-purple-500' },
-  { name: '读书鉴赏', slug: 'books', icon: '📚', color: 'from-amber-400 to-orange-500' },
-  { name: '电商运营', slug: 'ecommerce', icon: '🛒', color: 'from-emerald-400 to-teal-500' },
-  { name: '宝可梦', slug: 'pokemon', icon: '⚡', color: 'from-blue-400 to-cyan-500' },
+  { name: '日常生活', slug: 'daily', icon: '🏠' },
+  { name: '音乐分析', slug: 'music', icon: '🎵' },
+  { name: '读书鉴赏', slug: 'books', icon: '📚' },
+  { name: '电商运营', slug: 'ecommerce', icon: '🛒' },
+  { name: '宝可梦', slug: 'pokemon', icon: '⚡' },
 ];
 
 const categoryInfo: Record<string, { name: string }> = {
@@ -30,34 +30,32 @@ const categoryCounts = categories.map(cat => ({
   ...cat,
   count: allPosts.filter(post => post.data.category === cat.slug).length
 }));
-
-const latestPosts = posts.slice(0, 3);
 ---
 
 <Layout title="首页 | 我的博客">
-  <!-- Hero Section -->
-  <section class="mb-16 text-center py-12">
-    <h1 class="text-5xl font-bold mb-4 text-[#5c4a3a]">
+  <!-- Hero -->
+  <section class="mb-16">
+    <h1 class="text-3xl font-serif font-semibold text-gray-900 mb-3 tracking-tight">
       你好，欢迎来访
     </h1>
-    <p class="text-xl text-[#8b7355] max-w-2xl mx-auto font-['Caveat'] text-2xl">
+    <p class="text-gray-500 text-lg">
       在这里记录生活的点滴，分享关于音乐、读书、电商运营和宝可梦的思考
     </p>
   </section>
 
   <!-- Categories -->
   <section class="mb-16">
-    <h2 class="text-sm font-semibold text-[#a08060] uppercase tracking-wider mb-6 font-['Caveat']">探索分类</h2>
-    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+    <h2 class="text-xs font-medium text-gray-400 uppercase tracking-widest mb-6">探索分类</h2>
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
       {categoryCounts.map((cat) => (
         <a
           href={`${BASE}/category/${cat.slug}`}
-          class="group relative overflow-hidden rounded-2xl p-6 bg-[#fff9f0] border-2 border-dashed border-[#c4a882] hover:border-[#8b6b4a] hover:shadow-lg transition-all duration-300"
+          class="flex flex-col items-center gap-2 p-4 rounded-xl border border-gray-200 hover:border-gray-400 hover:bg-gray-50 transition-all duration-200 text-center"
         >
-          <div class="relative text-center">
-            <span class="text-4xl mb-4 block">{cat.icon}</span>
-            <h3 class="font-semibold text-[#5c4a3a] mb-1">{cat.name}</h3>
-            <p class="text-sm text-[#a08060]">{cat.count} 篇文章</p>
+          <span class="text-2xl">{cat.icon}</span>
+          <div>
+            <div class="font-medium text-gray-800 text-sm">{cat.name}</div>
+            <div class="text-xs text-gray-400">{cat.count} 篇</div>
           </div>
         </a>
       ))}
@@ -66,52 +64,27 @@ const latestPosts = posts.slice(0, 3);
 
   <!-- Latest Posts -->
   <section>
-    <h2 class="text-sm font-semibold text-[#a08060] uppercase tracking-wider mb-6 font-['Caveat']">最新文章</h2>
-    <div class="grid gap-6">
+    <h2 class="text-xs font-medium text-gray-400 uppercase tracking-widest mb-6">最新文章</h2>
+    <div class="space-y-4">
       {posts.length > 0 ? (
-        posts.map((post, index) => (
-          <article class="group relative bg-[#fff9f0] rounded-2xl border-2 border-dashed border-[#c4a882] p-8 hover:border-[#8b6b4a] hover:shadow-lg transition-all duration-300">
-            <div class="flex items-start gap-6">
-              {post.data.cover ? (
-                <div class="hidden md:flex w-20 h-20 rounded-xl overflow-hidden border-2 border-dashed border-[#c4a882] flex-shrink-0">
-                  <img src={post.data.cover} alt="" class="w-full h-full" />
-                </div>
-              ) : (
-                <div class={`hidden md:flex w-12 h-12 rounded-xl items-center justify-center text-2xl border-2 border-dashed border-[#c4a882]`}>
-                  {index === 0 ? '🚀' : index === 1 ? '✨' : '📝'}
-                </div>
-              )}
-              <div class="flex-1">
-                <div class="flex items-center gap-3 mb-3">
-                  <span class="px-3 py-1 rounded-full text-xs font-medium bg-[#ffe4c4] text-[#8b6b4a] border border-[#c4a882]">
-                    {categoryInfo[post.data.category]?.name || '未知'}
-                  </span>
-                  <span class="text-sm text-[#a08060]">{post.data.published.toLocaleDateString('zh-CN')}</span>
-                </div>
-                <h3 class="text-xl font-semibold text-[#5c4a3a] mb-2 group-hover:text-[#8b6b4a] transition-colors">
-                  <a href={`${BASE}/post/${post.id}`}>{post.data.title}</a>
-                </h3>
-                <p class="text-[#8b7355] line-clamp-2">{post.body.slice(0, 120)}...</p>
-                {post.data.tags && (
-                  <div class="flex gap-2 mt-4">
-                    {post.data.tags.slice(0, 3).map((tag) => (
-                      <span class="px-2 py-1 rounded-md text-xs bg-[#ffe4c4] text-[#8b6b4a] border border-[#c4a882]">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                )}
+        posts.map((post) => (
+          <article class="group">
+            <a href={`${BASE}/post/${post.id}`} class="block p-5 -mx-5 rounded-xl hover:bg-gray-50 transition-all duration-200">
+              <div class="flex items-center gap-3 mb-2">
+                <span class="text-xs text-gray-400">{post.data.published.toLocaleDateString('zh-CN')}</span>
+                <span class="px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded">
+                  {categoryInfo[post.data.category]?.name || '未知'}
+                </span>
               </div>
-              <a href={`${BASE}/post/${post.id}`} class="hidden group-hover:flex items-center justify-center w-10 h-10 rounded-full bg-[#ffe4c4] text-[#8b6b4a] group-hover:bg-[#c4a882] group-hover:text-[#fff9f0] transition-all duration-300 border border-[#c4a882]">
-                →
-              </a>
-            </div>
+              <h3 class="text-lg font-medium text-gray-900 group-hover:text-gray-600 transition-colors mb-2">
+                {post.data.title}
+              </h3>
+              <p class="text-sm text-gray-500 line-clamp-2">{post.body.slice(0, 120)}...</p>
+            </a>
           </article>
         ))
       ) : (
-        <div class="bg-[#fff9f0] rounded-2xl border-2 border-dashed border-[#c4a882] p-12 text-center">
-          <p class="text-[#8b7355]">暂无文章</p>
-        </div>
+        <p class="text-gray-500 text-center py-12">暂无文章</p>
       )}
     </div>
   </section>

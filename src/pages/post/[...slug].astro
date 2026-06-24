@@ -15,57 +15,56 @@ export async function getStaticPaths() {
 const { post } = Astro.props;
 const { Content } = await render(post);
 
-const categoryInfo: Record<string, { name: string; icon: string; color: string }> = {
-  daily: { name: '日常生活', icon: '🏠', color: 'from-rose-500 to-pink-500' },
-  music: { name: '音乐分析', icon: '🎵', color: 'from-violet-500 to-purple-500' },
-  books: { name: '读书鉴赏', icon: '📚', color: 'from-amber-500 to-orange-500' },
-  ecommerce: { name: '电商运营', icon: '🛒', color: 'from-emerald-500 to-teal-500' },
-  pokemon: { name: '宝可梦', icon: '⚡', color: 'from-blue-500 to-cyan-500' },
+const categoryInfo: Record<string, { name: string; icon: string }> = {
+  daily: { name: '日常生活', icon: '🏠' },
+  music: { name: '音乐分析', icon: '🎵' },
+  books: { name: '读书鉴赏', icon: '📚' },
+  ecommerce: { name: '电商运营', icon: '🛒' },
+  pokemon: { name: '宝可梦', icon: '⚡' },
 };
 
-const category = categoryInfo[post.data.category] || { name: '未知', icon: '📁', color: 'from-slate-500 to-gray-500' };
+const category = categoryInfo[post.data.category] || { name: '未知', icon: '📁' };
 ---
 
 <Layout title={`${post.data.title} | 我的博客`}>
-  <article class="bg-[#fff9f0] rounded-3xl border-2 border-dashed border-[#c4a882] overflow-hidden">
+  <article>
     <!-- Header -->
-    <header class="relative px-10 py-12 border-b-2 border-dashed border-[#c4a882]">
-      {post.data.cover ? (
-        <div class="absolute top-0 left-0 right-0 h-48 overflow-hidden" style="background: #ffe4c4;">
-          <img src={post.data.cover} alt="" class="w-full h-full" />
-        </div>
-      ) : (
-        <div class="absolute top-0 left-0 right-0 h-32 bg-[#ffe4c4]"></div>
-      )}
-      <div class="relative">
-        <a href={`${BASE}/category/${post.data.category}`} class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#fff9f0] text-sm text-[#8b6b4a] hover:bg-white transition-colors mb-6 border border-[#c4a882]">
-          <span>{category.icon}</span>
-          <span>{category.name}</span>
-        </a>
-        <h1 class="text-4xl font-bold text-[#5c4a3a] mb-4 leading-tight">{post.data.title}</h1>
-        <div class="flex items-center gap-4 text-sm text-[#a08060]">
-          <span class="font-['Caveat']">{post.data.published.toLocaleDateString('zh-CN')}</span>
-          {post.data.tags && (
-            <div class="flex gap-2">
-              {post.data.tags.map((tag) => (
-                <span class="px-2 py-1 rounded-md bg-[#ffe4c4] text-[#8b6b4a] border border-[#c4a882]">{tag}</span>
-              ))}
-            </div>
-          )}
-        </div>
+    <header class="mb-12 pb-8 border-b border-gray-200">
+      <a
+        href={`${BASE}/category/${post.data.category}`}
+        class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 transition-colors mb-6"
+      >
+        <span>{category.icon}</span>
+        <span>{category.name}</span>
+      </a>
+      <h1 class="text-3xl font-serif font-semibold text-gray-900 mb-4 leading-tight">
+        {post.data.title}
+      </h1>
+      <div class="flex items-center gap-4 text-sm text-gray-400">
+        <span>{post.data.published.toLocaleDateString('zh-CN')}</span>
+        {post.data.tags && (
+          <div class="flex gap-2">
+            {post.data.tags.map((tag) => (
+              <span class="px-2 py-0.5 text-xs bg-gray-100 text-gray-500 rounded">
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
     </header>
 
     <!-- Content -->
-    <div class="px-10 py-10">
-      <div class="prose prose-lg max-w-none prose-slate prose-headings:font-bold prose-headings:text-[#5c4a3a] prose-p:text-[#8b7355] prose-li:text-[#8b7355] prose-a:text-[#8b6b4a] prose-strong:text-[#5c4a3a]">
-        <Content />
-      </div>
+    <div class="prose prose-lg max-w-none prose-gray prose-headings:font-serif prose-headings:text-gray-900 prose-p:text-gray-600 prose-li:text-gray-600 prose-a:text-gray-900 prose-strong:text-gray-900">
+      <Content />
     </div>
 
     <!-- Footer -->
-    <footer class="px-10 py-6 border-t-2 border-dashed border-[#c4a882] bg-[#faf8f5]">
-      <a href={`${BASE}/category/${post.data.category}`} class="inline-flex items-center gap-2 text-[#8b6b4a] hover:text-[#5c4a3a] font-medium">
+    <footer class="mt-16 pt-8 border-t border-gray-200">
+      <a
+        href={`${BASE}/category/${post.data.category}`}
+        class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 transition-colors"
+      >
         ← 返回{category.name}
       </a>
     </footer>
@@ -74,36 +73,36 @@ const category = categoryInfo[post.data.category] || { name: '未知', icon: '�
 
 <style>
   .prose h2 {
-    @apply text-2xl font-bold text-[#5c4a3a] mt-10 mb-4;
+    @apply text-xl font-semibold text-gray-900 mt-12 mb-4;
   }
   .prose h3 {
-    @apply text-xl font-bold text-[#5c4a3a] mt-8 mb-3;
+    @apply text-lg font-semibold text-gray-900 mt-8 mb-3;
   }
   .prose p {
-    @apply text-[#8b7355] leading-relaxed mb-4;
+    @apply text-gray-600 leading-relaxed mb-6;
   }
   .prose ul, .prose ol {
-    @apply text-[#8b7355] mb-4 pl-6;
+    @apply text-gray-600 mb-6 pl-6;
   }
   .prose li {
     @apply mb-2;
   }
   .prose strong {
-    @apply font-bold text-[#5c4a3a];
+    @apply font-semibold text-gray-900;
   }
   .prose a {
-    @apply text-[#8b6b4a] hover:underline;
+    @apply text-gray-900 underline decoration-gray-300 hover:decoration-gray-900 transition-colors;
   }
   .prose blockquote {
-    @apply border-l-4 border-[#c4a882] pl-4 italic text-[#a08060] my-6;
+    @apply border-l-4 border-gray-300 pl-4 italic text-gray-500 my-8;
   }
   .prose code {
-    @apply bg-[#ffe4c4] px-1 py-0.5 rounded text-sm text-[#8b6b4a];
+    @apply bg-gray-100 px-1.5 py-0.5 rounded text-sm text-gray-800;
   }
   .prose pre {
-    @apply bg-[#5c4a3a] text-[#ffe4c4] p-4 rounded-xl overflow-x-auto my-6;
+    @apply bg-gray-900 text-gray-100 p-4 rounded-xl overflow-x-auto my-8;
   }
   .prose pre code {
-    @apply bg-transparent p-0 text-[#ffe4c4];
+    @apply bg-transparent p-0 text-gray-100;
   }
 </style>
