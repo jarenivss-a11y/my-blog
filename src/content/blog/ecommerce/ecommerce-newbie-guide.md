@@ -3,6 +3,7 @@ title: 电商运营基础（一、新手起店完整的运营流程）
 published: 2024-11-15
 category: ecommerce
 tags: [电商运营, 新手入门, 选品, 流量, 运营流程]
+cover: /covers/ecommerce-ecommerce-newbie-guide.svg
 ---
 
 > 任何东西的学习都要先有广度再有深度

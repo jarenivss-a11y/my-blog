@@ -3,6 +3,7 @@ title: 宝可梦队伍搭配思路
 published: 2026-06-24
 category: pokemon
 tags: [宝可梦, 游戏, 攻略]
+cover: /covers/pokemon-team-building.svg
 ---
 
 一个好的宝可梦队伍需要考虑属性搭配、种族值、个体值、特性、技能等多个因素。

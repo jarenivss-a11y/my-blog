@@ -1,0 +1,41 @@
+<svg width="600" height="400" viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="600" height="400" fill="#faf8f5"/>
+  <rect x="10" y="10" width="580" height="380" rx="15" fill="none" stroke="#c4a882" stroke-width="3" stroke-dasharray="10,5"/>
+
+  <!-- Book/guide -->
+  <rect x="80" y="100" width="120" height="160" rx="5" fill="#fff9f0" stroke="#8b7355" stroke-width="3"/>
+  <rect x="95" y="115" width="90" height="8" fill="#c4a882"/>
+  <rect x="95" y="130" width="70" height="5" fill="#d4c4a8"/>
+  <rect x="95" y="140" width="80" height="5" fill="#d4c4a8"/>
+  <rect x="95" y="150" width="60" height="5" fill="#d4c4a8"/>
+  <text x="140" y="200" text-anchor="middle" fill="#5c4a3a" font-size="40">📖</text>
+  <text x="140" y="240" text-anchor="middle" fill="#8b7355" font-size="14">新手指南</text>
+
+  <!-- Laptop -->
+  <rect x="300" y="120" width="200" height="130" rx="8" fill="#fff9f0" stroke="#8b7355" stroke-width="2"/>
+  <rect x="310" y="130" width="180" height="100" fill="#ffe4c4" stroke="#c4a882" stroke-width="1"/>
+  <rect x="290" y="250" width="220" height="12" rx="3" fill="#e8dcc8" stroke="#8b7355" stroke-width="2"/>
+
+  <!-- Steps/numbers -->
+  <circle cx="100" cy="320" r="20" fill="#ffe4c4" stroke="#c4a882" stroke-width="2"/>
+  <text x="100" y="328" text-anchor="middle" fill="#5c4a3a" font-size="20">1</text>
+
+  <circle cx="200" cy="320" r="20" fill="#ffe4c4" stroke="#c4a882" stroke-width="2"/>
+  <text x="200" y="328" text-anchor="middle" fill="#5c4a3a" font-size="20">2</text>
+
+  <circle cx="300" cy="320" r="20" fill="#ffe4c4" stroke="#c4a882" stroke-width="2"/>
+  <text x="300" y="328" text-anchor="middle" fill="#5c4a3a" font-size="20">3</text>
+
+  <circle cx="400" cy="320" r="20" fill="#ffe4c4" stroke="#c4a882" stroke-width="2"/>
+  <text x="400" y="328" text-anchor="middle" fill="#5c4a3a" font-size="20">4</text>
+
+  <!-- Arrow -->
+  <path d="M430 320 L480 320" stroke="#c4a882" stroke-width="3" stroke-dasharray="5,3"/>
+  <path d="M475 315 L485 320 L475 325" fill="none" stroke="#c4a882" stroke-width="2"/>
+
+  <!-- Cursor icon on laptop -->
+  <path d="M380 160 L380 190 L390 180 L400 200 L408 195 L398 175 L412 175 Z" fill="#8b6b4a" stroke="#5c4a3a" stroke-width="1"/>
+
+  <!-- Text -->
+  <text x="300" y="370" text-anchor="middle" fill="#5c4a3a" font-family="serif" font-size="20">学习路径</text>
+</svg>

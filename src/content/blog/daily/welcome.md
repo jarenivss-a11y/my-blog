@@ -3,6 +3,7 @@ title: 欢迎来到我的博客
 published: 2026-06-24
 category: daily
 tags: [随笔, 介绍]
+cover: /covers/daily-welcome.svg
 ---
 
 这是我的第一篇博客文章，未来会分享更多关于生活、音乐、读书、电商运营和宝可梦的内容。

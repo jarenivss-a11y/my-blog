@@ -3,6 +3,7 @@ title: 电商运营基础知识概览
 published: 2026-06-24
 category: ecommerce
 tags: [电商, 运营, 入门]
+cover: /covers/ecommerce-ecommerce-basics.svg
 ---
 
 电商运营是一个复杂的系统工程，涉及流量、商品、用户、内容、活动和供应链等多个维度。

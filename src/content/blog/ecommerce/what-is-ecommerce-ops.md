@@ -3,6 +3,7 @@ title: 新手必读：电商运营是什么，如何做好电商运营？
 published: 2024-09-23
 category: ecommerce
 tags: [电商运营, 新手入门, 基础知识]
+cover: /covers/ecommerce-what-is-ecommerce-ops.svg
 ---
 
 在数字化时代，电商运营已成为推动商业发展的重要力量。本文将全面介绍电商运营的基本概念、工作职责、所需能力以及常用工具，帮助初学者快速入门并掌握电商运营的核心要义。
