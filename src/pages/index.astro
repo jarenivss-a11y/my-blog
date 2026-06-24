@@ -1,37 +1,34 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
 
-const posts = [
-  {
-    title: '欢迎来到我的博客',
-    category: 'daily',
-    categoryName: '日常生活',
-    date: '2026-06-24',
-    excerpt: '这是我的第一篇博客文章，未来会分享更多关于生活、音乐、读书、电商运营和宝可梦的内容。',
-  },
-  {
-    title: '电商运营基础知识概览',
-    category: 'ecommerce',
-    categoryName: '电商运营',
-    date: '2026-06-24',
-    excerpt: '电商运营是一个复杂的系统工程，涉及流量、商品、用户、内容、活动和供应链等多个维度。',
-  },
-  {
-    title: '宝可梦队伍搭配思路',
-    category: 'pokemon',
-    categoryName: '宝可梦',
-    date: '2026-06-24',
-    excerpt: '一个好的宝可梦队伍需要考虑属性搭配、种族值、个体值、特性、技能等多个因素。',
-  },
-];
+const allPosts = await getCollection('blog');
+const posts = allPosts
+  .filter(post => !post.data.draft)
+  .sort((a, b) => b.data.published.getTime() - a.data.published.getTime())
+  .slice(0, 10);
 
 const categories = [
-  { name: '日常生活', slug: 'daily', icon: '🏠', count: 1 },
-  { name: '音乐分析', slug: 'music', icon: '🎵', count: 0 },
-  { name: '读书鉴赏', slug: 'books', icon: '📚', count: 0 },
-  { name: '电商运营', slug: 'ecommerce', icon: '🛒', count: 1 },
-  { name: '宝可梦', slug: 'pokemon', icon: '⚡', count: 1 },
+  { name: '日常生活', slug: 'daily', icon: '🏠' },
+  { name: '音乐分析', slug: 'music', icon: '🎵' },
+  { name: '读书鉴赏', slug: 'books', icon: '📚' },
+  { name: '电商运营', slug: 'ecommerce', icon: '🛒' },
+  { name: '宝可梦', slug: 'pokemon', icon: '⚡' },
 ];
+
+const categoryInfo: Record<string, { name: string }> = {
+  daily: { name: '日常生活' },
+  music: { name: '音乐分析' },
+  books: { name: '读书鉴赏' },
+  ecommerce: { name: '电商运营' },
+  pokemon: { name: '宝可梦' },
+};
+
+// 计算每个分类的文章数量
+const categoryCounts = categories.map(cat => ({
+  ...cat,
+  count: allPosts.filter(post => post.data.category === cat.slug).length
+}));
 ---
 
 <Layout title="首页 | 我的博客">
@@ -46,7 +43,7 @@ const categories = [
     <section class="mb-12">
       <h2 class="text-2xl font-bold text-gray-900 mb-6">分类</h2>
       <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-        {categories.map((cat) => (
+        {categoryCounts.map((cat) => (
           <a
             href={`/category/${cat.slug}`}
             class="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-indigo-300 transition-all"
@@ -63,20 +60,28 @@ const categories = [
     <section>
       <h2 class="text-2xl font-bold text-gray-900 mb-6">最新文章</h2>
       <div class="space-y-4">
-        {posts.map((post) => (
-          <article class="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-shadow">
-            <div class="flex items-center gap-3 text-sm text-gray-500 mb-3">
-              <span class="bg-gray-100 px-2 py-1 rounded">{post.categoryName}</span>
-              <span>{post.date}</span>
-            </div>
-            <h3 class="text-xl font-bold text-gray-900 mb-2">
-              <a href={`/post/${post.category}/${post.title}`} class="hover:text-indigo-600 transition-colors">
-                {post.title}
-              </a>
-            </h3>
-            <p class="text-gray-600">{post.excerpt}</p>
-          </article>
-        ))}
+        {posts.length > 0 ? (
+          posts.map((post) => (
+            <article class="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-shadow">
+              <div class="flex items-center gap-3 text-sm text-gray-500 mb-3">
+                <span class="bg-gray-100 px-2 py-1 rounded">
+                  {categoryInfo[post.data.category]?.name || '未知'}
+                </span>
+                <span>{post.data.published.toLocaleDateString('zh-CN')}</span>
+              </div>
+              <h3 class="text-xl font-bold text-gray-900 mb-2">
+                <a href={`/post/${post.id}`} class="hover:text-indigo-600 transition-colors">
+                  {post.data.title}
+                </a>
+              </h3>
+              <p class="text-gray-600 line-clamp-2">{post.body.slice(0, 150)}...</p>
+            </article>
+          ))
+        ) : (
+          <div class="bg-white rounded-xl border border-gray-200 p-12 text-center">
+            <p class="text-gray-500">暂无文章</p>
+          </div>
+        )}
       </div>
     </section>
   </div>

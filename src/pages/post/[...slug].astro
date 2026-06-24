@@ -1,0 +1,79 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+const categoryInfo: Record<string, { name: string; icon: string }> = {
+  daily: { name: '日常生活', icon: '🏠' },
+  music: { name: '音乐分析', icon: '🎵' },
+  books: { name: '读书鉴赏', icon: '📚' },
+  ecommerce: { name: '电商运营', icon: '🛒' },
+  pokemon: { name: '宝可梦', icon: '⚡' },
+};
+
+const category = categoryInfo[post.data.category] || { name: '未知', icon: '📁' };
+---
+
+<Layout title={`${post.data.title} | 我的博客`}>
+  <div class="p-8 max-w-3xl">
+    <article class="bg-white rounded-xl border border-gray-200 p-8">
+      <header class="mb-8 pb-8 border-b border-gray-200">
+        <div class="flex items-center gap-3 text-sm text-gray-500 mb-4">
+          <span class="bg-gray-100 px-2 py-1 rounded flex items-center gap-1">
+            <span>{category.icon}</span>
+            <span>{category.name}</span>
+          </span>
+          <span>{post.data.published.toLocaleDateString('zh-CN')}</span>
+        </div>
+        <h1 class="text-3xl font-bold text-gray-900">{post.data.title}</h1>
+        {post.data.tags && (
+          <div class="flex gap-2 mt-4">
+            {post.data.tags.map((tag) => (
+              <span class="bg-indigo-50 text-indigo-600 px-2 py-1 rounded text-sm">
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+      </header>
+
+      <div class="prose prose-gray max-w-none">
+        <Content />
+      </div>
+
+      <footer class="mt-12 pt-8 border-t border-gray-200">
+        <a href={`/category/${post.data.category}`} class="text-indigo-600 hover:underline">
+          ← 返回{category.name}
+        </a>
+      </footer>
+    </article>
+  </div>
+</Layout>
+
+<style>
+  .prose h2 {
+    @apply text-xl font-bold text-gray-900 mt-8 mb-4;
+  }
+  .prose p {
+    @apply text-gray-700 leading-relaxed mb-4;
+  }
+  .prose ul {
+    @apply list-disc list-inside text-gray-700 mb-4 space-y-1;
+  }
+  .prose ol {
+    @apply list-decimal list-inside text-gray-700 mb-4 space-y-1;
+  }
+  .prose strong {
+    @apply font-bold text-gray-900;
+  }
+</style>

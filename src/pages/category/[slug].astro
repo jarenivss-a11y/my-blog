@@ -1,5 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
 
 export function getStaticPaths() {
   return [
@@ -21,12 +22,9 @@ const categoryInfo: Record<string, { name: string; icon: string; description: st
   pokemon: { name: '宝可梦', icon: '⚡', description: '宝可梦相关内容' },
 };
 
-const info = categoryInfo[slug] || { name: '未知', icon: '📁', description: '' };
-
-// Sample posts - in real app these would come from content collections
-const posts = [
-  { title: '欢迎来到我的博客', date: '2026-06-24', excerpt: '这是第一篇文章...' },
-];
+const info = categoryInfo[slug as string] || { name: '未知', icon: '📁', description: '' };
+const allPosts = await getCollection('blog');
+const posts = allPosts.filter(post => post.data.category === slug).sort((a, b) => b.data.published.getTime() - a.data.published.getTime());
 ---
 
 <Layout title={`${info.name} | 我的博客`}>
@@ -43,11 +41,24 @@ const posts = [
       {posts.length > 0 ? (
         posts.map((post) => (
           <article class="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-shadow">
-            <div class="text-sm text-gray-500 mb-2">{post.date}</div>
+            <div class="text-sm text-gray-500 mb-2">
+              {post.data.published.toLocaleDateString('zh-CN')}
+            </div>
             <h2 class="text-xl font-bold text-gray-900 mb-2">
-              <a href="#" class="hover:text-indigo-600 transition-colors">{post.title}</a>
+              <a href={`/post/${post.id}`} class="hover:text-indigo-600 transition-colors">
+                {post.data.title}
+              </a>
             </h2>
-            <p class="text-gray-600">{post.excerpt}</p>
+            <p class="text-gray-600 line-clamp-3">{post.body.slice(0, 150)}...</p>
+            {post.data.tags && (
+              <div class="flex gap-2 mt-4">
+                {post.data.tags.map((tag) => (
+                  <span class="bg-gray-100 text-gray-600 px-2 py-1 rounded text-sm">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
           </article>
         ))
       ) : (
