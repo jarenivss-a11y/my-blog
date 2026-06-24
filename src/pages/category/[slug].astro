@@ -2,6 +2,8 @@
 import Layout from '../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
 
+const BASE = '/my-blog';
+
 export function getStaticPaths() {
   return [
     { params: { slug: 'daily' } },
@@ -27,7 +29,7 @@ const allPosts = await getCollection('blog');
 const posts = allPosts.filter(post => post.data.category === slug).sort((a, b) => b.data.published.getTime() - a.data.published.getTime());
 ---
 
-<Layout title={`${info.name} | 我的博客`}>
+< Layout title={`${info.name} | 我的博客`}>
   <div class="p-8">
     <div class="mb-8">
       <div class="flex items-center gap-3 mb-4">
@@ -45,7 +47,7 @@ const posts = allPosts.filter(post => post.data.category === slug).sort((a, b) =
               {post.data.published.toLocaleDateString('zh-CN')}
             </div>
             <h2 class="text-xl font-bold text-gray-900 mb-2">
-              <a href={`/post/${post.id}`} class="hover:text-indigo-600 transition-colors">
+              <a href={`${BASE}/post/${post.id}`} class="hover:text-indigo-600 transition-colors">
                 {post.data.title}
               </a>
             </h2>

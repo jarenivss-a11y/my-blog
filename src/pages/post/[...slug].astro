@@ -2,6 +2,8 @@
 import Layout from '../../layouts/Layout.astro';
 import { getCollection, render } from 'astro:content';
 
+const BASE = '/my-blog';
+
 export async function getStaticPaths() {
   const posts = await getCollection('blog');
   return posts.map((post) => ({
@@ -52,7 +54,7 @@ const category = categoryInfo[post.data.category] || { name: '未知', icon: '�
       </div>
 
       <footer class="mt-12 pt-8 border-t border-gray-200">
-        <a href={`/category/${post.data.category}`} class="text-indigo-600 hover:underline">
+        <a href={`${BASE}/category/${post.data.category}`} class="text-indigo-600 hover:underline">
           ← 返回{category.name}
         </a>
       </footer>

@@ -1,8 +1,10 @@
 ---
 import Layout from '../layouts/Layout.astro';
+
+const BASE = '/my-blog';
 ---
 
-<Layout title="关于我 | 我的博客">
+< Layout title="关于我 | 我的博客">
   <div class="p-8 max-w-2xl">
     <h1 class="text-3xl font-bold text-gray-900 mb-6">关于我</h1>
 
@@ -18,23 +20,23 @@ import Layout from '../layouts/Layout.astro';
       <ul class="space-y-2">
         <li class="flex items-center gap-2">
           <span>🏠</span>
-          <a href="/category/daily" class="text-indigo-600 hover:underline">日常生活</a>
+          <a href={`${BASE}/category/daily`} class="text-indigo-600 hover:underline">日常生活</a>
         </li>
         <li class="flex items-center gap-2">
           <span>🎵</span>
-          <a href="/category/music" class="text-indigo-600 hover:underline">音乐分析</a>
+          <a href={`${BASE}/category/music`} class="text-indigo-600 hover:underline">音乐分析</a>
         </li>
         <li class="flex items-center gap-2">
           <span>📚</span>
-          <a href="/category/books" class="text-indigo-600 hover:underline">读书鉴赏</a>
+          <a href={`${BASE}/category/books`} class="text-indigo-600 hover:underline">读书鉴赏</a>
         </li>
         <li class="flex items-center gap-2">
           <span>🛒</span>
-          <a href="/category/ecommerce" class="text-indigo-600 hover:underline">电商运营</a>
+          <a href={`${BASE}/category/ecommerce`} class="text-indigo-600 hover:underline">电商运营</a>
         </li>
         <li class="flex items-center gap-2">
           <span>⚡</span>
-          <a href="/category/pokemon" class="text-indigo-600 hover:underline">宝可梦</a>
+          <a href={`${BASE}/category/pokemon`} class="text-indigo-600 hover:underline">宝可梦</a>
         </li>
       </ul>
     </div>
