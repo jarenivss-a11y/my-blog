@@ -37,28 +37,27 @@ const latestPosts = posts.slice(0, 3);
 <Layout title="首页 | 我的博客">
   <!-- Hero Section -->
   <section class="mb-16 text-center py-12">
-    <h1 class="text-5xl font-bold mb-4 bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 bg-clip-text text-transparent">
+    <h1 class="text-5xl font-bold mb-4 text-[#5c4a3a]">
       你好，欢迎来访
     </h1>
-    <p class="text-xl text-slate-600 font-light max-w-2xl mx-auto">
+    <p class="text-xl text-[#8b7355] max-w-2xl mx-auto font-['Caveat'] text-2xl">
       在这里记录生活的点滴，分享关于音乐、读书、电商运营和宝可梦的思考
     </p>
   </section>
 
   <!-- Categories -->
   <section class="mb-16">
-    <h2 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-6">探索分类</h2>
+    <h2 class="text-sm font-semibold text-[#a08060] uppercase tracking-wider mb-6 font-['Caveat']">探索分类</h2>
     <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
       {categoryCounts.map((cat) => (
         <a
           href={`${BASE}/category/${cat.slug}`}
-          class="group relative overflow-hidden rounded-2xl p-6 bg-white border border-slate-200/50 hover:border-transparent hover:shadow-xl transition-all duration-300"
+          class="group relative overflow-hidden rounded-2xl p-6 bg-[#fff9f0] border-2 border-dashed border-[#c4a882] hover:border-[#8b6b4a] hover:shadow-lg transition-all duration-300"
         >
-          <div class={`absolute inset-0 bg-gradient-to-br ${cat.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
-          <div class="relative">
+          <div class="relative text-center">
             <span class="text-4xl mb-4 block">{cat.icon}</span>
-            <h3 class="font-semibold text-slate-800 mb-1">{cat.name}</h3>
-            <p class="text-sm text-slate-500">{cat.count} 篇文章</p>
+            <h3 class="font-semibold text-[#5c4a3a] mb-1">{cat.name}</h3>
+            <p class="text-sm text-[#a08060]">{cat.count} 篇文章</p>
           </div>
         </a>
       ))}
@@ -67,49 +66,51 @@ const latestPosts = posts.slice(0, 3);
 
   <!-- Latest Posts -->
   <section>
-    <h2 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-6">最新文章</h2>
+    <h2 class="text-sm font-semibold text-[#a08060] uppercase tracking-wider mb-6 font-['Caveat']">最新文章</h2>
     <div class="grid gap-6">
       {posts.length > 0 ? (
         posts.map((post, index) => (
-          <article class="group relative bg-white rounded-2xl border border-slate-200/50 p-8 hover:border-indigo-200 hover:shadow-lg hover:shadow-indigo-500/10 transition-all duration-300">
+          <article class="group relative bg-[#fff9f0] rounded-2xl border-2 border-dashed border-[#c4a882] p-8 hover:border-[#8b6b4a] hover:shadow-lg transition-all duration-300">
             <div class="flex items-start gap-6">
-              <div class={`hidden md:flex w-12 h-12 rounded-xl items-center justify-center text-2xl ${
-                index === 0 ? 'bg-gradient-to-br from-indigo-500 to-violet-500 text-white' :
-                index === 1 ? 'bg-gradient-to-br from-violet-500 to-purple-500 text-white' :
-                'bg-gradient-to-br from-purple-500 to-pink-500 text-white'
-              }`}>
-                {index === 0 ? '🚀' : index === 1 ? '✨' : '📝'}
-              </div>
+              {post.data.cover ? (
+                <div class="hidden md:flex w-20 h-20 rounded-xl overflow-hidden border-2 border-dashed border-[#c4a882] flex-shrink-0">
+                  <img src={post.data.cover} alt="" class="w-full h-full object-cover" />
+                </div>
+              ) : (
+                <div class={`hidden md:flex w-12 h-12 rounded-xl items-center justify-center text-2xl border-2 border-dashed border-[#c4a882]`}>
+                  {index === 0 ? '🚀' : index === 1 ? '✨' : '📝'}
+                </div>
+              )}
               <div class="flex-1">
                 <div class="flex items-center gap-3 mb-3">
-                  <span class="px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
+                  <span class="px-3 py-1 rounded-full text-xs font-medium bg-[#ffe4c4] text-[#8b6b4a] border border-[#c4a882]">
                     {categoryInfo[post.data.category]?.name || '未知'}
                   </span>
-                  <span class="text-sm text-slate-400">{post.data.published.toLocaleDateString('zh-CN')}</span>
+                  <span class="text-sm text-[#a08060]">{post.data.published.toLocaleDateString('zh-CN')}</span>
                 </div>
-                <h3 class="text-xl font-semibold text-slate-800 mb-2 group-hover:text-indigo-600 transition-colors">
+                <h3 class="text-xl font-semibold text-[#5c4a3a] mb-2 group-hover:text-[#8b6b4a] transition-colors">
                   <a href={`${BASE}/post/${post.id}`}>{post.data.title}</a>
                 </h3>
-                <p class="text-slate-600 line-clamp-2">{post.body.slice(0, 120)}...</p>
+                <p class="text-[#8b7355] line-clamp-2">{post.body.slice(0, 120)}...</p>
                 {post.data.tags && (
                   <div class="flex gap-2 mt-4">
                     {post.data.tags.slice(0, 3).map((tag) => (
-                      <span class="px-2 py-1 rounded-md text-xs bg-indigo-50 text-indigo-600">
+                      <span class="px-2 py-1 rounded-md text-xs bg-[#ffe4c4] text-[#8b6b4a] border border-[#c4a882]">
                         {tag}
                       </span>
                     ))}
                   </div>
                 )}
               </div>
-              <a href={`${BASE}/post/${post.id}`} class="hidden group-hover:flex items-center justify-center w-10 h-10 rounded-full bg-slate-100 text-slate-600 group-hover:bg-indigo-500 group-hover:text-white transition-all duration-300">
+              <a href={`${BASE}/post/${post.id}`} class="hidden group-hover:flex items-center justify-center w-10 h-10 rounded-full bg-[#ffe4c4] text-[#8b6b4a] group-hover:bg-[#c4a882] group-hover:text-[#fff9f0] transition-all duration-300 border border-[#c4a882]">
                 →
               </a>
             </div>
           </article>
         ))
       ) : (
-        <div class="bg-white rounded-2xl border border-slate-200/50 p-12 text-center">
-          <p class="text-slate-500">暂无文章</p>
+        <div class="bg-[#fff9f0] rounded-2xl border-2 border-dashed border-[#c4a882] p-12 text-center">
+          <p class="text-[#8b7355]">暂无文章</p>
         </div>
       )}
     </div>

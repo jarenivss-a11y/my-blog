@@ -15,35 +15,35 @@ const categories = [
 <Layout title="关于我 | 我的博客">
   <div class="text-center py-8">
     <!-- Avatar -->
-    <div class="w-32 h-32 mx-auto mb-8 rounded-full bg-gradient-to-br from-indigo-500 via-violet-500 to-purple-500 flex items-center justify-center text-white text-5xl shadow-xl">
+    <div class="w-32 h-32 mx-auto mb-8 rounded-full bg-[#fff9f0] flex items-center justify-center text-[#5c4a3a] text-5xl shadow-xl border-2 border-dashed border-[#c4a882]">
       M
     </div>
 
-    <h1 class="text-4xl font-bold text-slate-800 mb-4">关于我</h1>
-    <p class="text-lg text-slate-500 mb-8">一个对生活充满好奇的人</p>
+    <h1 class="text-4xl font-bold text-[#5c4a3a] mb-4">关于我</h1>
+    <p class="text-lg text-[#8b7355] mb-8 font-['Caveat'] text-xl">一个对生活充满好奇的人</p>
   </div>
 
-  <div class="bg-white rounded-3xl border border-slate-200/50 p-10">
+  <div class="bg-[#fff9f0] rounded-3xl border-2 border-dashed border-[#c4a882] p-10">
     <section class="mb-10">
-      <h2 class="text-xl font-bold text-slate-800 mb-4">介绍</h2>
-      <p class="text-slate-600 leading-relaxed mb-4">
+      <h2 class="text-xl font-bold text-[#5c4a3a] mb-4">介绍</h2>
+      <p class="text-[#8b7355] leading-relaxed mb-4">
         你好！我是一个对生活充满好奇的人，喜欢探索各种有趣的事物。这个博客用于记录我的思考和分享我的兴趣爱好。
       </p>
-      <p class="text-slate-600 leading-relaxed">
+      <p class="text-[#8b7355] leading-relaxed">
         我对电商运营充满热情，同时也热爱音乐、阅读和宝可梦。希望能在这里与你分享我的见解和心得。
       </p>
     </section>
 
     <section>
-      <h2 class="text-xl font-bold text-slate-800 mb-6">兴趣分类</h2>
+      <h2 class="text-xl font-bold text-[#5c4a3a] mb-6">兴趣分类</h2>
       <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
         {categories.map((cat, index) => (
           <a
             href={`${BASE}/category/${cat.slug}`}
-            class="group relative overflow-hidden rounded-2xl p-5 bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/50 hover:border-indigo-200 hover:shadow-lg transition-all duration-300"
+            class="group relative overflow-hidden rounded-2xl p-5 bg-[#fff9f0] border-2 border-dashed border-[#c4a882] hover:border-[#8b6b4a] hover:shadow-lg transition-all duration-300 text-center"
           >
             <span class="text-3xl mb-3 block">{cat.icon}</span>
-            <span class="font-medium text-slate-700 group-hover:text-indigo-600 transition-colors">{cat.name}</span>
+            <span class="font-medium text-[#5c4a3a] group-hover:text-[#8b6b4a] transition-colors">{cat.name}</span>
           </a>
         ))}
       </div>

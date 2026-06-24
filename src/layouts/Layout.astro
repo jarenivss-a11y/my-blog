@@ -27,54 +27,59 @@ const currentPath = Astro.url.pathname;
     <meta name="description" content={description} />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
   </head>
-  <body class="bg-gradient-to-br from-slate-50 via-white to-indigo-50 text-slate-800 min-h-screen font-sans">
+  <body class="bg-[#faf8f5] text-[#4a4a4a] min-h-screen font-['ZCOOL_XiaoWei']">
     <div class="flex min-h-screen">
       <!-- Sidebar -->
-      <aside class="fixed left-0 top-0 h-full w-72 bg-white/80 backdrop-blur-xl border-r border-slate-200/50 p-8 flex flex-col">
+      <aside class="fixed left-0 top-0 h-full w-72 bg-[#fff9f0] border-r-2 border-dashed border-[#8b7355]/30 p-8 flex flex-col" style="border: 3px dashed #c4a882; border-radius: 0 20px 20px 0;">
         <!-- Logo -->
-        <div class="mb-12">
+        <div class="mb-12" style="transform: rotate(-1deg);">
           <a href={BASE} class="block group">
-            <h1 class="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent group-hover:from-violet-600 group-hover:to-indigo-600 transition-all duration-300">
+            <h1 class="text-3xl font-['Ma_Shan_Zheng'] text-[#5c4a3a] group-hover:text-[#8b6b4a] transition-colors">
               我的博客
             </h1>
-            <p class="text-sm text-slate-500 mt-1 font-light">记录生活，分享思考</p>
+            <p class="text-sm text-[#a08060] mt-1 font-['Caveat'] text-lg">记录生活，分享思考</p>
           </a>
+        </div>
+
+        <!-- Decorative line -->
+        <div class="mb-8">
+          <svg width="100%" height="10" viewBox="0 0 200 10" preserveAspectRatio="none">
+            <path d="M0,5 Q50,0 100,5 T200,5" stroke="#c4a882" stroke-width="2" fill="none" stroke-dasharray="5,3"/>
+          </svg>
         </div>
 
         <!-- Navigation -->
         <nav class="flex-1">
-          <ul class="space-y-2">
+          <ul class="space-y-3">
             {categories.map((cat) => (
               <li>
                 <a
                   href={`${BASE}/category/${cat.slug}`}
-                  class={`flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-200 ${
+                  class={`flex items-center gap-4 px-5 py-3 rounded-xl transition-all duration-200 ${
                     currentPath.includes(cat.slug)
-                      ? 'bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/25'
-                      : 'text-slate-600 hover:bg-slate-100 hover:text-indigo-600'
+                      ? 'bg-[#ffe4c4] text-[#8b6b4a] border-2 border-[#c4a882] shadow-sm'
+                      : 'text-[#6b5a4a] hover:bg-[#fff5e6] border-2 border-transparent hover:border-dashed hover:border-[#c4a882]'
                   }`}
+                  style="transform: rotate(0deg);"
                 >
-                  <span class="text-xl">{cat.icon}</span>
-                  <span class="font-medium">{cat.name}</span>
+                  <span class="text-2xl">{cat.icon}</span>
+                  <span class="font-['Caveat'] text-xl">{cat.name}</span>
                 </a>
               </li>
             ))}
           </ul>
         </nav>
 
-        <!-- About -->
-        <div class="pt-8 border-t border-slate-200/50">
-          <a href={`${BASE}/about`} class="flex items-center gap-3 text-slate-500 hover:text-indigo-600 transition-colors">
-            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-400 to-violet-500 flex items-center justify-center text-white font-medium">
-              M
-            </div>
-            <div>
-              <p class="text-sm font-medium">关于我</p>
-              <p class="text-xs text-slate-400">了解更多信息</p>
-            </div>
-          </a>
+        <!-- Decorative corner -->
+        <div class="mt-8 pt-6 border-t-2 border-dashed border-[#c4a882]/50">
+          <div class="text-center">
+            <svg width="60" height="60" viewBox="0 0 60 60" class="mx-auto opacity-50">
+              <circle cx="30" cy="30" r="25" stroke="#c4a882" stroke-width="2" fill="none" stroke-dasharray="3,3"/>
+              <text x="30" y="35" text-anchor="middle" fill="#c4a882" font-size="14" font-family="Caveat">✿</text>
+            </svg>
+          </div>
         </div>
       </aside>
 
@@ -88,7 +93,30 @@ const currentPath = Astro.url.pathname;
 
     <style is:global>
       * {
-        font-family: 'Noto Sans SC', 'Space Grotesk', sans-serif;
+        font-family: 'ZCOOL XiaoWei', 'Caveat', serif;
+      }
+      h1, h2, h3 {
+        font-family: 'Ma Shan Zheng', cursive;
+      }
+      body {
+        background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='50' cy='50' r='1' fill='%23e8dcc8' fill-opacity='0.4'/%3E%3C/svg%3E");
+      }
+      a:hover {
+        text-decoration: none;
+      }
+      ::selection {
+        background: #ffe4c4;
+        color: #8b6b4a;
+      }
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #faf8f5;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #c4a882;
+        border-radius: 4px;
       }
     </style>
   </body>
