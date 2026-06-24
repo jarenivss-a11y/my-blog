@@ -48,7 +48,7 @@ const posts = allPosts.filter(post => post.data.category === slug).sort((a, b) =
           <div class="flex items-start justify-between gap-4">
             {post.data.cover && (
               <div class="flex-shrink-0 w-24 h-24 rounded-xl overflow-hidden border border-[#c4a882]">
-                <img src={post.data.cover} alt="" class="w-full h-full object-cover" />
+                <img src={post.data.cover} alt="" class="w-full h-full" style="object-fit: contain;" />
               </div>
             )}
             <div class="flex-1">
