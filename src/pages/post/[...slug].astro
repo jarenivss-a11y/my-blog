@@ -5,6 +5,7 @@ import TableOfContents from '../../components/TableOfContents.astro';
 import SocialShare from '../../components/SocialShare.astro';
 import Comments from '../../components/Comments.astro';
 import ArticleSEO from '../../components/ArticleSEO.astro';
+import RelatedPosts from '../../components/RelatedPosts.astro';
 
 const BASE = '/my-blog';
 const SITE_URL = 'https://jarenivss-a11y.github.io/my-blog';
@@ -146,6 +147,9 @@ const category = categoryInfo[post.data.category] || { name: '未知', icon: '�
 
       <!-- Comments -->
       <Comments title={post.data.title} />
+
+      <!-- Related Posts -->
+      <RelatedPosts currentPostId={post.id} category={post.data.category} />
     </div>
   </article>
 
