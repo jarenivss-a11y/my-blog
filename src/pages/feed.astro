@@ -1,0 +1,70 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const BASE = '/my-blog';
+
+const posts = await getCollection('blog');
+const sortedPosts = posts
+  .filter(post => !post.data.draft)
+  .sort((a, b) => b.data.published.getTime() - a.data.published.getTime());
+
+const categoryInfo: Record<string, { name: string; icon: string }> = {
+  daily: { name: '日常生活', icon: '🏠' },
+  music: { name: '音乐分析', icon: '🎵' },
+  books: { name: '读书鉴赏', icon: '📚' },
+  ecommerce: { name: '电商运营', icon: '🛒' },
+  pokemon: { name: '宝可梦', icon: '⚡' },
+};
+---
+
+<Layout title="RSS 订阅 | 我的博客" description="订阅我的博客 RSS 获取最新更新">
+  <div class="max-w-3xl mx-auto">
+    <header class="mb-8 p-8 rounded-3xl backdrop-blur-xl bg-white/70 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50">
+      <div class="flex items-center gap-3 mb-4">
+        <svg class="w-8 h-8 text-primary" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19.01 7.38 20 6.18 20C4.98 20 4 19.01 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1z"/>
+        </svg>
+        <h1 class="text-2xl font-serif font-black text-slate-900 dark:text-white">RSS 订阅</h1>
+      </div>
+      <p class="text-slate-600 dark:text-slate-300">通过 RSS 阅读器订阅我的博客，第一时间获取最新文章更新。</p>
+      <div class="mt-4 p-4 rounded-xl bg-slate-100 dark:bg-slate-700/50">
+        <code class="text-sm text-slate-600 dark:text-slate-300 break-all">https://jarenivss-a11y.github.io/my-blog/rss.xml</code>
+      </div>
+    </header>
+
+    <div class="space-y-4">
+      {sortedPosts.map((post) => {
+        const category = categoryInfo[post.data.category] || { name: '未知', icon: '📁' };
+        return (
+          <a
+            href={`${BASE}/post/${post.id}`}
+            class="block p-6 rounded-2xl backdrop-blur-xl bg-white/50 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50 hover:bg-white/70 dark:hover:bg-slate-800/70 hover:border-primary/30 transition-all"
+          >
+            <div class="flex items-center gap-2 text-sm text-slate-400 dark:text-slate-500 mb-2">
+              <span>{category.icon}</span>
+              <span>{category.name}</span>
+              <span>·</span>
+              <span>{post.data.published.toLocaleDateString('zh-CN')}</span>
+            </div>
+            <h2 class="text-lg font-medium text-slate-800 dark:text-white mb-2 hover:text-primary transition-colors">
+              {post.data.title}
+            </h2>
+            <p class="text-sm text-slate-500 dark:text-slate-400 line-clamp-2">
+              {post.body.slice(0, 150)}...
+            </p>
+            {post.data.tags && post.data.tags.length > 0 && (
+              <div class="flex gap-2 mt-3">
+                {post.data.tags.map((tag) => (
+                  <span class="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary">
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            )}
+          </a>
+        );
+      })}
+    </div>
+  </div>
+</Layout>

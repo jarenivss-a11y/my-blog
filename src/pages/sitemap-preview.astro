@@ -1,0 +1,111 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const BASE = '/my-blog';
+
+const posts = await getCollection('blog');
+const sortedPosts = posts
+  .filter(post => !post.data.draft)
+  .sort((a, b) => b.data.published.getTime() - a.data.published.getTime());
+
+const categories = [
+  { name: '日常生活', slug: 'daily', icon: '🏠' },
+  { name: '音乐分析', slug: 'music', icon: '🎵' },
+  { name: '读书鉴赏', slug: 'books', icon: '📚' },
+  { name: '电商运营', slug: 'ecommerce', icon: '🛒' },
+  { name: '宝可梦', slug: 'pokemon', icon: '⚡' },
+];
+
+const navLinks = [
+  { name: '首页', href: '/' },
+  { name: '归档', href: '/archive' },
+  { name: '标签', href: '/tags' },
+  { name: '友链', href: '/friends' },
+  { name: '关于', href: '/about' },
+];
+
+const categoryInfo: Record<string, { name: string; icon: string }> = {
+  daily: { name: '日常生活', icon: '🏠' },
+  music: { name: '音乐分析', icon: '🎵' },
+  books: { name: '读书鉴赏', icon: '📚' },
+  ecommerce: { name: '电商运营', icon: '🛒' },
+  pokemon: { name: '宝可梦', icon: '⚡' },
+};
+
+const postsByCategory = categories.map(cat => ({
+  ...cat,
+  posts: sortedPosts.filter(p => p.data.category === cat.slug)
+})).filter(cat => cat.posts.length > 0);
+---
+
+<Layout title="网站地图 | 我的博客" description="浏览博客所有页面和文章">
+  <div class="max-w-3xl mx-auto">
+    <header class="mb-8 p-8 rounded-3xl backdrop-blur-xl bg-white/70 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50">
+      <div class="flex items-center gap-3 mb-4">
+        <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+        </svg>
+        <h1 class="text-2xl font-serif font-black text-slate-900 dark:text-white">网站地图</h1>
+      </div>
+      <p class="text-slate-600 dark:text-slate-300">浏览博客的所有页面和文章分类。</p>
+    </header>
+
+    <!-- Main Pages -->
+    <section class="mb-8 p-6 rounded-2xl backdrop-blur-xl bg-white/50 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50">
+      <h2 class="text-lg font-serif font-bold text-slate-900 dark:text-white mb-4">主要页面</h2>
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+        {navLinks.map((link) => (
+          <a
+            href={`${BASE}${link.href}`}
+            class="p-3 rounded-xl bg-white/50 dark:bg-slate-700/50 hover:bg-primary/10 hover:border-primary/30 border border-transparent transition-all text-slate-700 dark:text-slate-200 hover:text-primary"
+          >
+            {link.name}
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <!-- Categories -->
+    <section class="mb-8 p-6 rounded-2xl backdrop-blur-xl bg-white/50 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50">
+      <h2 class="text-lg font-serif font-bold text-slate-900 dark:text-white mb-4">分类</h2>
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+        {categories.map((cat) => (
+          <a
+            href={`${BASE}/category/${cat.slug}`}
+            class="flex flex-col items-center gap-2 p-4 rounded-xl bg-white/50 dark:bg-slate-700/50 hover:bg-primary/10 hover:border-primary/30 border border-transparent transition-all text-center"
+          >
+            <span class="text-2xl">{cat.icon}</span>
+            <span class="text-sm font-medium text-slate-700 dark:text-slate-200">{cat.name}</span>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <!-- Articles by Category -->
+    {postsByCategory.map((category) => (
+      <section class="mb-8 p-6 rounded-2xl backdrop-blur-xl bg-white/50 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50">
+        <h2 class="flex items-center gap-2 text-lg font-serif font-bold text-slate-900 dark:text-white mb-4">
+          <span>{category.icon}</span>
+          <span>{category.name}</span>
+          <span class="text-sm font-normal text-slate-400">({category.posts.length} 篇)</span>
+        </h2>
+        <div class="space-y-2">
+          {category.posts.map((post) => (
+            <a
+              href={`${BASE}/post/${post.id}`}
+              class="flex items-center justify-between p-3 rounded-xl bg-white/30 dark:bg-slate-700/30 hover:bg-primary/10 transition-all group"
+            >
+              <span class="text-slate-700 dark:text-slate-200 group-hover:text-primary transition-colors">
+                {post.data.title}
+              </span>
+              <span class="text-sm text-slate-400">
+                {post.data.published.toLocaleDateString('zh-CN')}
+              </span>
+            </a>
+          ))}
+        </div>
+      </section>
+    ))}
+  </div>
+</Layout>
