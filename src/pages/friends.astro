@@ -1,0 +1,73 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const BASE = '/my-blog';
+
+// 友链数据 - 可以后续扩展
+const friends = [
+  {
+    name: 'XHBlogs',
+    description: '一个高颜值的毛玻璃风格个人博客系统',
+    url: 'https://github.com/heiehiehi/XinghuisamaBlogs',
+    avatar: 'X',
+  },
+];
+---
+
+<Layout title="友链 | 我的博客">
+  <!-- Header -->
+  <header class="mb-12 p-8 rounded-3xl backdrop-blur-xl bg-gradient-to-br from-white/80 to-slate-100/80 dark:from-slate-800/80 dark:to-slate-900/80 border border-white/50 dark:border-slate-700/50">
+    <h1 class="text-3xl font-serif font-black text-slate-900 dark:text-white mb-2">友链</h1>
+    <p class="text-slate-500 dark:text-slate-400">交换链接，携手前行</p>
+  </header>
+
+  <!-- Friends Grid -->
+  <section class="mb-12">
+    <h2 class="text-xs font-medium text-slate-400 uppercase tracking-widest mb-6">我的朋友们</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {friends.map((friend) => (
+        <a
+          href={friend.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="group p-6 rounded-2xl backdrop-blur-xl bg-white/70 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50 hover:bg-white dark:hover:bg-slate-800 hover:border-primary/30 dark:hover:border-primary/50 hover:shadow-lg transition-all duration-300"
+        >
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-xl font-serif text-white flex-shrink-0">
+              {friend.avatar}
+            </div>
+            <div>
+              <h3 class="font-medium text-slate-900 dark:text-white group-hover:text-primary transition-colors mb-1">
+                {friend.name}
+              </h3>
+              <p class="text-sm text-slate-500 dark:text-slate-400 line-clamp-2">
+                {friend.description}
+              </p>
+            </div>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- Apply Section -->
+  <section class="p-8 rounded-3xl backdrop-blur-xl bg-white/50 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50">
+    <h2 class="text-lg font-serif font-bold text-slate-900 dark:text-white mb-4">申请友链</h2>
+    <p class="text-slate-500 dark:text-slate-400 mb-6">
+      如果你想和我交换友链，欢迎通过以下方式联系我：
+    </p>
+    <div class="space-y-3 text-sm">
+      <div class="flex items-center gap-3">
+        <span class="text-slate-400">博客名称：</span>
+        <span class="text-slate-700 dark:text-slate-200">我的博客</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-slate-400">博客地址：</span>
+        <span class="text-slate-700 dark:text-slate-200">https://jarenivss-a11y.github.io/my-blog/</span>
+      </div>
+    </div>
+    <p class="text-xs text-slate-400 mt-6">
+      * 请确保你的博客内容健康、至少有一篇原创文章，且网站可以正常访问
+    </p>
+  </section>
+</Layout>

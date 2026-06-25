@@ -30,17 +30,37 @@ const categoryCounts = categories.map(cat => ({
   ...cat,
   count: allPosts.filter(post => post.data.category === cat.slug).length
 }));
+
+// Get all tags
+const allTags = [...new Set(allPosts.flatMap(post => post.data.tags || []))];
 ---
 
 <Layout title="首页 | 我的博客">
-  <!-- Hero -->
-  <section class="mb-16">
-    <h1 class="text-4xl font-serif font-black text-slate-900 dark:text-white mb-4 tracking-tight">
-      你好，欢迎来访
-    </h1>
-    <p class="text-lg text-slate-500 dark:text-slate-400">
-      在这里记录生活的点滴，分享关于音乐、读书、电商运营和宝可梦的思考
-    </p>
+  <!-- Hero Section -->
+  <section class="mb-16 p-8 rounded-3xl backdrop-blur-xl bg-gradient-to-br from-primary/5 via-white/70 to-primary/10 dark:from-primary/10 dark:via-slate-800/70 dark:to-primary/10 border border-primary/10 dark:border-primary/20">
+    <div class="flex flex-col md:flex-row items-center gap-8">
+      <!-- Avatar -->
+      <div class="w-28 h-28 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-5xl font-serif text-white shadow-xl shadow-primary/30 flex-shrink-0">
+        M
+      </div>
+
+      <!-- Info -->
+      <div class="text-center md:text-left">
+        <h1 class="text-3xl md:text-4xl font-serif font-black text-slate-900 dark:text-white mb-3 tracking-tight">
+          你好，欢迎来访
+        </h1>
+        <p class="text-lg text-slate-500 dark:text-slate-400 mb-4 max-w-xl">
+          在这里记录生活的点滴，分享关于音乐、读书、电商运营和宝可梦的思考
+        </p>
+        <div class="flex flex-wrap gap-2 justify-center md:justify-start">
+          {allTags.slice(0, 8).map((tag) => (
+            <span class="px-3 py-1 text-xs rounded-full bg-primary/10 text-primary dark:bg-primary/20">
+              #{tag}
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- Categories -->
@@ -81,6 +101,15 @@ const categoryCounts = categories.map(cat => ({
                 {post.data.title}
               </h3>
               <p class="text-sm text-slate-500 dark:text-slate-400 line-clamp-2">{post.body.slice(0, 120)}...</p>
+              {post.data.tags && post.data.tags.length > 0 && (
+                <div class="flex gap-2 mt-3">
+                  {post.data.tags.slice(0, 3).map((tag) => (
+                    <span class="px-2 py-0.5 text-xs bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 rounded">
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              )}
             </a>
           </article>
         ))

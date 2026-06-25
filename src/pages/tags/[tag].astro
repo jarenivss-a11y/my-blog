@@ -1,0 +1,74 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const BASE = '/my-blog';
+
+export async function getStaticPaths() {
+  const allPosts = await getCollection('blog');
+
+  // Collect all unique tags
+  const allTags = [...new Set(allPosts.flatMap(post => post.data.tags || []))];
+
+  return allTags.map(tag => ({
+    params: { tag },
+    props: { tag }
+  }));
+}
+
+const { tag } = Astro.props;
+
+// Get all posts
+const allPosts = await getCollection('blog');
+
+// Filter posts by tag
+const taggedPosts = allPosts
+  .filter(post => post.data.tags && post.data.tags.includes(tag as string))
+  .sort((a, b) => b.data.published.getTime() - a.data.published.getTime());
+
+const categoryInfo: Record<string, { name: string }> = {
+  daily: { name: '日常生活' },
+  music: { name: '音乐分析' },
+  books: { name: '读书鉴赏' },
+  ecommerce: { name: '电商运营' },
+  pokemon: { name: '宝可梦' },
+};
+---
+
+<Layout title={`#${tag} | 我的博客`}>
+  <!-- Header -->
+  <header class="mb-12 p-8 rounded-3xl backdrop-blur-xl bg-gradient-to-br from-white/80 to-slate-100/80 dark:from-slate-800/80 dark:to-slate-900/80 border border-white/50 dark:border-slate-700/50">
+    <a href={`${BASE}/tags`} class="text-sm text-slate-400 hover:text-primary transition-colors mb-2 inline-block">← 返回标签</a>
+    <h1 class="text-3xl font-serif font-black text-slate-900 dark:text-white mb-2">#{tag}</h1>
+    <p class="text-slate-500 dark:text-slate-400">共 {taggedPosts.length} 篇文章</p>
+  </header>
+
+  <!-- Posts -->
+  <div class="space-y-4">
+    {taggedPosts.length > 0 ? (
+      taggedPosts.map((post) => (
+        <article class="group">
+          <a
+            href={`${BASE}/post/${post.id}`}
+            class="block p-6 rounded-2xl backdrop-blur-xl bg-white/70 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50 hover:bg-white dark:hover:bg-slate-800 hover:border-primary/30 dark:hover:border-primary/50 hover:shadow-lg transition-all duration-300"
+          >
+            <div class="flex items-center gap-3 mb-3">
+              <span class="text-xs text-slate-400">{post.data.published.toLocaleDateString('zh-CN')}</span>
+              <span class="px-2 py-0.5 text-xs bg-primary/10 text-primary dark:bg-primary/20 rounded-full">
+                {categoryInfo[post.data.category]?.name || '未知'}
+              </span>
+            </div>
+            <h3 class="text-lg font-serif font-semibold text-slate-900 dark:text-white group-hover:text-primary transition-colors mb-2">
+              {post.data.title}
+            </h3>
+            <p class="text-sm text-slate-500 dark:text-slate-400 line-clamp-2">{post.body.slice(0, 150)}...</p>
+          </a>
+        </article>
+      ))
+    ) : (
+      <div class="text-center py-16">
+        <p class="text-slate-400 dark:text-slate-500">暂无文章</p>
+      </div>
+    )}
+  </div>
+</Layout>

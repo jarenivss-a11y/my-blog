@@ -1,0 +1,94 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const BASE = '/my-blog';
+
+// Get query from URL
+const query = Astro.url.searchParams.get('q') || '';
+
+const allPosts = await getCollection('blog');
+const posts = allPosts
+  .filter(post => !post.data.draft)
+  .sort((a, b) => b.data.published.getTime() - a.data.published.getTime());
+
+const categoryInfo: Record<string, { name: string }> = {
+  daily: { name: '日常生活' },
+  music: { name: '音乐分析' },
+  books: { name: '读书鉴赏' },
+  ecommerce: { name: '电商运营' },
+  pokemon: { name: '宝可梦' },
+};
+
+// Filter posts by query
+const searchResults = query
+  ? posts.filter(post =>
+      post.data.title.toLowerCase().includes(query.toLowerCase()) ||
+      post.body.toLowerCase().includes(query.toLowerCase()) ||
+      (post.data.tags && post.data.tags.some(tag => tag.toLowerCase().includes(query.toLowerCase())))
+    )
+  : [];
+---
+
+<Layout title={`搜索: ${query} | 我的博客`}>
+  <!-- Header -->
+  <header class="mb-12 p-8 rounded-3xl backdrop-blur-xl bg-gradient-to-br from-white/80 to-slate-100/80 dark:from-slate-800/80 dark:to-slate-900/80 border border-white/50 dark:border-slate-700/50">
+    <h1 class="text-3xl font-serif font-black text-slate-900 dark:text-white mb-2">搜索</h1>
+    <p class="text-slate-500 dark:text-slate-400">
+      {query ? `关于 "${query}" 的搜索结果` : '输入关键词搜索文章'}
+    </p>
+  </header>
+
+  <!-- Search Form -->
+  <form method="get" action="/my-blog/search" class="mb-8">
+    <div class="relative max-w-xl">
+      <input
+        type="text"
+        name="q"
+        value={query}
+        placeholder="搜索文章标题、内容或标签..."
+        class="w-full h-12 pl-12 pr-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+      />
+      <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+      </svg>
+    </div>
+  </form>
+
+  <!-- Results -->
+  {query && (
+    <section>
+      <h2 class="text-xs font-medium text-slate-400 uppercase tracking-widest mb-6">
+        找到 {searchResults.length} 篇文章
+      </h2>
+      <div class="space-y-4">
+        {searchResults.length > 0 ? (
+          searchResults.map((post) => (
+            <article class="group">
+              <a
+                href={`${BASE}/post/${post.id}`}
+                class="block p-6 rounded-2xl backdrop-blur-xl bg-white/70 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50 hover:bg-white dark:hover:bg-slate-800 hover:border-primary/30 dark:hover:border-primary/50 hover:shadow-lg transition-all duration-300"
+              >
+                <div class="flex items-center gap-3 mb-3">
+                  <span class="text-xs text-slate-400">{post.data.published.toLocaleDateString('zh-CN')}</span>
+                  <span class="px-2 py-0.5 text-xs bg-primary/10 text-primary dark:bg-primary/20 rounded-full">
+                    {categoryInfo[post.data.category]?.name || '未知'}
+                  </span>
+                </div>
+                <h3 class="text-lg font-serif font-semibold text-slate-900 dark:text-white group-hover:text-primary transition-colors mb-2">
+                  {post.data.title}
+                </h3>
+                <p class="text-sm text-slate-500 dark:text-slate-400 line-clamp-2">{post.body.slice(0, 150)}...</p>
+              </a>
+            </article>
+          ))
+        ) : (
+          <div class="text-center py-16">
+            <p class="text-slate-400 dark:text-slate-500 mb-4">没有找到相关文章</p>
+            <p class="text-sm text-slate-400 dark:text-slate-500">试试其他关键词？</p>
+          </div>
+        )}
+      </div>
+    </section>
+  )}
+</Layout>

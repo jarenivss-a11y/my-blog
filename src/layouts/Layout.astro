@@ -2,6 +2,7 @@
 import Fireflies from '../components/Fireflies.astro';
 import Sakura from '../components/Sakura.astro';
 import ThemeToggle from '../components/ThemeToggle.astro';
+import BackToTop from '../components/BackToTop.astro';
 
 interface Props {
   title: string;
@@ -17,6 +18,13 @@ const categories = [
   { name: '读书鉴赏', slug: 'books', icon: '📚' },
   { name: '电商运营', slug: 'ecommerce', icon: '🛒' },
   { name: '宝可梦', slug: 'pokemon', icon: '⚡' },
+];
+
+const navLinks = [
+  { name: '首页', href: '/' },
+  { name: '标签', href: '/tags' },
+  { name: '友链', href: '/friends' },
+  { name: '关于', href: '/about' },
 ];
 
 const currentPath = Astro.url.pathname;
@@ -39,41 +47,82 @@ const currentPath = Astro.url.pathname;
     <Fireflies />
 
     <!-- Navigation -->
-    <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 border-b border-white/20 dark:border-white/10 backdrop-blur-xl bg-white/60 dark:bg-slate-900/60 shadow-sm">
-      <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-        <a href={BASE} class="text-xl font-black text-slate-800 dark:text-white tracking-tighter hover:text-primary transition-colors">
-          我的博客
-          <span class="text-primary mx-1">の</span>
-          <span class="text-slate-400 dark:text-slate-500 font-normal text-sm">宝藏之地</span>
-        </a>
-
-        <nav class="hidden md:flex items-center gap-8">
-          {categories.map((cat) => (
-            <a
-              href={`${BASE}/category/${cat.slug}`}
-              class={`relative py-1 text-sm font-medium transition-colors ${
-                currentPath.includes(cat.slug)
-                  ? 'text-primary dark:text-primary'
-                  : 'text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary'
-              }`}
-            >
-              {cat.name}
-              {currentPath.includes(cat.slug) && (
-                <span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-primary rounded-full animate-pulse"></span>
-              )}
+    <header id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
+      <div class="mx-auto px-4 transition-all duration-300">
+        <div id="nav-container" class="relative overflow-hidden transition-all duration-300 rounded-none">
+          <div class="flex h-16 items-center justify-between px-4 md:px-6">
+            <a href={BASE} class="text-xl font-black text-slate-800 dark:text-white tracking-tighter hover:text-primary transition-colors">
+              我的博客
+              <span class="text-primary mx-1">の</span>
+              <span class="text-slate-400 dark:text-slate-500 font-normal text-sm">宝藏之地</span>
             </a>
-          ))}
-        </nav>
 
-        <div class="flex items-center gap-4">
-          <ThemeToggle />
+            <!-- Desktop Navigation -->
+            <nav class="hidden md:flex items-center gap-6">
+              {navLinks.map((link) => (
+                <a
+                  href={`${BASE}${link.href}`}
+                  class={`relative py-1 text-sm font-medium transition-colors ${
+                    currentPath === `${BASE}${link.href}` || currentPath === `${BASE}${link.href}/`
+                      ? 'text-primary dark:text-primary'
+                      : 'text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary'
+                  }`}
+                >
+                  {link.name}
+                  {currentPath === `${BASE}${link.href}` && (
+                    <span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-primary rounded-full animate-pulse"></span>
+                  )}
+                </a>
+              ))}
+
+              <!-- Search -->
+              <div class="relative">
+                <input
+                  type="text"
+                  id="search-input"
+                  placeholder="搜索..."
+                  class="h-9 w-40 rounded-full border-0 bg-slate-100 dark:bg-slate-800 pl-9 pr-4 text-sm placeholder:text-slate-400 focus:w-56 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                />
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+              </div>
+
+              <ThemeToggle />
+            </nav>
+
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-btn" class="md:hidden p-2 text-slate-600 dark:text-slate-300 hover:text-primary">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Mobile Menu -->
+          <div id="mobile-menu" class="hidden md:hidden px-4 pb-4">
+            <div class="flex flex-col space-y-2">
+              {navLinks.map((link) => (
+                <a
+                  href={`${BASE}${link.href}`}
+                  class={`py-2 text-sm font-medium transition-colors ${
+                    currentPath === `${BASE}${link.href}` || currentPath === `${BASE}${link.href}/`
+                      ? 'text-primary'
+                      : 'text-slate-600 dark:text-slate-300'
+                  }`}
+                >
+                  {link.name}
+                </a>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </header>
 
     <!-- Main Content -->
-    <div class="pt-24 pb-20">
-      <div class="max-w-6xl mx-auto px-6">
+    <div id="main-content" class="pt-24 pb-20">
+      <div class="max-w-6xl mx-auto px-4 md:px-6">
         <main>
           <slot />
         </main>
@@ -84,6 +133,9 @@ const currentPath = Astro.url.pathname;
     <footer class="py-8 border-t border-slate-200/50 dark:border-slate-800/50 text-center">
       <p class="text-sm text-slate-400 dark:text-slate-500">© 2026 我的博客 · 用心记录每一天</p>
     </footer>
+
+    <!-- Back to Top Button -->
+    <BackToTop />
 
     <!-- Scrollbar Styles -->
     <style is:global>
@@ -115,5 +167,76 @@ const currentPath = Astro.url.pathname;
         background: rgba(99, 102, 241, 0.6);
       }
     </style>
+
+    <script>
+      // Navigation scroll behavior
+      function initNavScroll() {
+        const navbar = document.getElementById('navbar');
+        const navContainer = document.getElementById('nav-container');
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        if (!navbar || !navContainer) return;
+
+        let lastScrollY = window.scrollY;
+        let ticking = false;
+
+        const handleScroll = () => {
+          if (!ticking) {
+            window.requestAnimationFrame(() => {
+              const scrollY = window.scrollY;
+
+              if (scrollY > 100) {
+                // Scrolled: add glass effect
+                navContainer.classList.add('rounded-2xl', 'border', 'border-white/50', 'dark:border-white/10', 'bg-white/80', 'dark:bg-slate-900/80', 'backdrop-blur-xl', 'shadow-lg', 'shadow-black/5');
+                navbar.classList.add('top-4');
+                navbar.classList.remove('top-0');
+                navContainer.classList.remove('rounded-none');
+              } else {
+                // At top: transparent
+                navContainer.classList.remove('rounded-2xl', 'border', 'border-white/50', 'dark:border-white/10', 'bg-white/80', 'dark:bg-slate-900/80', 'backdrop-blur-xl', 'shadow-lg', 'shadow-black/5');
+                navbar.classList.remove('top-4');
+                navbar.classList.add('top-0');
+                navContainer.classList.add('rounded-none');
+              }
+
+              lastScrollY = scrollY;
+              ticking = false;
+            });
+            ticking = true;
+          }
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        handleScroll();
+
+        // Mobile menu toggle
+        if (mobileMenuBtn && mobileMenu) {
+          mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+          });
+        }
+      }
+
+      // Search handler
+      function initSearch() {
+        const searchInput = document.getElementById('search-input') as HTMLInputElement;
+        if (!searchInput) return;
+
+        searchInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' && searchInput.value.trim()) {
+            const query = encodeURIComponent(searchInput.value.trim());
+            window.location.href = `/my-blog/search?q=${query}`;
+          }
+        });
+      }
+
+      initNavScroll();
+      initSearch();
+      document.addEventListener('astro:after-swap', () => {
+        initNavScroll();
+        initSearch();
+      });
+    </script>
   </body>
 </html>

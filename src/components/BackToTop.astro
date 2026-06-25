@@ -1,0 +1,47 @@
+---
+// Back to Top button component
+---
+
+<button
+  id="back-to-top"
+  class="fixed bottom-8 right-8 z-50 w-12 h-12 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl border border-white/50 dark:border-white/20 shadow-lg flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300 hover:bg-primary hover:text-white hover:border-primary"
+  aria-label="返回顶部"
+>
+  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+  </svg>
+</button>
+
+<script>
+  function initBackToTop() {
+    const btn = document.getElementById('back-to-top');
+    if (!btn) return;
+
+    let visible = false;
+
+    const toggleVisibility = () => {
+      const scrollY = window.scrollY;
+      if (scrollY > 400 && !visible) {
+        btn.classList.remove('opacity-0', 'pointer-events-none');
+        btn.classList.add('opacity-100', 'pointer-events-auto');
+        visible = true;
+      } else if (scrollY <= 400 && visible) {
+        btn.classList.add('opacity-0', 'pointer-events-none');
+        btn.classList.remove('opacity-100', 'pointer-events-auto');
+        visible = false;
+      }
+    };
+
+    const scrollToTop = () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    window.addEventListener('scroll', toggleVisibility, { passive: true });
+    btn.addEventListener('click', scrollToTop);
+
+    toggleVisibility();
+  }
+
+  initBackToTop();
+  document.addEventListener('astro:after-swap', initBackToTop);
+</script>
