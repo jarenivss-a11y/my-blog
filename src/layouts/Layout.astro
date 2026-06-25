@@ -3,6 +3,8 @@ import Fireflies from '../components/Fireflies.astro';
 import Sakura from '../components/Sakura.astro';
 import ThemeToggle from '../components/ThemeToggle.astro';
 import BackToTop from '../components/BackToTop.astro';
+import ReadingProgress from '../components/ReadingProgress.astro';
+import VisitorStats from '../components/VisitorStats.astro';
 
 interface Props {
   title: string;
@@ -22,6 +24,7 @@ const categories = [
 
 const navLinks = [
   { name: '首页', href: '/' },
+  { name: '归档', href: '/archive' },
   { name: '标签', href: '/tags' },
   { name: '友链', href: '/friends' },
   { name: '关于', href: '/about' },
@@ -37,12 +40,23 @@ const currentPath = Astro.url.pathname;
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={`https://jarenivss-a11y.github.io${Astro.url.pathname}`} />
+    <meta property="og:site_name" content="我的博客" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600&display=swap" rel="stylesheet">
     <link rel="alternate" type="application/rss+xml" title="我的博客 RSS" href="/my-blog/rss.xml" />
   </head>
   <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen font-sans antialiased transition-colors duration-500">
+    <!-- Reading Progress Bar -->
+    <ReadingProgress />
+
     <!-- Background Effects -->
     <Sakura />
     <Fireflies />
@@ -144,7 +158,8 @@ const currentPath = Astro.url.pathname;
           </svg>
         </a>
       </div>
-      <p class="text-sm text-slate-400 dark:text-slate-500">© 2026 我的博客 · 用心记录每一天</p>
+      <VisitorStats />
+      <p class="text-sm text-slate-400 dark:text-slate-500 mt-2">© 2026 我的博客 · 用心记录每一天</p>
     </footer>
 
     <!-- Back to Top Button -->

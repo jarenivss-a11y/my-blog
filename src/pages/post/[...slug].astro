@@ -1,8 +1,12 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { getCollection, render } from 'astro:content';
+import TableOfContents from '../../components/TableOfContents.astro';
+import SocialShare from '../../components/SocialShare.astro';
+import Comments from '../../components/Comments.astro';
 
 const BASE = '/my-blog';
+const SITE_URL = 'https://jarenivss-a11y.github.io/my-blog';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog');
@@ -13,7 +17,7 @@ export async function getStaticPaths() {
 }
 
 const { post } = Astro.props;
-const { Content } = await render(post);
+const { Content, headings } = await render(post);
 
 // Get all posts for prev/next navigation
 const allPosts = await getCollection('blog');
@@ -40,85 +44,96 @@ const categoryInfo: Record<string, { name: string; icon: string }> = {
 const category = categoryInfo[post.data.category] || { name: '未知', icon: '📁' };
 ---
 
-< Layout title={`${post.data.title} | 我的博客`}>
-  <article class="max-w-3xl mx-auto">
-    <!-- Header -->
-    <header class="mb-12 p-8 rounded-3xl backdrop-blur-xl bg-white/70 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50">
-      <a
-        href={`${BASE}/category/${post.data.category}`}
-        class="inline-flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors mb-6"
-      >
-        <span>{category.icon}</span>
-        <span>{category.name}</span>
-      </a>
-      <h1 class="text-3xl font-serif font-black text-slate-900 dark:text-white mb-6 leading-tight">
-        {post.data.title}
-      </h1>
-      <div class="flex items-center gap-4 text-sm text-slate-400 dark:text-slate-500">
-        <span>{post.data.published.toLocaleDateString('zh-CN')}</span>
-        <span class="text-slate-300 dark:text-slate-600">·</span>
-        <span>{readingTime} 分钟阅读</span>
-        {post.data.tags && post.data.tags.length > 0 && (
-          <>
-            <span class="text-slate-300 dark:text-slate-600">·</span>
-            <div class="flex gap-2">
-              {post.data.tags.map((tag) => (
-                <a href={`${BASE}/tags/${encodeURIComponent(tag)}`} class="hover:text-primary transition-colors">
-                  #{tag}
-                </a>
-              ))}
-            </div>
-          </>
-        )}
+<Layout title={`${post.data.title} | 我的博客`}>
+  <article class="relative">
+    <!-- Table of Contents (fixed right) -->
+    <TableOfContents headings={headings} />
+
+    <div class="max-w-3xl mx-auto">
+      <!-- Header -->
+      <header class="mb-12 p-8 rounded-3xl backdrop-blur-xl bg-white/70 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50">
+        <a
+          href={`${BASE}/category/${post.data.category}`}
+          class="inline-flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors mb-6"
+        >
+          <span>{category.icon}</span>
+          <span>{category.name}</span>
+        </a>
+        <h1 class="text-3xl font-serif font-black text-slate-900 dark:text-white mb-6 leading-tight">
+          {post.data.title}
+        </h1>
+        <div class="flex items-center gap-4 text-sm text-slate-400 dark:text-slate-500">
+          <span>{post.data.published.toLocaleDateString('zh-CN')}</span>
+          <span class="text-slate-300 dark:text-slate-600">·</span>
+          <span>{readingTime} 分钟阅读</span>
+          {post.data.tags && post.data.tags.length > 0 && (
+            <>
+              <span class="text-slate-300 dark:text-slate-600">·</span>
+              <div class="flex gap-2">
+                {post.data.tags.map((tag) => (
+                  <a href={`${BASE}/tags/${encodeURIComponent(tag)}`} class="hover:text-primary transition-colors">
+                    #{tag}
+                  </a>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="p-8 rounded-3xl backdrop-blur-xl bg-white/70 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50 prose prose-lg max-w-none prose-slate dark:prose-invert prose-headings:font-serif prose-headings:text-slate-900 dark:prose-headings:text-white prose-p:text-slate-600 dark:prose-p:text-slate-300 prose-li:text-slate-600 dark:prose-li:text-slate-300 prose-a:text-primary prose-strong:text-slate-900 dark:prose-strong:text-white">
+        <Content />
       </div>
-    </header>
 
-    <!-- Content -->
-    <div class="p-8 rounded-3xl backdrop-blur-xl bg-white/70 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50 prose prose-lg max-w-none prose-slate dark:prose-invert prose-headings:font-serif prose-headings:text-slate-900 dark:prose-headings:text-white prose-p:text-slate-600 dark:prose-p:text-slate-300 prose-li:text-slate-600 dark:prose-li:text-slate-300 prose-a:text-primary prose-strong:text-slate-900 dark:prose-strong:text-white">
-      <Content />
+      <!-- Prev/Next Navigation -->
+      {(prevPost || nextPost) && (
+        <nav class="mt-8 grid grid-cols-2 gap-4">
+          {prevPost ? (
+            <a
+              href={`${BASE}/post/${prevPost.id}`}
+              class="group p-6 rounded-2xl backdrop-blur-xl bg-white/50 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50 hover:bg-white/70 dark:hover:bg-slate-800/70 hover:border-primary/30 transition-all"
+            >
+              <span class="text-xs text-slate-400 mb-1 block">← 上一篇</span>
+              <span class="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-primary transition-colors line-clamp-2">
+                {prevPost.data.title}
+              </span>
+            </a>
+          ) : (
+            <div></div>
+          )}
+          {nextPost ? (
+            <a
+              href={`${BASE}/post/${nextPost.id}`}
+              class="group p-6 rounded-2xl backdrop-blur-xl bg-white/50 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50 hover:bg-white/70 dark:hover:bg-slate-800/70 hover:border-primary/30 transition-all text-right"
+            >
+              <span class="text-xs text-slate-400 mb-1 block">下一篇 →</span>
+              <span class="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-primary transition-colors line-clamp-2">
+                {nextPost.data.title}
+              </span>
+            </a>
+          ) : (
+            <div></div>
+          )}
+        </nav>
+      )}
+
+      <!-- Footer -->
+      <footer class="mt-8 p-6 rounded-2xl backdrop-blur-xl bg-white/50 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50">
+        <div class="flex items-center justify-between flex-wrap gap-4">
+          <a
+            href={`${BASE}/category/${post.data.category}`}
+            class="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-primary transition-colors"
+          >
+            ← 返回{category.name}
+          </a>
+          <SocialShare title={post.data.title} url={`${SITE_URL}/post/${post.id}`} />
+        </div>
+      </footer>
+
+      <!-- Comments -->
+      <Comments title={post.data.title} />
     </div>
-
-    <!-- Prev/Next Navigation -->
-    {(prevPost || nextPost) && (
-      <nav class="mt-8 grid grid-cols-2 gap-4">
-        {prevPost ? (
-          <a
-            href={`${BASE}/post/${prevPost.id}`}
-            class="group p-6 rounded-2xl backdrop-blur-xl bg-white/50 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50 hover:bg-white/70 dark:hover:bg-slate-800/70 hover:border-primary/30 transition-all"
-          >
-            <span class="text-xs text-slate-400 mb-1 block">← 上一篇</span>
-            <span class="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-primary transition-colors line-clamp-2">
-              {prevPost.data.title}
-            </span>
-          </a>
-        ) : (
-          <div></div>
-        )}
-        {nextPost ? (
-          <a
-            href={`${BASE}/post/${nextPost.id}`}
-            class="group p-6 rounded-2xl backdrop-blur-xl bg-white/50 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50 hover:bg-white/70 dark:hover:bg-slate-800/70 hover:border-primary/30 transition-all text-right"
-          >
-            <span class="text-xs text-slate-400 mb-1 block">下一篇 →</span>
-            <span class="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-primary transition-colors line-clamp-2">
-              {nextPost.data.title}
-            </span>
-          </a>
-        ) : (
-          <div></div>
-        )}
-      </nav>
-    )}
-
-    <!-- Footer -->
-    <footer class="mt-8 p-6 rounded-2xl backdrop-blur-xl bg-white/50 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50 text-center">
-      <a
-        href={`${BASE}/category/${post.data.category}`}
-        class="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-primary transition-colors"
-      >
-        ← 返回{category.name}
-      </a>
-    </footer>
   </article>
 </Layout>
 

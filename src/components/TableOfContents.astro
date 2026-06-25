@@ -1,0 +1,70 @@
+---
+// Table of Contents - extracts headings from content
+interface Props {
+  headings: { depth: number; slug: string; text: string }[];
+}
+
+const { headings } = Astro.props;
+const filteredHeadings = headings.filter(h => h.depth === 2 || h.depth === 3);
+---
+
+{filteredHeadings.length > 2 && (
+  <nav id="toc" class="hidden lg:block fixed right-8 top-32 w-64">
+    <div class="p-4 rounded-2xl backdrop-blur-xl bg-white/70 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50">
+      <h4 class="text-xs font-medium text-slate-400 uppercase tracking-widest mb-4">目录</h4>
+      <ul class="space-y-2">
+        {filteredHeadings.map((heading) => (
+          <li class={heading.depth === 3 ? 'pl-3' : ''}>
+            <a
+              href={`#${heading.slug}`}
+              class="block text-sm text-slate-500 dark:text-slate-400 hover:text-primary transition-colors line-clamp-2 toc-link"
+              data-slug={heading.slug}
+            >
+              {heading.text}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </nav>
+)}
+
+<script>
+  function initTOC() {
+    const tocLinks = document.querySelectorAll('.toc-link');
+    if (!tocLinks.length) return;
+
+    const headingElements = Array.from(tocLinks).map(link => {
+      const slug = link.getAttribute('data-slug');
+      return slug ? document.getElementById(slug) : null;
+    }).filter(Boolean) as HTMLElement[];
+
+    const updateActiveLink = () => {
+      const scrollY = window.scrollY + 100;
+
+      let currentId = '';
+      headingElements.forEach(heading => {
+        if (heading.offsetTop <= scrollY) {
+          currentId = heading.id;
+        }
+      });
+
+      tocLinks.forEach(link => {
+        const slug = link.getAttribute('data-slug');
+        if (slug === currentId) {
+          link.classList.add('text-primary', 'font-medium');
+          link.classList.remove('text-slate-500');
+        } else {
+          link.classList.remove('text-primary', 'font-medium');
+          link.classList.add('text-slate-500');
+        }
+      });
+    };
+
+    window.addEventListener('scroll', updateActiveLink, { passive: true });
+    updateActiveLink();
+  }
+
+  initTOC();
+  document.addEventListener('astro:after-swap', initTOC);
+</script>

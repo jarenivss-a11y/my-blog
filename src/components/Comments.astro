@@ -1,0 +1,92 @@
+---
+// Giscus Comments Component
+// To enable comments, you need to:
+// 1. Enable Discussions on your GitHub repository
+// 2. Install the Giscus app: https://github.com/apps/giscus
+// 3. Update the config below with your repo info
+
+interface Props {
+  title?: string;
+}
+
+const { title = '' } = Astro.props;
+
+// Config - update these values with your info
+const config = {
+  repo: 'jarenivss-a11y/my-blog' as `${string}/${string}`,
+  repoId: 'YOUR_REPO_ID',
+  category: 'Announcements',
+  categoryId: 'YOUR_CATEGORY_ID',
+  mapping: 'pathname' as const,
+  theme: 'light',
+  lang: 'zh-CN',
+};
+---
+
+{config.repoId !== 'YOUR_REPO_ID' ? (
+  <div id="giscus-container" class="mt-12">
+    <giscus-widget
+      id="comments"
+      repo={config.repo}
+      repoId={config.repoId}
+      category={config.category}
+      categoryId={config.categoryId}
+      mapping={config.mapping}
+      theme={Astro.cookies.get('theme')?.value === 'dark' ? 'dark' : 'light'}
+      lang={config.lang}
+      loading="lazy"
+    />
+  </div>
+) : (
+  <div class="mt-12 p-8 rounded-2xl backdrop-blur-xl bg-white/50 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50 text-center">
+    <p class="text-slate-500 dark:text-slate-400 mb-4">
+      评论功能正在配置中...
+    </p>
+    <p class="text-xs text-slate-400">
+      如需启用评论，请配置 Giscus：<br/>
+      1. 在 GitHub 仓库中启用 Discussions<br/>
+      2. 安装 Giscus App<br/>
+      3. 配置 repoId 和 categoryId
+    </p>
+  </div>
+)}
+
+<script>
+  // Load Giscus script
+  function loadGiscus() {
+    if (document.querySelector('giscus-widget')) return;
+
+    const script = document.createElement('script');
+    script.src = 'https://giscus.app/client.js';
+    script.setAttribute('data-repo', 'jarenivss-a11y/my-blog');
+    script.setAttribute('data-repo-id', 'YOUR_REPO_ID');
+    script.setAttribute('data-category', 'Announcements');
+    script.setAttribute('data-category-id', 'YOUR_CATEGORY_ID');
+    script.setAttribute('data-mapping', 'pathname');
+    script.setAttribute('data-strict', '0');
+    script.setAttribute('data-reactions-enabled', '1');
+    script.setAttribute('data-emit-metadata', '0');
+    script.setAttribute('data-input-position', 'bottom');
+    script.setAttribute('data-theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+    script.setAttribute('data-lang', 'zh-CN');
+    script.setAttribute('data-loading', 'lazy');
+    script.crossOrigin = 'anonymous';
+    script.async = true;
+    document.head.appendChild(script);
+  }
+
+  // Load on page load
+  loadGiscus();
+
+  // Reload on theme change
+  const observer = new MutationObserver(() => {
+    const giscusFrame = document.querySelector<HTMLIFrameElement>('.giscus-frame');
+    if (giscusFrame?.contentWindow) {
+      giscusFrame.contentWindow.postMessage(
+        { giscus: { setConfig: { theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light' } } },
+        'https://giscus.app'
+      );
+    }
+  });
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+</script>

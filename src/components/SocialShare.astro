@@ -1,0 +1,86 @@
+---
+// Social Share buttons component
+interface Props {
+  title: string;
+  url: string;
+}
+
+const { title, url } = Astro.props;
+const encodedTitle = encodeURIComponent(title);
+const encodedUrl = encodeURIComponent(url);
+---
+
+<div class="flex items-center gap-3">
+  <span class="text-sm text-slate-400">分享到</span>
+
+  <!-- Twitter/X -->
+  <a
+    href={`https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="w-9 h-9 rounded-full bg-[#1DA1F2]/10 text-[#1DA1F2] hover:bg-[#1DA1F2] hover:text-white flex items-center justify-center transition-all"
+    title="分享到 Twitter"
+  >
+    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+    </svg>
+  </a>
+
+  <!-- Weibo -->
+  <a
+    href={`https://service.weibo.com/share/share.php?title=${encodedTitle}&url=${encodedUrl}`}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="w-9 h-9 rounded-full bg-[#E6162D]/10 text-[#E6162D] hover:bg-[#E6162D] hover:text-white flex items-center justify-center transition-all"
+    title="分享到微博"
+  >
+    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+      <path d="M10.098 20.323c-3.977.391-7.414-1.406-7.672-4.02-.259-2.609 2.759-5.047 6.74-5.441 3.979-.394 7.413 1.404 7.672 4.02.259 2.6-2.759 5.049-6.74 5.441zM9.05 17.219c-.384.616-1.208.884-1.829.602-.612-.279-.793-.991-.406-1.593.379-.595 1.176-.861 1.793-.601.622.263.82.972.442 1.592zm1.27-1.627c-.141.237-.449.353-.689.253-.236-.09-.313-.361-.177-.586.138-.227.436-.338.674-.24.239.09.315.36.192.573zm.176-2.719c-1.893-.493-4.033.45-4.857 2.118-.836 1.704-.026 3.591 1.886 4.21 1.983.64 4.318-.341 5.132-2.179.8-1.793-.201-3.642-2.161-4.149zm7.563-1.224c-.346-.105-.579-.174-.405-.629.38-.992.424-1.833.012-2.441-.85-1.258-3.604-1.136-6.173-.026 0 0-.732.33-1.552.792-.594-.387-1.355-.598-2.087-.598-2.648 0-4.801 2.129-4.801 4.751 0 1.37.567 2.6 1.467 3.457-.023.195-.039.398-.039.608 0 2.214 1.834 4.012 4.098 4.012 1.022 0 1.966-.346 2.73-.917.764.572 1.708.917 2.73.917 2.264 0 4.098-1.798 4.098-4.012 0-.21-.016-.413-.039-.608.9-.856 1.467-2.087 1.467-3.457 0-1.372-.567-2.6-1.467-3.457.9-.856 1.467-2.087 1.467-3.457 0-.638-.148-1.237-.41-1.772.263.105.546.17.834.17.637 0 1.268-.316 1.268-.786 0-.471-.631-.787-1.268-.787-.638 0-1.304.238-1.604.63-.299-.392-.965-.63-1.604-.63-1.114 0-1.864.75-1.864 1.571 0 .633.458 1.205.458 1.205-.026 0-.052.008-.078.008z"/>
+    </svg>
+  </a>
+
+  <!-- Copy Link -->
+  <button
+    id="copy-link-btn"
+    class="w-9 h-9 rounded-full bg-slate-200/50 dark:bg-slate-700/50 text-slate-500 hover:bg-slate-300 dark:hover:bg-slate-600 hover:text-slate-700 dark:hover:text-slate-200 flex items-center justify-center transition-all"
+    title="复制链接"
+    data-url={url}
+  >
+    <svg id="copy-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+    </svg>
+    <svg id="check-icon" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+    </svg>
+  </button>
+</div>
+
+<script>
+  function initSocialShare() {
+    const copyBtn = document.getElementById('copy-link-btn');
+    const copyIcon = document.getElementById('copy-icon');
+    const checkIcon = document.getElementById('check-icon');
+
+    if (!copyBtn || !copyIcon || !checkIcon) return;
+
+    copyBtn.addEventListener('click', async () => {
+      const url = copyBtn.getAttribute('data-url');
+      if (!url) return;
+
+      try {
+        await navigator.clipboard.writeText(url);
+        copyIcon.classList.add('hidden');
+        checkIcon.classList.remove('hidden');
+        setTimeout(() => {
+          copyIcon.classList.remove('hidden');
+          checkIcon.classList.add('hidden');
+        }, 2000);
+      } catch (err) {
+        console.error('Failed to copy:', err);
+      }
+    });
+  }
+
+  initSocialShare();
+  document.addEventListener('astro:after-swap', initSocialShare);
+</script>
