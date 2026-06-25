@@ -10,21 +10,56 @@ const categories = [
   { name: '电商运营', slug: 'ecommerce', icon: '🛒' },
   { name: '宝可梦', slug: 'pokemon', icon: '⚡' },
 ];
+
+const skills = [
+  { name: '电商运营', level: 85 },
+  { name: '内容创作', level: 70 },
+  { name: '数据分析', level: 60 },
+  { name: '音乐欣赏', level: 80 },
+];
+
+const socialLinks = [
+  { name: 'GitHub', url: 'https://github.com/jarenivss-a11y', icon: 'github' },
+  { name: 'RSS', url: '/my-blog/rss.xml', icon: 'rss' },
+];
 ---
 
 <Layout title="关于我 | 我的博客">
   <div class="max-w-3xl mx-auto">
     <!-- Avatar Card -->
-    <div class="mb-12 p-8 rounded-3xl backdrop-blur-xl bg-gradient-to-br from-white/80 to-slate-100/80 dark:from-slate-800/80 dark:to-slate-900/80 border border-white/50 dark:border-slate-700/50 text-center">
-      <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-primary/20 to-primary/40 flex items-center justify-center text-4xl font-serif text-primary backdrop-blur-xl">
+    <div class="mb-8 p-8 rounded-3xl backdrop-blur-xl bg-gradient-to-br from-white/80 to-slate-100/80 dark:from-slate-800/80 dark:to-slate-900/80 border border-white/50 dark:border-slate-700/50 text-center">
+      <div class="w-28 h-28 mx-auto mb-6 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-5xl font-serif text-white shadow-xl shadow-primary/30">
         M
       </div>
       <h1 class="text-3xl font-serif font-black text-slate-900 dark:text-white mb-2">关于我</h1>
       <p class="text-slate-500 dark:text-slate-400">一个对生活充满好奇的人</p>
+
+      <!-- Social Links -->
+      <div class="flex items-center justify-center gap-4 mt-6">
+        {socialLinks.map((link) => (
+          <a
+            href={link.url}
+            target={link.url.startsWith('http') ? '_blank' : '_self'}
+            rel="noopener noreferrer"
+            class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-500 hover:text-primary hover:bg-primary/10 transition-all"
+          >
+            {link.icon === 'github' && (
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+              </svg>
+            )}
+            {link.icon === 'rss' && (
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19.01 7.38 20 6.18 20C4.98 20 4 19.01 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1z"/>
+              </svg>
+            )}
+          </a>
+        ))}
+      </div>
     </div>
 
     <!-- Introduction -->
-    <section class="mb-12 p-8 rounded-3xl backdrop-blur-xl bg-white/70 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50">
+    <section class="mb-8 p-8 rounded-3xl backdrop-blur-xl bg-white/70 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50">
       <h2 class="text-lg font-serif font-bold text-slate-900 dark:text-white mb-4">介绍</h2>
       <p class="text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
         你好！我是一个对生活充满好奇的人，喜欢探索各种有趣的事物。这个博客用于记录我的思考和分享我的兴趣爱好。
@@ -32,6 +67,27 @@ const categories = [
       <p class="text-slate-600 dark:text-slate-300 leading-relaxed">
         我对电商运营充满热情，同时也热爱音乐、阅读和宝可梦。希望能在这里与你分享我的见解和心得。
       </p>
+    </section>
+
+    <!-- Skills -->
+    <section class="mb-8 p-8 rounded-3xl backdrop-blur-xl bg-white/70 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50">
+      <h2 class="text-lg font-serif font-bold text-slate-900 dark:text-white mb-6">技能</h2>
+      <div class="space-y-4">
+        {skills.map((skill) => (
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm font-medium text-slate-700 dark:text-slate-200">{skill.name}</span>
+              <span class="text-xs text-slate-400">{skill.level}%</span>
+            </div>
+            <div class="h-2 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+              <div
+                class="h-full bg-gradient-to-r from-primary to-primary/60 rounded-full transition-all duration-500"
+                style={`width: ${skill.level}%`}
+              ></div>
+            </div>
+          </div>
+        ))}
+      </div>
     </section>
 
     <!-- Categories -->

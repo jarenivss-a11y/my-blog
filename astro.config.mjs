@@ -8,7 +8,11 @@ export default defineConfig({
   integrations: [
     tailwind(),
     sitemap({
-      filter: (page) => !page.includes('/tags/'), // Exclude individual tag pages
+      filter: (page) => !page.includes('/tags/'),
     }),
   ],
+  prefetch: {
+    prefetchAll: true,
+    defaultStrategy: 'viewport',
+  },
 });

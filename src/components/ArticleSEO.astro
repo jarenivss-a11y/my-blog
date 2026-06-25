@@ -1,0 +1,44 @@
+---
+// Article-specific SEO for blog posts
+interface Props {
+  title: string;
+  description?: string;
+  url: string;
+  publishedTime: Date;
+  author?: string;
+}
+
+const {
+  title,
+  description = "",
+  url,
+  publishedTime,
+  author = "博主",
+} = Astro.props;
+
+const siteUrl = "https://jarenivss-a11y.github.io/my-blog";
+const fullUrl = `${siteUrl}${url}`;
+---
+
+<!-- Article JSON-LD Structured Data -->
+<script type="application/ld+json" set:html={JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": title,
+  "description": description,
+  "url": fullUrl,
+  "datePublished": publishedTime.toISOString(),
+  "author": {
+    "@type": "Person",
+    "name": author
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "我的博客",
+    "url": siteUrl
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": fullUrl
+  }
+})} />

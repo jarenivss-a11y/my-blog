@@ -4,6 +4,7 @@ import { getCollection, render } from 'astro:content';
 import TableOfContents from '../../components/TableOfContents.astro';
 import SocialShare from '../../components/SocialShare.astro';
 import Comments from '../../components/Comments.astro';
+import ArticleSEO from '../../components/ArticleSEO.astro';
 
 const BASE = '/my-blog';
 const SITE_URL = 'https://jarenivss-a11y.github.io/my-blog';
@@ -81,6 +82,18 @@ const category = categoryInfo[post.data.category] || { name: '未知', icon: '�
         </div>
       </header>
 
+      {/* Cover Image */}
+      {post.data.cover && (
+        <div class="mb-8 rounded-3xl overflow-hidden">
+          <img
+            src={post.data.cover}
+            alt={post.data.title}
+            class="w-full h-64 md:h-80 object-cover"
+            loading="lazy"
+          />
+        </div>
+      )}
+
       <!-- Content -->
       <div class="p-8 rounded-3xl backdrop-blur-xl bg-white/70 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50 prose prose-lg max-w-none prose-slate dark:prose-invert prose-headings:font-serif prose-headings:text-slate-900 dark:prose-headings:text-white prose-p:text-slate-600 dark:prose-p:text-slate-300 prose-li:text-slate-600 dark:prose-li:text-slate-300 prose-a:text-primary prose-strong:text-slate-900 dark:prose-strong:text-white">
         <Content />
@@ -135,6 +148,14 @@ const category = categoryInfo[post.data.category] || { name: '未知', icon: '�
       <Comments title={post.data.title} />
     </div>
   </article>
+
+  <!-- Article SEO -->
+  <ArticleSEO
+    title={post.data.title}
+    description={post.body.slice(0, 200)}
+    url={`/post/${post.id}`}
+    publishedTime={post.data.published}
+  />
 </Layout>
 
 <style is:global>
