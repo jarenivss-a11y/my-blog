@@ -15,6 +15,20 @@ export async function getStaticPaths() {
 const { post } = Astro.props;
 const { Content } = await render(post);
 
+// Get all posts for prev/next navigation
+const allPosts = await getCollection('blog');
+const categoryPosts = allPosts
+  .filter(p => p.data.category === post.data.category && !p.data.draft)
+  .sort((a, b) => b.data.published.getTime() - a.data.published.getTime());
+
+const currentIndex = categoryPosts.findIndex(p => p.id === post.id);
+const prevPost = currentIndex < categoryPosts.length - 1 ? categoryPosts[currentIndex + 1] : null;
+const nextPost = currentIndex > 0 ? categoryPosts[currentIndex - 1] : null;
+
+// Calculate reading time (assuming 400 words per minute)
+const wordCount = post.body.split(/\s+/).length;
+const readingTime = Math.max(1, Math.ceil(wordCount / 400));
+
 const categoryInfo: Record<string, { name: string; icon: string }> = {
   daily: { name: '日常生活', icon: '🏠' },
   music: { name: '音乐分析', icon: '🎵' },
@@ -26,7 +40,7 @@ const categoryInfo: Record<string, { name: string; icon: string }> = {
 const category = categoryInfo[post.data.category] || { name: '未知', icon: '📁' };
 ---
 
-<Layout title={`${post.data.title} | 我的博客`}>
+< Layout title={`${post.data.title} | 我的博客`}>
   <article class="max-w-3xl mx-auto">
     <!-- Header -->
     <header class="mb-12 p-8 rounded-3xl backdrop-blur-xl bg-white/70 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50">
@@ -42,14 +56,19 @@ const category = categoryInfo[post.data.category] || { name: '未知', icon: '�
       </h1>
       <div class="flex items-center gap-4 text-sm text-slate-400 dark:text-slate-500">
         <span>{post.data.published.toLocaleDateString('zh-CN')}</span>
-        {post.data.tags && (
-          <div class="flex gap-2">
-            {post.data.tags.map((tag) => (
-              <span class="px-2 py-0.5 text-xs bg-primary/10 text-primary dark:bg-primary/20 rounded-full">
-                {tag}
-              </span>
-            ))}
-          </div>
+        <span class="text-slate-300 dark:text-slate-600">·</span>
+        <span>{readingTime} 分钟阅读</span>
+        {post.data.tags && post.data.tags.length > 0 && (
+          <>
+            <span class="text-slate-300 dark:text-slate-600">·</span>
+            <div class="flex gap-2">
+              {post.data.tags.map((tag) => (
+                <a href={`${BASE}/tags/${encodeURIComponent(tag)}`} class="hover:text-primary transition-colors">
+                  #{tag}
+                </a>
+              ))}
+            </div>
+          </>
         )}
       </div>
     </header>
@@ -58,6 +77,38 @@ const category = categoryInfo[post.data.category] || { name: '未知', icon: '�
     <div class="p-8 rounded-3xl backdrop-blur-xl bg-white/70 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50 prose prose-lg max-w-none prose-slate dark:prose-invert prose-headings:font-serif prose-headings:text-slate-900 dark:prose-headings:text-white prose-p:text-slate-600 dark:prose-p:text-slate-300 prose-li:text-slate-600 dark:prose-li:text-slate-300 prose-a:text-primary prose-strong:text-slate-900 dark:prose-strong:text-white">
       <Content />
     </div>
+
+    <!-- Prev/Next Navigation -->
+    {(prevPost || nextPost) && (
+      <nav class="mt-8 grid grid-cols-2 gap-4">
+        {prevPost ? (
+          <a
+            href={`${BASE}/post/${prevPost.id}`}
+            class="group p-6 rounded-2xl backdrop-blur-xl bg-white/50 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50 hover:bg-white/70 dark:hover:bg-slate-800/70 hover:border-primary/30 transition-all"
+          >
+            <span class="text-xs text-slate-400 mb-1 block">← 上一篇</span>
+            <span class="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-primary transition-colors line-clamp-2">
+              {prevPost.data.title}
+            </span>
+          </a>
+        ) : (
+          <div></div>
+        )}
+        {nextPost ? (
+          <a
+            href={`${BASE}/post/${nextPost.id}`}
+            class="group p-6 rounded-2xl backdrop-blur-xl bg-white/50 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50 hover:bg-white/70 dark:hover:bg-slate-800/70 hover:border-primary/30 transition-all text-right"
+          >
+            <span class="text-xs text-slate-400 mb-1 block">下一篇 →</span>
+            <span class="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-primary transition-colors line-clamp-2">
+              {nextPost.data.title}
+            </span>
+          </a>
+        ) : (
+          <div></div>
+        )}
+      </nav>
+    )}
 
     <!-- Footer -->
     <footer class="mt-8 p-6 rounded-2xl backdrop-blur-xl bg-white/50 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50 text-center">

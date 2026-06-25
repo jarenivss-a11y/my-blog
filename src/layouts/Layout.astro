@@ -40,6 +40,7 @@ const currentPath = Astro.url.pathname;
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="alternate" type="application/rss+xml" title="我的博客 RSS" href="/my-blog/rss.xml" />
   </head>
   <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen font-sans antialiased transition-colors duration-500">
     <!-- Background Effects -->
@@ -131,6 +132,18 @@ const currentPath = Astro.url.pathname;
 
     <!-- Footer -->
     <footer class="py-8 border-t border-slate-200/50 dark:border-slate-800/50 text-center">
+      <div class="flex items-center justify-center gap-4 mb-4">
+        <a href="/my-blog/rss.xml" class="text-sm text-slate-400 hover:text-primary transition-colors" title="RSS 订阅">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19.01 7.38 20 6.18 20C4.98 20 4 19.01 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1z"/>
+          </svg>
+        </a>
+        <a href="/my-blog/sitemap-index.xml" class="text-sm text-slate-400 hover:text-primary transition-colors" title="网站地图">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+          </svg>
+        </a>
+      </div>
       <p class="text-sm text-slate-400 dark:text-slate-500">© 2026 我的博客 · 用心记录每一天</p>
     </footer>
 

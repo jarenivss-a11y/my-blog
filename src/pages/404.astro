@@ -1,0 +1,60 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const BASE = '/my-blog';
+---
+
+<Layout title="页面不存在 | 我的博客">
+  <div class="min-h-[60vh] flex items-center justify-center">
+    <div class="text-center">
+      <!-- 404 Icon -->
+      <div class="text-8xl mb-6">🔍</div>
+
+      <!-- Heading -->
+      <h1 class="text-4xl font-serif font-black text-slate-900 dark:text-white mb-4">
+        404
+      </h1>
+      <h2 class="text-xl font-medium text-slate-600 dark:text-slate-300 mb-2">
+        页面不存在
+      </h2>
+      <p class="text-slate-400 dark:text-slate-500 mb-8">
+        抱歉，你访问的页面不存在或已被移除
+      </p>
+
+      <!-- Actions -->
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a
+          href={BASE}
+          class="px-6 py-3 rounded-full bg-primary text-white font-medium hover:bg-primary/90 transition-colors"
+        >
+          返回首页
+        </a>
+        <a
+          href={`${BASE}/search`}
+          class="px-6 py-3 rounded-full border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium hover:border-primary hover:text-primary transition-colors"
+        >
+          搜索文章
+        </a>
+      </div>
+
+      <!-- Random Posts -->
+      <div class="mt-16">
+        <p class="text-sm text-slate-400 mb-4">不如看看这些文章？</p>
+        <div class="flex flex-wrap gap-2 justify-center">
+          <a href={`${BASE}/category/daily`} class="px-4 py-2 rounded-full bg-white/70 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50 text-sm text-slate-600 dark:text-slate-300 hover:border-primary hover:text-primary transition-colors">
+            🏠 日常生活
+          </a>
+          <a href={`${BASE}/category/music`} class="px-4 py-2 rounded-full bg-white/70 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50 text-sm text-slate-600 dark:text-slate-300 hover:border-primary hover:text-primary transition-colors">
+            🎵 音乐分析
+          </a>
+          <a href={`${BASE}/category/ecommerce`} class="px-4 py-2 rounded-full bg-white/70 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50 text-sm text-slate-600 dark:text-slate-300 hover:border-primary hover:text-primary transition-colors">
+            🛒 电商运营
+          </a>
+          <a href={`${BASE}/tags`} class="px-4 py-2 rounded-full bg-white/70 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50 text-sm text-slate-600 dark:text-slate-300 hover:border-primary hover:text-primary transition-colors">
+            🏷️ 标签
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
