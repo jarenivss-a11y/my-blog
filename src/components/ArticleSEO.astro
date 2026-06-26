@@ -6,6 +6,7 @@ interface Props {
   url: string;
   publishedTime: Date;
   author?: string;
+  image?: string;
 }
 
 const {
@@ -14,11 +15,20 @@ const {
   url,
   publishedTime,
   author = "博主",
+  image,
 } = Astro.props;
 
 const siteUrl = "https://jarenivss-a11y.github.io/my-blog";
 const fullUrl = `${siteUrl}${url}`;
+const twitterImage = image || `${siteUrl}/og-default.png`;
 ---
+
+<!-- Twitter Card Meta Tags -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={twitterImage} />
+<meta name="twitter:image:alt" content={title} />
 
 <!-- Article JSON-LD Structured Data -->
 <script type="application/ld+json" set:html={JSON.stringify({
@@ -40,5 +50,6 @@ const fullUrl = `${siteUrl}${url}`;
   "mainEntityOfPage": {
     "@type": "WebPage",
     "@id": fullUrl
-  }
+  },
+  ...(image && { "image": image })
 })} />

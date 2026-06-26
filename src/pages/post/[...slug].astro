@@ -166,6 +166,7 @@ const category = categoryInfo[post.data.category] || { name: '未知', icon: '�
     description={post.body.slice(0, 200)}
     url={`/post/${post.id}`}
     publishedTime={post.data.published}
+    image={post.data.cover}
   />
 </Layout>
 
