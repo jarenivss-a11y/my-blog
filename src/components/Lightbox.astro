@@ -1,0 +1,35 @@
+<script>
+  function initLightbox() {
+    document.querySelectorAll('img').forEach((img) => {
+      if (img.closest('a')?.classList.contains('lightbox-enabled')) return;
+      if (img.closest('.prose') || img.closest('article')) {
+        const link = document.createElement('a');
+        link.href = img.src;
+        link.className = 'lightbox-enabled cursor-zoom-in';
+        link.setAttribute('data-lightbox', 'true');
+        img.parentNode?.insertBefore(link, img);
+        link.appendChild(img);
+      }
+    });
+
+    document.querySelectorAll('a[data-lightbox]').forEach((link) => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const img = link.querySelector('img');
+        if (!img) return;
+
+        const overlay = document.createElement('div');
+        overlay.className = 'lightbox-overlay fixed inset-0 bg-black/90 z-[9999] flex items-center justify-center cursor-zoom-out';
+        overlay.innerHTML = `<img src="${link.href}" class="max-w-[90vw] max-h-[90vh] object-contain" />`;
+        document.body.appendChild(overlay);
+        overlay.addEventListener('click', () => overlay.remove());
+        overlay.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') overlay.remove();
+        });
+      });
+    });
+  }
+
+  initLightbox();
+  document.addEventListener('astro:after-swap', initLightbox);
+</script>

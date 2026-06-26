@@ -7,6 +7,7 @@ import ReadingProgress from '../components/ReadingProgress.astro';
 import VisitorStats from '../components/VisitorStats.astro';
 import SEO from '../components/SEO.astro';
 import CopyButton from '../components/CopyButton.astro';
+import Lightbox from '../components/Lightbox.astro';
 
 interface Props {
   title: string;
@@ -313,5 +314,6 @@ const currentPath = Astro.url.pathname;
       });
     </script>
     <CopyButton />
+    <Lightbox />
   </body>
 </html>
