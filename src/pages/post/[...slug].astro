@@ -6,6 +6,7 @@ import SocialShare from '../../components/SocialShare.astro';
 import Comments from '../../components/Comments.astro';
 import ArticleSEO from '../../components/ArticleSEO.astro';
 import RelatedPosts from '../../components/RelatedPosts.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
 
 const BASE = '/my-blog';
 const SITE_URL = 'https://jarenivss-a11y.github.io/my-blog';
@@ -52,6 +53,12 @@ const category = categoryInfo[post.data.category] || { name: '未知', icon: '�
     <TableOfContents headings={headings} />
 
     <div class="max-w-3xl mx-auto">
+      <!-- Breadcrumb -->
+      <Breadcrumb items={[
+        { name: category.name, href: `${BASE}/category/${post.data.category}` },
+        { name: post.data.title }
+      ]} />
+
       <!-- Header -->
       <header class="mb-12 p-8 rounded-3xl backdrop-blur-xl bg-white/70 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50">
         <a

@@ -21,7 +21,10 @@ const {
 
 const siteUrl = "https://jarenivss-a11y.github.io/my-blog";
 const fullUrl = `${siteUrl}${url}`;
+const canonicalUrl = `https://jarenivss-a11y.github.io${url}`;
 ---
+
+<link rel="canonical" href={canonicalUrl} />
 
 {type === 'article' && publishedTime && (
   <script type="application/ld+json" set:html={JSON.stringify({

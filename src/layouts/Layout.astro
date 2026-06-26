@@ -57,6 +57,11 @@ const currentPath = Astro.url.pathname;
     <SEO title={title} description={description} url={Astro.url.pathname} />
   </head>
   <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen font-sans antialiased transition-colors duration-500">
+    <!-- Skip to content -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary focus:text-white focus:rounded-lg focus:outline-none focus:ring-2 focus:ring-white">
+      跳转到主要内容
+    </a>
+
     <!-- Reading Progress Bar -->
     <ReadingProgress />
 
@@ -206,6 +211,17 @@ const currentPath = Astro.url.pathname;
       }
       ::-webkit-scrollbar-thumb:hover {
         background: rgba(99, 102, 241, 0.6);
+      }
+
+      /* Focus Styles for Accessibility */
+      :focus-visible {
+        outline: 2px solid rgba(99, 102, 241, 0.6);
+        outline-offset: 2px;
+      }
+      a:focus-visible, button:focus-visible {
+        outline: 2px solid var(--color-primary, #6366f1);
+        outline-offset: 2px;
+        border-radius: 4px;
       }
 
       /* Page Transition Animations */

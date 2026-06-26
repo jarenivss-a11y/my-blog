@@ -1,0 +1,27 @@
+---
+interface Props {
+  items: Array<{ name: string; href?: string }>;
+}
+
+const { items } = Astro.props;
+---
+
+<nav aria-label="面包屑导航" class="mb-6">
+  <ol class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+    <li>
+      <a href="/my-blog/" class="hover:text-primary transition-colors">首页</a>
+    </li>
+    {items.map((item, index) => (
+      <>
+        <li class="text-slate-300 dark:text-slate-600">/</li>
+        {item.href ? (
+          <li>
+            <a href={item.href} class="hover:text-primary transition-colors">{item.name}</a>
+          </li>
+        ) : (
+          <li class="text-slate-700 dark:text-slate-200" aria-current="page">{item.name}</li>
+        )}
+      </>
+    ))}
+  </ol>
+</nav>
