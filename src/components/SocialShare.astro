@@ -71,6 +71,18 @@ const encodedUrl = encodeURIComponent(url);
         await navigator.clipboard.writeText(url);
         copyIcon.classList.add('hidden');
         checkIcon.classList.remove('hidden');
+
+        // Show toast
+        const toast = document.createElement('div');
+        toast.className = 'fixed bottom-8 left-1/2 -translate-x-1/2 px-4 py-2 rounded-lg bg-slate-800 text-white text-sm opacity-0 transition-opacity duration-300 pointer-events-none z-50';
+        toast.textContent = '链接已复制到剪贴板';
+        document.body.appendChild(toast);
+        requestAnimationFrame(() => toast.classList.add('opacity-100'));
+        setTimeout(() => {
+          toast.classList.remove('opacity-100');
+          setTimeout(() => toast.remove(), 300);
+        }, 2000);
+
         setTimeout(() => {
           copyIcon.classList.remove('hidden');
           checkIcon.classList.add('hidden');
