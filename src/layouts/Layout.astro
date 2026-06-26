@@ -6,6 +6,7 @@ import BackToTop from '../components/BackToTop.astro';
 import ReadingProgress from '../components/ReadingProgress.astro';
 import VisitorStats from '../components/VisitorStats.astro';
 import SEO from '../components/SEO.astro';
+import CopyButton from '../components/CopyButton.astro';
 
 interface Props {
   title: string;
@@ -311,5 +312,6 @@ const currentPath = Astro.url.pathname;
         initSearch();
       });
     </script>
+    <CopyButton />
   </body>
 </html>
