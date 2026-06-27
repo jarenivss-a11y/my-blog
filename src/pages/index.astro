@@ -82,8 +82,24 @@ const allTags = [...new Set(allPosts.flatMap(post => post.data.tags || []))];
 
       <!-- Latest Posts -->
       <section>
-        <h2 class="text-xs font-medium text-slate-400 uppercase tracking-widest mb-6">最新文章</h2>
-        <div class="space-y-4">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-xs font-medium text-slate-400 uppercase tracking-widest">最新文章</h2>
+          <div class="flex gap-2">
+            <button id="layout-list" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" title="列表布局">
+              <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+              </svg>
+            </button>
+            <button id="layout-grid" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" title="网格布局">
+              <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- List Layout -->
+        <div id="posts-list" class="space-y-4">
           {posts.length > 0 ? (
             posts.map((post) => (
               <article class="group">
@@ -119,9 +135,74 @@ const allTags = [...new Set(allPosts.flatMap(post => post.data.tags || []))];
             </div>
           )}
         </div>
+
+        <!-- Grid Layout -->
+        <div id="posts-grid" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4">
+          {posts.length > 0 ? (
+            posts.map((post) => (
+              <article class="group">
+                <a
+                  href={`${BASE}/post/${post.id}`}
+                  class="block p-6 rounded-2xl backdrop-blur-xl bg-white/70 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50 hover:bg-white dark:hover:bg-slate-800 hover:border-primary/30 dark:hover:border-primary/50 hover:shadow-lg transition-all duration-300 h-full"
+                >
+                  <div class="flex items-center gap-3 mb-3">
+                    <span class="px-2 py-0.5 text-xs bg-primary/10 text-primary dark:bg-primary/20 rounded-full">
+                      {categoryInfo[post.data.category]?.name || '未知'}
+                    </span>
+                    <span class="text-xs text-slate-400">{post.data.published.toLocaleDateString('zh-CN')}</span>
+                  </div>
+                  <h3 class="text-lg font-serif font-semibold text-slate-900 dark:text-white group-hover:text-primary transition-colors mb-2 line-clamp-2">
+                    {post.data.title}
+                  </h3>
+                  <p class="text-sm text-slate-500 dark:text-slate-400 line-clamp-3">{post.body.slice(0, 100)}...</p>
+                </a>
+              </article>
+            ))
+          ) : (
+            <div class="col-span-2 text-center py-16">
+              <p class="text-slate-400 dark:text-slate-500">暂无文章</p>
+            </div>
+          )}
+        </div>
       </section>
     </main>
 
     <Sidebar />
   </div>
+
+  <script>
+    function initLayoutToggle() {
+      const listBtn = document.getElementById('layout-list');
+      const gridBtn = document.getElementById('layout-grid');
+      const listView = document.getElementById('posts-list');
+      const gridView = document.getElementById('posts-grid');
+
+      if (!listBtn || !gridBtn || !listView || !gridView) return;
+
+      const savedLayout = localStorage.getItem('posts-layout') || 'list';
+
+      function setLayout(layout: string) {
+        if (layout === 'grid') {
+          listView.classList.add('hidden');
+          gridView.classList.remove('hidden');
+          gridBtn.classList.add('bg-primary/10', 'text-primary');
+          listBtn.classList.remove('bg-primary/10', 'text-primary');
+        } else {
+          listView.classList.remove('hidden');
+          gridView.classList.add('hidden');
+          listBtn.classList.add('bg-primary/10', 'text-primary');
+          gridBtn.classList.remove('bg-primary/10', 'text-primary');
+        }
+        localStorage.setItem('posts-layout', layout);
+      }
+
+      listBtn.addEventListener('click', () => setLayout('list'));
+      gridBtn.addEventListener('click', () => setLayout('grid'));
+
+      setLayout(savedLayout);
+    }
+
+    initLayoutToggle();
+    document.addEventListener('astro:after-swap', initLayoutToggle);
+  </script>
 </Layout>
