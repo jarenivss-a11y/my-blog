@@ -1,13 +1,16 @@
 ---
-// Reading Progress Bar - shows at the top of the page
+// Reading Progress Bar - shows at the top of the page with animated gradient
 ---
 
 <div id="reading-progress" class="fixed top-0 left-0 right-0 z-[100]">
   <div
     id="progress-bar"
-    class="h-1 bg-gradient-to-r from-primary to-primary transition-all duration-100 ease-out"
+    class="h-1 transition-all duration-100 ease-out relative overflow-hidden"
     style="width: 0%;"
-  ></div>
+  >
+    <div class="absolute inset-0 bg-gradient-to-r from-primary via-purple-500 to-pink-500 animate-gradient"></div>
+    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent animate-shine"></div>
+  </div>
   <!-- Reading stats tooltip -->
   <div id="reading-stats" class="hidden absolute right-4 top-3 px-3 py-1.5 rounded-lg backdrop-blur-xl bg-white/90 dark:bg-slate-800/90 border border-white/50 dark:border-slate-700/50 shadow-lg text-xs text-slate-500 dark:text-slate-400 flex items-center gap-3">
     <span id="reading-percent">0%</span>
@@ -15,6 +18,24 @@
     <span id="reading-time-left"></span>
   </div>
 </div>
+
+<style>
+  @keyframes gradient {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  @keyframes shine {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+  .animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient 3s ease infinite;
+  }
+  .animate-shine {
+    animation: shine 2s ease-in-out infinite;
+  }
+</style>
 
 <script>
   function initReadingProgress() {
