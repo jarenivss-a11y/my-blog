@@ -1,0 +1,62 @@
+---
+// Reading Position - saves and restores scroll position for articles
+---
+
+<script>
+  function initReadingPosition() {
+    const STORAGE_KEY = 'reading-position';
+    const article = document.querySelector('article');
+    if (!article) return;
+
+    const articleId = window.location.pathname;
+
+    function getPositions() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+      } catch {
+        return {};
+      }
+    }
+
+    function savePosition() {
+      const scrollY = window.scrollY;
+      const positions = getPositions();
+      positions[articleId] = {
+        scrollY,
+        timestamp: Date.now()
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(positions));
+    }
+
+    function restorePosition() {
+      const positions = getPositions();
+      const saved = positions[articleId];
+      if (saved) {
+        // Only restore if saved within last 7 days
+        const sevenDays = 7 * 24 * 60 * 60 * 1000;
+        if (Date.now() - saved.timestamp < sevenDays) {
+          // Small delay to ensure page is ready
+          setTimeout(() => {
+            window.scrollTo({ top: saved.scrollY, behavior: 'instant' });
+          }, 100);
+        }
+      }
+    }
+
+    // Save position on scroll (debounced)
+    let saveTimeout;
+    window.addEventListener('scroll', () => {
+      clearTimeout(saveTimeout);
+      saveTimeout = setTimeout(savePosition, 500);
+    }, { passive: true });
+
+    // Also save before leaving
+    window.addEventListener('beforeunload', savePosition);
+
+    // Restore on load
+    restorePosition();
+  }
+
+  initReadingPosition();
+  document.addEventListener('astro:after-swap', initReadingPosition);
+</script>

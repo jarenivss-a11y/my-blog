@@ -12,6 +12,7 @@ import JumpToComments from '../../components/JumpToComments.astro';
 import ReadingMode from '../../components/ReadingMode.astro';
 import ReadAloud from '../../components/ReadAloud.astro';
 import ParagraphCopy from '../../components/ParagraphCopy.astro';
+import ReadingPosition from '../../components/ReadingPosition.astro';
 
 const BASE = '/my-blog';
 const SITE_URL = 'https://jarenivss-a11y.github.io/my-blog';
@@ -194,6 +195,9 @@ const category = categoryInfo[post.data.category] || { name: '未知', icon: '�
 
       <!-- Paragraph Copy -->
       <ParagraphCopy />
+
+      <!-- Reading Position Persistence -->
+      <ReadingPosition />
 
       <!-- Comments -->
       <Comments title={post.data.title} />
