@@ -1,0 +1,52 @@
+---
+// CopyAllCode - adds a button to copy all code blocks at once
+---
+
+<script>
+  function initCopyAllCode() {
+    const article = document.querySelector('article');
+    if (!article) return;
+
+    const codeBlocks = article.querySelectorAll('pre');
+    if (codeBlocks.length <= 1) return;
+
+    // Create a floating button to copy all code
+    const container = article.querySelector('.prose');
+    if (!container) return;
+
+    const button = document.createElement('button');
+    button.className = 'copy-all-code-btn absolute top-4 right-4 px-3 py-1.5 text-xs rounded-lg bg-slate-700 hover:bg-slate-600 text-white transition-colors opacity-0 hover:opacity-100';
+    button.textContent = '复制所有代码';
+    button.style.cssText = 'z-index: 10;';
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'relative';
+    wrapper.style.cssText = 'position: relative;';
+
+    container.querySelectorAll('pre').forEach((pre) => {
+      pre.parentNode?.insertBefore(wrapper.cloneNode(true), pre);
+    });
+
+    // Add the button to the article header
+    const header = article.querySelector('header');
+    if (header) {
+      const btn = document.createElement('button');
+      btn.className = 'copy-all-code-btn px-3 py-1.5 text-xs rounded-lg bg-slate-700 hover:bg-slate-600 text-white transition-colors';
+      btn.textContent = `复制所有代码 (${codeBlocks.length})`;
+      btn.addEventListener('click', async () => {
+        const allCode = Array.from(codeBlocks)
+          .map((pre, i) => `// 代码块 ${i + 1}\n${pre.textContent || ''}`)
+          .join('\n\n');
+        await navigator.clipboard.writeText(allCode);
+        btn.textContent = '已复制!';
+        setTimeout(() => {
+          btn.textContent = `复制所有代码 (${codeBlocks.length})`;
+        }, 2000);
+      });
+      header.appendChild(btn);
+    }
+  }
+
+  initCopyAllCode();
+  document.addEventListener('astro:after-swap', initCopyAllCode);
+</script>
