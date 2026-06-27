@@ -1,0 +1,119 @@
+---
+// ShortcutHelp - shows keyboard shortcut help modal
+---
+
+<button
+  id="shortcut-help-btn"
+  class="fixed right-4 bottom-4 z-40 p-3 rounded-full backdrop-blur-xl bg-white/80 dark:bg-slate-800/80 border border-white/50 dark:border-slate-700/50 shadow-lg hover:shadow-xl transition-all hover:scale-105 hover:bg-primary hover:text-white"
+  aria-label="键盘快捷键"
+  title="键盘快捷键"
+>
+  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+  </svg>
+</button>
+
+<!-- Shortcut Help Modal -->
+<div id="shortcut-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center">
+  <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="shortcut-overlay"></div>
+  <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden">
+    <div class="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-700">
+      <h3 class="text-lg font-bold text-slate-900 dark:text-white">键盘快捷键</h3>
+      <button id="shortcut-close" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+        <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <div class="p-6 space-y-4">
+      <div class="space-y-3">
+        <h4 class="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">导航</h4>
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-slate-600 dark:text-slate-300">首页</span>
+            <kbd class="px-2 py-1 bg-slate-100 dark:bg-slate-700 rounded text-sm font-mono">G then H</kbd>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-slate-600 dark:text-slate-300">归档</span>
+            <kbd class="px-2 py-1 bg-slate-100 dark:bg-slate-700 rounded text-sm font-mono">G then A</kbd>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-slate-600 dark:text-slate-300">搜索</span>
+            <kbd class="px-2 py-1 bg-slate-100 dark:bg-slate-700 rounded text-sm font-mono">/</kbd>
+          </div>
+        </div>
+      </div>
+      <div class="space-y-3">
+        <h4 class="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">文章</h4>
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-slate-600 dark:text-slate-300">阅读模式</span>
+            <kbd class="px-2 py-1 bg-slate-100 dark:bg-slate-700 rounded text-sm font-mono">R</kbd>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-slate-600 dark:text-slate-300">朗读文章</span>
+            <kbd class="px-2 py-1 bg-slate-100 dark:bg-slate-700 rounded text-sm font-mono">P</kbd>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-slate-600 dark:text-slate-300">返回顶部</span>
+            <kbd class="px-2 py-1 bg-slate-100 dark:bg-slate-700 rounded text-sm font-mono">T</kbd>
+          </div>
+        </div>
+      </div>
+      <div class="space-y-3">
+        <h4 class="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">其他</h4>
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-slate-600 dark:text-slate-300">切换主题</span>
+            <kbd class="px-2 py-1 bg-slate-100 dark:bg-slate-700 rounded text-sm font-mono">D</kbd>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-slate-600 dark:text-slate-300">显示帮助</span>
+            <kbd class="px-2 py-1 bg-slate-100 dark:bg-slate-700 rounded text-sm font-mono">?</kbd>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function initShortcutHelp() {
+    const btn = document.getElementById('shortcut-help-btn');
+    const modal = document.getElementById('shortcut-modal');
+    const closeBtn = document.getElementById('shortcut-close');
+    const overlay = document.getElementById('shortcut-overlay');
+
+    if (!btn || !modal) return;
+
+    function openModal() {
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      modal.classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    btn.addEventListener('click', openModal);
+    closeBtn?.addEventListener('click', closeModal);
+    overlay?.addEventListener('click', closeModal);
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+        closeModal();
+      }
+      if (e.key === '?' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        const target = e.target as HTMLElement;
+        if (target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA') {
+          e.preventDefault();
+          openModal();
+        }
+      }
+    });
+  }
+
+  initShortcutHelp();
+  document.addEventListener('astro:after-swap', initShortcutHelp);
+</script>
