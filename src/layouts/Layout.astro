@@ -29,6 +29,7 @@ const categories = [
 
 const navLinks = [
   { name: '首页', href: '/' },
+  { name: '技能库', href: '/skills' },
   { name: '归档', href: '/archive' },
   { name: '标签', href: '/tags' },
   { name: '订阅', href: '/feed' },
@@ -43,6 +44,21 @@ const currentPath = Astro.url.pathname;
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
+    <!-- Blocking script to set theme color before page renders -->
+    <script is:inline>
+      (function() {
+        var saved = localStorage.getItem('blog-theme-color');
+        if (saved) {
+          var hex = saved.replace('#', '');
+          var r = parseInt(hex.substring(0, 2), 16);
+          var g = parseInt(hex.substring(2, 4), 16);
+          var b = parseInt(hex.substring(4, 6), 16);
+          document.documentElement.style.setProperty('--color-primary', saved);
+          document.documentElement.style.setProperty('--color-primary-light', 'rgba(' + r + ', ' + g + ', ' + b + ', 0.12)');
+          document.documentElement.style.setProperty('--color-primary-dark', 'rgba(' + r + ', ' + g + ', ' + b + ', 0.25)');
+        }
+      })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
     <meta name="description" content={description} />
@@ -219,6 +235,13 @@ const currentPath = Astro.url.pathname;
 
       /* Theme Color Variables */
       :root {
+        --color-primary: #6366f1;
+        --color-primary-light: rgba(99, 102, 241, 0.12);
+        --color-primary-dark: rgba(99, 102, 241, 0.25);
+      }
+
+      /* Also set on html element for dynamic updates */
+      html {
         --color-primary: #6366f1;
         --color-primary-light: rgba(99, 102, 241, 0.12);
         --color-primary-dark: rgba(99, 102, 241, 0.25);

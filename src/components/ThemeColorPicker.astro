@@ -82,8 +82,20 @@
 
   function applyThemeColor(color: string) {
     document.documentElement.style.setProperty('--color-primary', color);
-    document.documentElement.style.setProperty('--color-primary-light', color + '20');
-    document.documentElement.style.setProperty('--color-primary-dark', color + '40');
+
+    // Calculate lighter and darker variants
+    const hex = color.replace('#', '');
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+
+    document.documentElement.style.setProperty('--color-primary-light', `rgba(${r}, ${g}, ${b}, 0.12)`);
+    document.documentElement.style.setProperty('--color-primary-dark', `rgba(${r}, ${g}, ${b}, 0.25)`);
+
+    // Update all elements with inline primary colors
+    document.querySelectorAll('[style*="--color-primary"]').forEach(el => {
+      (el as HTMLElement).style.setProperty('--color-primary', color);
+    });
 
     const customColor = document.getElementById('custom-color') as HTMLInputElement;
     if (customColor) {
