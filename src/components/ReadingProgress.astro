@@ -76,6 +76,14 @@
         }
       }
 
+      // Update title with progress
+      const originalTitle = document.title.replace(/^\[\d+%\] /, '');
+      if (progress > 5 && progress < 100) {
+        document.title = `[${Math.round(progress)}%] ${originalTitle}`;
+      } else {
+        document.title = originalTitle;
+      }
+
       // Show stats on hover/focus
       if (statsEl) {
         statsEl.classList.toggle('hidden', progress < 5 || progress >= 100);
