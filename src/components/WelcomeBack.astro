@@ -1,0 +1,106 @@
+---
+// WelcomeBack - shows a welcome message for returning visitors
+---
+
+<script>
+  function initWelcomeBack() {
+    const STORAGE_KEY = 'last-visit';
+    const VISITED_KEY = 'has-visited';
+
+    const lastVisit = localStorage.getItem(STORAGE_KEY);
+    const hasVisited = localStorage.getItem(VISITED_KEY);
+
+    const now = new Date();
+    const today = now.toDateString();
+
+    // Update last visit
+    localStorage.setItem(STORAGE_KEY, today);
+
+    if (!hasVisited) {
+      localStorage.setItem(VISITED_KEY, 'true');
+      return; // First visit, don't show welcome back
+    }
+
+    if (lastVisit && lastVisit !== today) {
+      // Returning visitor
+      const daysSince = Math.floor((now.getTime() - new Date(lastVisit).getTime()) / (1000 * 60 * 60 * 24));
+
+      if (daysSince >= 7) {
+        showWelcomeBack(`欢迎回来！你已经 ${daysSince} 天没来了，最近有很多新内容哦 🎉`);
+      } else if (daysSince >= 1) {
+        showWelcomeBack(`欢迎回来！上次访问是 ${daysSince} 天前 👋`);
+      }
+    }
+
+    // Also show recently read articles if any
+    const historyKey = 'browse-history';
+    try {
+      const history = JSON.parse(localStorage.getItem(historyKey) || '[]');
+      if (history.length > 0) {
+        const recentItem = history[0];
+        if (recentItem.date === today) {
+          // User has been reading today
+          const readCount = history.filter((h: any) => h.date === today).length;
+          if (readCount >= 2) {
+            showToast(`今天已经阅读了 ${readCount} 篇文章，继续加油！ 📚`, 4000);
+          }
+        }
+      }
+    } catch {}
+  }
+
+  function showWelcomeBack(message: string) {
+    const toast = document.createElement('div');
+    toast.className = 'welcome-toast fixed top-20 left-1/2 -translate-x-1/2 z-[200] px-6 py-3 rounded-2xl backdrop-blur-xl bg-primary/90 text-white shadow-lg animate-fade-in-down';
+    toast.style.cssText = 'animation: fadeInDown 0.5s ease-out forwards;';
+    toast.innerHTML = `
+      <div class="flex items-center gap-3">
+        <span class="text-lg">👋</span>
+        <span class="font-medium">${message}</span>
+      </div>
+    `;
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+      toast.style.animation = 'fadeOutUp 0.5s ease-out forwards';
+      setTimeout(() => toast.remove(), 500);
+    }, 5000);
+  }
+
+  function showToast(message: string, duration: number) {
+    const toast = document.createElement('div');
+    toast.className = 'welcome-toast fixed top-20 left-1/2 -translate-x-1/2 z-[200] px-6 py-3 rounded-2xl backdrop-blur-xl bg-slate-800/90 text-white shadow-lg';
+    toast.innerHTML = `
+      <div class="flex items-center gap-3">
+        <span>${message}</span>
+      </div>
+    `;
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transition = 'opacity 0.5s';
+      setTimeout(() => toast.remove(), 500);
+    }, duration);
+  }
+
+  // Add animation keyframes
+  if (!document.getElementById('welcome-styles')) {
+    const style = document.createElement('style');
+    style.id = 'welcome-styles';
+    style.textContent = `
+      @keyframes fadeInDown {
+        from { opacity: 0; transform: translate(-50%, -20px); }
+        to { opacity: 1; transform: translate(-50%, 0); }
+      }
+      @keyframes fadeOutUp {
+        from { opacity: 1; transform: translate(-50%, 0); }
+        to { opacity: 0; transform: translate(-50%, -20px); }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  initWelcomeBack();
+  document.addEventListener('astro:after-swap', initWelcomeBack);
+</script>
