@@ -1,0 +1,62 @@
+---
+// Browse History Component - tracks recently viewed posts
+interface Props {
+  maxItems?: number;
+}
+
+const { maxItems = 5 } = Astro.props;
+---
+
+<div id="browse-history" class="p-4 rounded-2xl backdrop-blur-xl bg-white/50 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50">
+  <h4 class="text-xs font-medium text-slate-400 uppercase tracking-widest mb-3">最近浏览</h4>
+  <div id="history-list" class="space-y-2">
+    <p class="text-sm text-slate-400 italic">暂无浏览记录</p>
+  </div>
+</div>
+
+<script define:vars={{ maxItems }}>
+  const STORAGE_KEY = 'browse-history';
+
+  function getHistory() {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    } catch {
+      return [];
+    }
+  }
+
+  function addToHistory(postId, title, url) {
+    const history = getHistory().filter(item => item.id !== postId);
+    history.unshift({ id: postId, title, url, time: Date.now() });
+    const trimmed = history.slice(0, maxItems);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(trimmed));
+    renderHistory();
+  }
+
+  function renderHistory() {
+    const list = document.getElementById('history-list');
+    if (!list) return;
+
+    const history = getHistory();
+    if (history.length === 0) {
+      list.innerHTML = '<p class="text-sm text-slate-400 italic">暂无浏览记录</p>';
+      return;
+    }
+
+    list.innerHTML = history.map(item => `
+      <a href="${item.url}" class="block text-sm text-slate-600 dark:text-slate-300 hover:text-primary transition-colors line-clamp-2 py-1">
+        <span class="text-primary/60 mr-2">·</span>${item.title}
+      </a>
+    `).join('');
+  }
+
+  // Track current page
+  const titleEl = document.querySelector('h1');
+  if (titleEl && window.location.pathname.includes('/post/')) {
+    const title = titleEl.textContent?.trim() || '';
+    const path = window.location.pathname;
+    addToHistory(path, title, path);
+  }
+
+  renderHistory();
+</script>
