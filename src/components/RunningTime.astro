@@ -1,0 +1,28 @@
+---
+const startDate = new Date('2024-01-01'); // Blog start date - update this to your actual blog start date
+const now = new Date();
+const daysRunning = Math.floor((now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+---
+
+<div class="running-time text-xs text-slate-400 dark:text-slate-500">
+  <span>博客已运行</span>
+  <span id="running-days" class="font-mono text-primary ml-1">{daysRunning}</span>
+  <span>天</span>
+</div>
+
+<script>
+  function updateRunningTime() {
+    const startDate = new Date('2024-01-01');
+    const now = new Date();
+    const diff = now.getTime() - startDate.getTime();
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const daysEl = document.getElementById('running-days');
+    if (daysEl) {
+      daysEl.textContent = days.toString();
+    }
+  }
+
+  updateRunningTime();
+  // Update every day
+  setInterval(updateRunningTime, 24 * 60 * 60 * 1000);
+</script>
