@@ -47,7 +47,7 @@ const monthNames = ['一月', '二月', '三月', '四月', '五月', '六月', 
             <span>{year}</span>
             <span class="text-sm font-normal text-slate-400">{Object.values(months).flat().length} 篇</span>
           </h2>
-          <div class="space-y-8 pl-4 border-l-2 border-primary/20">
+          <div class="space-y-8 pl-4 border-l-2 border-primary">
             {Object.entries(months)
               .sort(([a], [b]) => Number(b) - Number(a))
               .map(([month, monthPosts]) => (
@@ -59,7 +59,7 @@ const monthNames = ['一月', '二月', '三月', '四月', '五月', '六月', 
                     {monthPosts.map((post) => (
                       <a
                         href={`${BASE}/post/${post.id}`}
-                        class="group flex items-center gap-4 p-4 rounded-xl backdrop-blur-xl bg-white/50 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50 hover:bg-white/70 dark:hover:bg-slate-800/70 hover:border-primary/30 transition-all"
+                        class="group flex items-center gap-4 p-4 rounded-xl backdrop-blur-xl bg-white/50 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50 hover:bg-white/70 dark:hover:bg-slate-800/70 hover:border-primary transition-all"
                       >
                         <span class="text-sm text-slate-400 w-16 flex-shrink-0">
                           {post.data.published.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' })}
@@ -67,7 +67,7 @@ const monthNames = ['一月', '二月', '三月', '四月', '五月', '六月', 
                         <span class="flex-1 text-slate-800 dark:text-slate-100 group-hover:text-primary transition-colors line-clamp-1">
                           {post.data.title}
                         </span>
-                        <span class="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary flex-shrink-0">
+                        <span class="text-xs px-2 py-0.5 rounded-full bg-primary text-primary flex-shrink-0">
                           {categoryInfo[post.data.category]?.name || '未知'}
                         </span>
                       </a>

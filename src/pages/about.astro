@@ -28,7 +28,7 @@ const socialLinks = [
   <div class="max-w-3xl mx-auto">
     <!-- Avatar Card -->
     <div class="mb-8 p-8 rounded-3xl backdrop-blur-xl bg-gradient-to-br from-white/80 to-slate-100/80 dark:from-slate-800/80 dark:to-slate-900/80 border border-white/50 dark:border-slate-700/50 text-center">
-      <div class="w-28 h-28 mx-auto mb-6 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-5xl font-serif text-white shadow-xl shadow-primary/30">
+      <div class="w-28 h-28 mx-auto mb-6 rounded-full bg-gradient-to-br from-primary to-primary flex items-center justify-center text-5xl font-serif text-white shadow-xl shadow-primary">
         M
       </div>
       <h1 class="text-3xl font-serif font-black text-slate-900 dark:text-white mb-2">关于我</h1>
@@ -41,7 +41,7 @@ const socialLinks = [
             href={link.url}
             target={link.url.startsWith('http') ? '_blank' : '_self'}
             rel="noopener noreferrer"
-            class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-500 hover:text-primary hover:bg-primary/10 transition-all"
+            class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-500 hover:text-primary hover:bg-primary transition-all"
           >
             {link.icon === 'github' && (
               <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -81,7 +81,7 @@ const socialLinks = [
             </div>
             <div class="h-2 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
               <div
-                class="h-full bg-gradient-to-r from-primary to-primary/60 rounded-full transition-all duration-500"
+                class="h-full bg-gradient-to-r from-primary to-primary rounded-full transition-all duration-500"
                 style={`width: ${skill.level}%`}
               ></div>
             </div>
@@ -97,7 +97,7 @@ const socialLinks = [
         {categories.map((cat) => (
           <a
             href={`${BASE}/category/${cat.slug}`}
-            class="group flex flex-col items-center gap-2 p-4 rounded-2xl backdrop-blur-xl bg-white/50 dark:bg-slate-700/50 border border-white/50 dark:border-slate-600/50 hover:bg-primary/10 hover:border-primary/30 dark:hover:border-primary/50 transition-all duration-300 text-center"
+            class="group flex flex-col items-center gap-2 p-4 rounded-2xl backdrop-blur-xl bg-white/50 dark:bg-slate-700/50 border border-white/50 dark:border-slate-600/50 hover:bg-primary hover:border-primary dark:hover:border-primary transition-all duration-300 text-center"
           >
             <span class="text-2xl">{cat.icon}</span>
             <span class="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-primary transition-colors">{cat.name}</span>
