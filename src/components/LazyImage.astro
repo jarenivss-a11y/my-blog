@@ -1,0 +1,58 @@
+---
+// LazyImage - adds fade-in effect for lazy loaded images
+---
+
+<script>
+  function initLazyImages() {
+    if ('loading' in HTMLImageElement.prototype) {
+      // Native lazy loading supported
+      document.querySelectorAll('img[loading="lazy"]').forEach((img) => {
+        img.addEventListener('load', () => {
+          img.classList.add('lazy-loaded');
+        });
+        // If already loaded
+        if ((img as HTMLImageElement).complete) {
+          img.classList.add('lazy-loaded');
+        }
+      });
+    } else {
+      // Fallback for browsers without native lazy loading
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const img = entry.target as HTMLImageElement;
+            if (img.dataset.src) {
+              img.src = img.dataset.src;
+            }
+            img.classList.add('lazy-loaded');
+            observer.unobserve(img);
+          }
+        });
+      });
+
+      document.querySelectorAll('img[data-src]').forEach((img) => {
+        observer.observe(img);
+      });
+    }
+  }
+
+  initLazyImages();
+  document.addEventListener('astro:after-swap', initLazyImages);
+</script>
+
+<style is:global>
+  img.lazy-loaded {
+    animation: lazyFadeIn 0.5s ease forwards;
+  }
+
+  @keyframes lazyFadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+</style>

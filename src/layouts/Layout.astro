@@ -9,6 +9,7 @@ import RunningTime from '../components/RunningTime.astro';
 import SEO from '../components/SEO.astro';
 import CopyButton from '../components/CopyButton.astro';
 import Lightbox from '../components/Lightbox.astro';
+import LazyImage from '../components/LazyImage.astro';
 import ThemeColorPicker from '../components/ThemeColorPicker.astro';
 import ShareCard from '../components/ShareCard.astro';
 import KeyboardShortcuts from '../components/KeyboardShortcuts.astro';
@@ -317,6 +318,31 @@ const currentPath = Astro.url.pathname;
       ::view-transition-new(root) {
         animation: fadeIn 0.3s ease-out forwards;
       }
+
+      /* Print Styles */
+      @media print {
+        .fixed, header, footer, nav, .back-to-top, #reading-progress, #reading-stats {
+          display: none !important;
+        }
+        body {
+          background: white !important;
+          color: black !important;
+        }
+        article {
+          max-width: 100% !important;
+          box-shadow: none !important;
+        }
+        a {
+          color: black !important;
+          text-decoration: underline !important;
+        }
+        h1, h2, h3 {
+          page-break-after: avoid;
+        }
+        pre, blockquote {
+          page-break-inside: avoid;
+        }
+      }
     </style>
 
     <script>
@@ -403,6 +429,7 @@ const currentPath = Astro.url.pathname;
       });
     </script>
     <CopyButton />
+    <LazyImage />
     <Lightbox />
     <ThemeColorPicker />
     <ShareCard />
