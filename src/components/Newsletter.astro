@@ -1,0 +1,117 @@
+---
+// Newsletter Subscription Component
+---
+
+<div id="newsletter-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="newsletter-overlay"></div>
+  <div class="relative bg-white dark:bg-slate-800 rounded-3xl p-8 max-w-md w-full shadow-2xl">
+    <button id="newsletter-close" class="absolute top-4 right-4 p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+      <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </button>
+
+    <div class="text-center mb-6">
+      <span class="text-4xl mb-4 block">📬</span>
+      <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">订阅更新</h3>
+      <p class="text-sm text-slate-500 dark:text-slate-400">订阅我的博客，获取最新文章推送</p>
+    </div>
+
+    <form id="newsletter-form" class="space-y-4">
+      <div>
+        <input
+          type="email"
+          id="newsletter-email"
+          placeholder="your@email.com"
+          required
+          class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+        />
+      </div>
+      <button
+        type="submit"
+        class="w-full py-3 px-4 bg-primary text-white rounded-xl font-medium hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+        </svg>
+        订阅
+      </button>
+    </form>
+
+    <div id="newsletter-success" class="hidden text-center py-4">
+      <span class="text-4xl mb-4 block">✨</span>
+      <p class="text-slate-600 dark:text-slate-300">订阅成功！感谢你的支持 🎉</p>
+    </div>
+
+    <p class="text-xs text-slate-400 dark:text-slate-500 text-center mt-4">
+      每周一三五更新 · 不发送垃圾邮件
+    </p>
+  </div>
+</div>
+
+<button
+  id="newsletter-trigger"
+  class="fixed bottom-24 left-4 z-50 p-3 rounded-full backdrop-blur-xl bg-white/80 dark:bg-slate-800/80 border border-white/50 dark:border-slate-700/50 shadow-lg hover:shadow-xl transition-all hover:scale-105"
+  aria-label="订阅更新"
+>
+  <svg class="w-5 h-5 text-slate-600 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+  </svg>
+</button>
+
+<script>
+  function initNewsletter() {
+    const modal = document.getElementById('newsletter-modal');
+    const trigger = document.getElementById('newsletter-trigger');
+    const closeBtn = document.getElementById('newsletter-close');
+    const overlay = document.getElementById('newsletter-overlay');
+    const form = document.getElementById('newsletter-form') as HTMLFormElement;
+    const success = document.getElementById('newsletter-success');
+    const emailInput = document.getElementById('newsletter-email') as HTMLInputElement;
+
+    if (!modal || !trigger) return;
+
+    // Check if already subscribed
+    const isSubscribed = localStorage.getItem('newsletter-subscribed');
+    if (isSubscribed) {
+      trigger.classList.add('hidden');
+    }
+
+    const openModal = () => {
+      modal.classList.remove('hidden');
+      emailInput?.focus();
+    };
+
+    const closeModal = () => {
+      modal.classList.add('hidden');
+    };
+
+    trigger.addEventListener('click', openModal);
+    closeBtn?.addEventListener('click', closeModal);
+    overlay?.addEventListener('click', closeModal);
+
+    form?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = emailInput?.value;
+      if (email) {
+        // Store subscription (in real app, this would send to a backend)
+        const subscriptions = JSON.parse(localStorage.getItem('newsletter-emails') || '[]');
+        if (!subscriptions.includes(email)) {
+          subscriptions.push(email);
+          localStorage.setItem('newsletter-emails', JSON.stringify(subscriptions));
+        }
+        localStorage.setItem('newsletter-subscribed', 'true');
+        trigger.classList.add('hidden');
+
+        // Show success
+        form.classList.add('hidden');
+        if (success) success.classList.remove('hidden');
+
+        setTimeout(closeModal, 2000);
+      }
+    });
+  }
+
+  initNewsletter();
+  document.addEventListener('astro:after-swap', initNewsletter);
+</script>

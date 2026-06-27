@@ -11,6 +11,8 @@ import CopyButton from '../components/CopyButton.astro';
 import Lightbox from '../components/Lightbox.astro';
 import ThemeColorPicker from '../components/ThemeColorPicker.astro';
 import ShareCard from '../components/ShareCard.astro';
+import KeyboardShortcuts from '../components/KeyboardShortcuts.astro';
+import Newsletter from '../components/Newsletter.astro';
 
 interface Props {
   title: string;
@@ -384,5 +386,7 @@ const currentPath = Astro.url.pathname;
     <Lightbox />
     <ThemeColorPicker />
     <ShareCard />
+    <KeyboardShortcuts />
+    <Newsletter />
   </body>
 </html>

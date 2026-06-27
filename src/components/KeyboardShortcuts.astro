@@ -1,0 +1,80 @@
+---
+// Keyboard Shortcuts Component
+---
+
+<div id="keyboard-hint" class="fixed bottom-8 left-4 z-40 p-3 rounded-lg backdrop-blur-xl bg-white/80 dark:bg-slate-800/80 border border-white/50 dark:border-slate-700/50 shadow-lg text-xs text-slate-500 opacity-0 transition-opacity duration-300 pointer-events-none">
+  <div class="space-y-1">
+    <div><kbd class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-700 font-mono">j</kbd> / <kbd class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-700 font-mono">k</kbd> 上/下导航</div>
+    <div><kbd class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-700 font-mono">g</kbd> 回到顶部</div>
+    <div><kbd class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-700 font-mono">s</kbd> 搜索</div>
+    <div><kbd class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-700 font-mono">?</kbd> 关闭帮助</div>
+  </div>
+</div>
+
+<script>
+  function initKeyboardShortcuts() {
+    const hint = document.getElementById('keyboard-hint');
+    let hintVisible = false;
+
+    const showHint = () => {
+      if (hint) {
+        hint.classList.remove('opacity-0', 'pointer-events-none');
+        hintVisible = true;
+        setTimeout(() => {
+          hint.classList.add('opacity-0', 'pointer-events-none');
+          hintVisible = false;
+        }, 3000);
+      }
+    };
+
+    // Show hint on first press of ?
+    document.addEventListener('keydown', (e) => {
+      // Ignore if user is typing in an input
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+
+      switch (e.key.toLowerCase()) {
+        case '?':
+          if (hint) {
+            hint.classList.toggle('opacity-0', hintVisible);
+            hint.classList.toggle('pointer-events-none', hintVisible);
+            hintVisible = !hintVisible;
+          }
+          break;
+        case 'j':
+        case 'arrowdown':
+          window.scrollBy({ top: 100, behavior: 'smooth' });
+          break;
+        case 'k':
+        case 'arrowup':
+          window.scrollBy({ top: -100, behavior: 'smooth' });
+          break;
+        case 'g':
+          if (e.shiftKey) {
+            // G = bottom
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+          } else {
+            // g = top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+          break;
+        case 's':
+          const searchInput = document.getElementById('search-input');
+          if (searchInput) {
+            searchInput.focus();
+          }
+          break;
+      }
+    });
+
+    // Show hint on first visit (once per session)
+    if (!sessionStorage.getItem('keyboard-hint-shown')) {
+      setTimeout(showHint, 1000);
+      sessionStorage.setItem('keyboard-hint-shown', 'true');
+    }
+  }
+
+  initKeyboardShortcuts();
+  document.addEventListener('astro:after-swap', initKeyboardShortcuts);
+</script>
