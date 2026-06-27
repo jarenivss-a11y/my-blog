@@ -1,0 +1,27 @@
+---
+// EditOnGitHub - adds edit link for articles
+---
+
+<script>
+  function initEditLink() {
+    const editBtns = document.querySelectorAll('.edit-on-github');
+    editBtns.forEach((btn) => {
+      const postId = btn.getAttribute('data-post-id');
+      if (postId) {
+        const editUrl = `https://github.com/jarenivss-a11y/my-blog/edit/main/src/content/blog/${postId}.md`;
+        (btn as HTMLAnchorElement).href = editUrl;
+        (btn as HTMLAnchorElement).target = '_blank';
+        btn.classList.remove('hidden');
+      }
+    });
+  }
+
+  initEditLink();
+  document.addEventListener('astro:after-swap', initEditLink);
+</script>
+
+<style>
+  .edit-on-github {
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-full text-slate-500 hover:text-primary transition-colors;
+  }
+</style>
