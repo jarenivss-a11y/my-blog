@@ -17,6 +17,7 @@ import Newsletter from '../components/Newsletter.astro';
 import ScrollAnimations from '../components/ScrollAnimations.astro';
 import RandomPost from '../components/RandomPost.astro';
 import ShortcutHelp from '../components/ShortcutHelp.astro';
+import FontSize from '../components/FontSize.astro';
 import AnnouncementBanner from '../components/AnnouncementBanner.astro';
 import CopyLinkBubble from '../components/CopyLinkBubble.astro';
 import ReadingList from '../components/ReadingList.astro';
@@ -301,6 +302,7 @@ const currentPath = Astro.url.pathname;
         --color-primary: #6366f1;
         --color-primary-light: rgba(99, 102, 241, 0.12);
         --color-primary-dark: rgba(99, 102, 241, 0.25);
+        --article-font-size: 18px;
       }
 
       /* Focus Styles for Accessibility */
@@ -451,6 +453,7 @@ const currentPath = Astro.url.pathname;
     <BackButton />
     <RandomPost />
     <ShortcutHelp />
+    <FontSize />
     <ReadingList />
   </body>
 </html>

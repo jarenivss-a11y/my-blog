@@ -218,6 +218,9 @@ const category = categoryInfo[post.data.category] || { name: '未知', icon: '�
 </Layout>
 
 <style is:global>
+  .prose {
+    font-size: var(--article-font-size, 18px);
+  }
   .prose h2 {
     @apply text-xl font-bold text-slate-900 dark:text-white mt-12 mb-4;
   }
