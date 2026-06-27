@@ -1,5 +1,7 @@
 <script>
   function initLightbox() {
+    const images: HTMLImageElement[] = [];
+
     document.querySelectorAll('img').forEach((img) => {
       if (img.closest('a')?.classList.contains('lightbox-enabled')) return;
       if (img.closest('.prose') || img.closest('article')) {
@@ -7,27 +9,98 @@
         link.href = img.src;
         link.className = 'lightbox-enabled cursor-zoom-in';
         link.setAttribute('data-lightbox', 'true');
+        link.setAttribute('data-alt', img.alt || '');
         img.parentNode?.insertBefore(link, img);
         link.appendChild(img);
+        images.push(img);
       }
     });
 
-    document.querySelectorAll('a[data-lightbox]').forEach((link) => {
+    let currentIndex = 0;
+
+    document.querySelectorAll('a[data-lightbox]').forEach((link, index) => {
       link.addEventListener('click', (e) => {
         e.preventDefault();
-        const img = link.querySelector('img');
-        if (!img) return;
-
-        const overlay = document.createElement('div');
-        overlay.className = 'lightbox-overlay fixed inset-0 bg-black/90 z-[9999] flex items-center justify-center cursor-zoom-out';
-        overlay.innerHTML = `<img src="${link.href}" class="max-w-[90vw] max-h-[90vh] object-contain" />`;
-        document.body.appendChild(overlay);
-        overlay.addEventListener('click', () => overlay.remove());
-        overlay.addEventListener('keydown', (e) => {
-          if (e.key === 'Escape') overlay.remove();
-        });
+        currentIndex = Array.from(document.querySelectorAll('a[data-lightbox]')).indexOf(link as HTMLAnchorElement);
+        openLightbox(link as HTMLAnchorElement);
       });
     });
+
+    function openLightbox(link: HTMLAnchorElement) {
+      const img = link.querySelector('img');
+      if (!img) return;
+
+      const allImages = Array.from(document.querySelectorAll('a[data-lightbox]'));
+      const currentSrc = link.href;
+
+      const overlay = document.createElement('div');
+      overlay.className = 'lightbox-overlay fixed inset-0 bg-black/95 z-[9999] flex items-center justify-center';
+      overlay.innerHTML = `
+        <button class="lightbox-close absolute top-4 right-4 p-2 text-white/80 hover:text-white transition-colors">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+        <button class="lightbox-prev absolute left-4 top-1/2 -translate-y-1/2 p-2 text-white/80 hover:text-white transition-colors">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <button class="lightbox-next absolute right-4 top-1/2 -translate-y-1/2 p-2 text-white/80 hover:text-white transition-colors">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        </button>
+        <img src="${currentSrc}" alt="${img.alt || ''}" class="max-w-[90vw] max-h-[85vh] object-contain" />
+        ${img.alt ? `<div class="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/80 text-sm max-w-[80%] text-center">${img.alt}</div>` : ''}
+      `;
+
+      document.body.appendChild(overlay);
+
+      overlay.querySelector('.lightbox-close')?.addEventListener('click', () => overlay.remove());
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) overlay.remove();
+      });
+
+      const prevBtn = overlay.querySelector('.lightbox-prev');
+      const nextBtn = overlay.querySelector('.lightbox-next');
+
+      prevBtn?.addEventListener('click', () => {
+        currentIndex = (currentIndex - 1 + allImages.length) % allImages.length;
+        updateLightboxImage(overlay, allImages[currentIndex]);
+      });
+
+      nextBtn?.addEventListener('click', () => {
+        currentIndex = (currentIndex + 1) % allImages.length;
+        updateLightboxImage(overlay, allImages[currentIndex]);
+      });
+
+      document.addEventListener('keydown', function handler(e) {
+        if (e.key === 'Escape') overlay.remove();
+        if (e.key === 'ArrowLeft') prevBtn?.dispatchEvent(new Event('click'));
+        if (e.key === 'ArrowRight') nextBtn?.dispatchEvent(new Event('click'));
+      });
+
+      overlay.addEventListener('remove', () => {
+        document.removeEventListener('keydown', handler);
+      });
+    }
+
+    function updateLightboxImage(overlay: HTMLElement, link: Element) {
+      const img = link.querySelector('img');
+      if (!img) return;
+      const imgEl = overlay.querySelector('img');
+      if (imgEl) {
+        imgEl.src = link.href;
+        imgEl.alt = img.alt || '';
+      }
+      const caption = overlay.querySelector('.absolute.bottom-4');
+      if (caption && img.alt) {
+        caption.innerHTML = img.alt;
+      } else if (caption) {
+        caption.remove();
+      }
+    }
   }
 
   initLightbox();
