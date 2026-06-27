@@ -1,0 +1,37 @@
+---
+// RandomPost - adds a button to navigate to a random blog post
+---
+
+<button
+  id="random-post-btn"
+  class="fixed left-4 bottom-24 z-40 p-3 rounded-full backdrop-blur-xl bg-white/80 dark:bg-slate-800/80 border border-white/50 dark:border-slate-700/50 shadow-lg hover:shadow-xl transition-all hover:scale-105 hover:bg-primary hover:text-white"
+  aria-label="随机文章"
+  title="随机文章"
+>
+  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+  </svg>
+</button>
+
+<script>
+  function initRandomPost() {
+    const btn = document.getElementById('random-post-btn');
+    if (!btn) return;
+
+    // Get all post URLs at build time from a global variable set by the server
+    const postUrls = (window as any).__POST_URLS__ || [];
+
+    if (postUrls.length === 0) return;
+
+    btn.addEventListener('click', () => {
+      const randomIndex = Math.floor(Math.random() * postUrls.length);
+      const randomUrl = postUrls[randomIndex];
+      if (randomUrl) {
+        window.location.href = randomUrl;
+      }
+    });
+  }
+
+  initRandomPost();
+  document.addEventListener('astro:after-swap', initRandomPost);
+</script>

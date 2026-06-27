@@ -15,10 +15,12 @@ import ShareCard from '../components/ShareCard.astro';
 import KeyboardShortcuts from '../components/KeyboardShortcuts.astro';
 import Newsletter from '../components/Newsletter.astro';
 import ScrollAnimations from '../components/ScrollAnimations.astro';
+import RandomPost from '../components/RandomPost.astro';
 import AnnouncementBanner from '../components/AnnouncementBanner.astro';
 import CopyLinkBubble from '../components/CopyLinkBubble.astro';
 import ReadingList from '../components/ReadingList.astro';
 import BackButton from '../components/BackButton.astro';
+import { getCollection } from 'astro:content';
 
 interface Props {
   title: string;
@@ -27,6 +29,12 @@ interface Props {
 
 const { title, description = "Personal Blog" } = Astro.props;
 const BASE = '/my-blog';
+
+// Get all posts for random post feature
+const allPosts = await getCollection('blog');
+const postUrls = allPosts
+  .filter(p => !p.data.draft)
+  .map(p => `${BASE}/post/${p.id}`);
 
 const categories = [
   { name: '日常生活', slug: 'daily', icon: '🏠' },
@@ -84,6 +92,7 @@ const currentPath = Astro.url.pathname;
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600&display=swap" rel="stylesheet">
     <link rel="alternate" type="application/rss+xml" title="我的博客 RSS" href="/my-blog/rss.xml" />
     <SEO title={title} description={description} url={Astro.url.pathname} />
+    <script is:inline define:vars={{ postUrls }}>window.__POST_URLS__ = postUrls;</script>
   </head>
   <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen font-sans antialiased transition-colors duration-500">
     <!-- Skip to content -->
@@ -439,6 +448,7 @@ const currentPath = Astro.url.pathname;
     <ScrollAnimations />
     <CopyLinkBubble />
     <BackButton />
+    <RandomPost />
     <ReadingList />
   </body>
 </html>
