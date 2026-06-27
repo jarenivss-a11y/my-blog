@@ -1,19 +1,43 @@
 ---
-// Theme Toggle - 暗色/亮色模式切换
+// Theme Toggle - 暗色/亮色模式切换 with sun/moon animation
 ---
 
-<button id="theme-toggle" class="relative w-14 h-7 rounded-full bg-slate-200 dark:bg-slate-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary">
-  <span id="toggle-indicator" class="absolute top-1 left-1 w-5 h-5 rounded-full bg-white shadow-md transform transition-transform duration-300 dark:translate-x-7">
+<button id="theme-toggle" class="relative w-14 h-7 rounded-full bg-slate-200 dark:bg-slate-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary overflow-hidden">
+  <span id="toggle-indicator" class="absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow-md transform transition-all duration-300 dark:translate-x-7">
+    <!-- Sun icon -->
+    <svg id="sun-icon" class="absolute inset-0 w-6 h-6 p-1 text-amber-500 transition-all duration-300 dark:opacity-0 dark:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+    </svg>
+    <!-- Moon icon -->
+    <svg id="moon-icon" class="absolute inset-0 w-6 h-6 p-1 text-slate-600 transition-all duration-300 opacity-0 -rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+    </svg>
   </span>
   <span class="sr-only">切换主题</span>
 </button>
 
+<style>
+  #sun-icon {
+    transform: rotate(0deg);
+  }
+  #moon-icon {
+    transform: rotate(-90deg);
+  }
+  :global(.dark) #sun-icon {
+    opacity: 0;
+    transform: rotate(90deg);
+  }
+  :global(.dark) #moon-icon {
+    opacity: 1;
+    transform: rotate(0deg);
+  }
+</style>
+
 <script>
   function initThemeToggle() {
     const toggle = document.getElementById('theme-toggle');
-    const indicator = document.getElementById('toggle-indicator');
 
-    if (!toggle || !indicator) return;
+    if (!toggle) return;
 
     // Check for saved theme preference or system preference
     const savedTheme = localStorage.getItem('theme');
@@ -33,4 +57,5 @@
   }
 
   initThemeToggle();
+  document.addEventListener('astro:after-swap', initThemeToggle);
 </script>
