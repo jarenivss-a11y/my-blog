@@ -1,0 +1,37 @@
+---
+import SidebarStats from './SidebarStats.astro';
+import Calendar from './Calendar.astro';
+
+const BASE = '/my-blog';
+
+const quickLinks = [
+  { name: '🏠 首页', href: '/' },
+  { name: '📝 归档', href: '/archive' },
+  { name: '🏷️ 标签', href: '/tags' },
+  { name: '🤝 友链', href: '/friends' },
+  { name: '📖 关于', href: '/about' },
+];
+---
+
+<aside class="hidden xl:block space-y-6">
+  <!-- Quick Links -->
+  <div class="p-4 rounded-2xl backdrop-blur-xl bg-white/70 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50">
+    <h4 class="text-xs font-medium text-slate-400 uppercase tracking-widest mb-4">快捷导航</h4>
+    <nav class="space-y-1">
+      {quickLinks.map(link => (
+        <a
+          href={`${BASE}${link.href}`}
+          class="block py-2 px-3 rounded-lg text-sm text-slate-600 dark:text-slate-300 hover:bg-primary/10 hover:text-primary transition-colors"
+        >
+          {link.name}
+        </a>
+      ))}
+    </nav>
+  </div>
+
+  <!-- Stats -->
+  <SidebarStats />
+
+  <!-- Calendar -->
+  <Calendar />
+</aside>

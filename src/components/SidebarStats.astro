@@ -1,0 +1,56 @@
+---
+import { getCollection } from 'astro:content';
+
+const allPosts = await getCollection('blog');
+const publishedPosts = allPosts.filter(p => !p.data.draft);
+const totalWords = publishedPosts.reduce((acc, post) => acc + post.body.split(/\s+/).length, 0);
+
+const categories = ['daily', 'music', 'books', 'ecommerce', 'pokemon'];
+const categoryCount = categories.map(cat => ({
+  name: cat,
+  count: publishedPosts.filter(p => p.data.category === cat).length
+})).filter(c => c.count > 0);
+
+const tags = publishedPosts.flatMap(p => p.data.tags || []);
+const tagCount = [...new Set(tags)].length;
+
+const now = new Date();
+const startDate = new Date('2024-01-01');
+const daysSinceStart = Math.floor((now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+---
+
+<div class="p-4 rounded-2xl backdrop-blur-xl bg-white/70 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50">
+  <h4 class="text-xs font-medium text-slate-400 uppercase tracking-widest mb-4">博客统计</h4>
+  <div class="space-y-3">
+    <div class="flex items-center justify-between">
+      <span class="text-sm text-slate-500 dark:text-slate-400">文章总数</span>
+      <span class="text-sm font-medium text-primary">{publishedPosts.length}</span>
+    </div>
+    <div class="flex items-center justify-between">
+      <span class="text-sm text-slate-500 dark:text-slate-400">标签总数</span>
+      <span class="text-sm font-medium text-primary">{tagCount}</span>
+    </div>
+    <div class="flex items-center justify-between">
+      <span class="text-sm text-slate-500 dark:text-slate-400">总字数</span>
+      <span class="text-sm font-medium text-primary">{totalWords.toLocaleString()}</span>
+    </div>
+    <div class="flex items-center justify-between">
+      <span class="text-sm text-slate-500 dark:text-slate-400">运行天数</span>
+      <span class="text-sm font-medium text-primary">{daysSinceStart}</span>
+    </div>
+  </div>
+
+  {categoryCount.length > 0 && (
+    <div class="mt-4 pt-4 border-t border-slate-200/50 dark:border-slate-700/50">
+      <div class="text-xs text-slate-400 mb-2">分类分布</div>
+      <div class="space-y-2">
+        {categoryCount.map(cat => (
+          <div class="flex items-center justify-between text-xs">
+            <span class="text-slate-500 dark:text-slate-400">{cat.name}</span>
+            <span class="text-slate-600 dark:text-slate-300">{cat.count}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
+</div>
