@@ -1,0 +1,134 @@
+---
+// ReadingStats - tracks and displays reading statistics
+---
+
+<div id="reading-stats-widget" class="fixed right-4 top-32 z-30 hidden md:block">
+  <button
+    id="reading-stats-toggle"
+    class="p-3 rounded-full backdrop-blur-xl bg-white/80 dark:bg-slate-800/80 border border-white/50 dark:border-slate-700/50 shadow-lg hover:shadow-xl transition-all"
+    aria-label="阅读统计"
+  >
+    <svg class="w-5 h-5 text-slate-600 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+    </svg>
+  </button>
+</div>
+
+<!-- Reading Stats Modal -->
+<div id="reading-stats-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center">
+  <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="reading-stats-overlay"></div>
+  <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden">
+    <div class="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-700">
+      <h3 class="text-lg font-bold text-slate-900 dark:text-white">📊 阅读统计</h3>
+      <button id="reading-stats-close" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+        <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <div class="p-6 space-y-6">
+      <div class="grid grid-cols-2 gap-4">
+        <div class="text-center p-4 rounded-2xl bg-primary/10">
+          <div class="text-3xl font-bold text-primary" id="stats-articles-read">0</div>
+          <div class="text-sm text-slate-500 dark:text-slate-400">文章已读</div>
+        </div>
+        <div class="text-center p-4 rounded-2xl bg-green-500/10">
+          <div class="text-3xl font-bold text-green-500" id="stats-words-read">0</div>
+          <div class="text-sm text-slate-500 dark:text-slate-400">文字阅读</div>
+        </div>
+      </div>
+      <div class="space-y-2">
+        <div class="flex justify-between text-sm">
+          <span class="text-slate-500 dark:text-slate-400">阅读时间</span>
+          <span class="font-medium text-slate-700 dark:text-slate-200" id="stats-reading-time">0 分钟</span>
+        </div>
+        <div class="flex justify-between text-sm">
+          <span class="text-slate-500 dark:text-slate-400">收藏文章</span>
+          <span class="font-medium text-slate-700 dark:text-slate-200" id="stats-saved">0 篇</span>
+        </div>
+        <div class="flex justify-between text-sm">
+          <span class="text-slate-500 dark:text-slate-400">最近阅读</span>
+          <span class="font-medium text-slate-700 dark:text-slate-200" id="stats-last-read">-</span>
+        </div>
+      </div>
+      <button
+        id="clear-reading-data"
+        class="w-full py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+      >
+        清除阅读数据
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function initReadingStats() {
+    const widget = document.getElementById('reading-stats-widget');
+    const toggleBtn = document.getElementById('reading-stats-toggle');
+    const modal = document.getElementById('reading-stats-modal');
+    const closeBtn = document.getElementById('reading-stats-close');
+    const overlay = document.getElementById('reading-stats-overlay');
+    const clearBtn = document.getElementById('clear-reading-data');
+
+    if (!widget || !toggleBtn || !modal) return;
+
+    const READ_KEY = 'articles-read';
+    const WORDS_KEY = 'words-read';
+    const TIME_KEY = 'reading-time';
+    const LAST_KEY = 'last-read';
+
+    function getData() {
+      return {
+        articlesRead: parseInt(localStorage.getItem(READ_KEY) || '0', 10),
+        wordsRead: parseInt(localStorage.getItem(WORDS_KEY) || '0', 10),
+        readingTime: parseInt(localStorage.getItem(TIME_KEY) || '0', 10),
+        lastRead: localStorage.getItem(LAST_KEY) || ''
+      };
+    }
+
+    function updateUI() {
+      const data = getData();
+      const savedList = JSON.parse(localStorage.getItem('reading-list') || '[]');
+
+      document.getElementById('stats-articles-read').textContent = data.articlesRead.toLocaleString();
+      document.getElementById('stats-words-read').textContent = data.wordsRead.toLocaleString();
+      document.getElementById('stats-reading-time').textContent = `${Math.round(data.readingTime)} 分钟`;
+      document.getElementById('stats-saved').textContent = `${savedList.length} 篇`;
+      document.getElementById('stats-last-read').textContent = data.lastRead || '-';
+    }
+
+    function openModal() {
+      updateUI();
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      modal.classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    toggleBtn.addEventListener('click', openModal);
+    closeBtn?.addEventListener('click', closeModal);
+    overlay?.addEventListener('click', closeModal);
+
+    clearBtn?.addEventListener('click', () => {
+      if (confirm('确定要清除所有阅读数据吗？')) {
+        localStorage.removeItem(READ_KEY);
+        localStorage.removeItem(WORDS_KEY);
+        localStorage.removeItem(TIME_KEY);
+        localStorage.removeItem(LAST_KEY);
+        updateUI();
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+        closeModal();
+      }
+    });
+  }
+
+  initReadingStats();
+  document.addEventListener('astro:after-swap', initReadingStats);
+</script>
