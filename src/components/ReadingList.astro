@@ -1,0 +1,186 @@
+---
+// Reading List - Save posts for later reading
+---
+
+<button
+  id="reading-list-btn"
+  class="fixed right-4 z-40 p-3 rounded-full backdrop-blur-xl bg-white/80 dark:bg-slate-800/80 border border-white/50 dark:border-slate-700/50 shadow-lg hover:shadow-xl transition-all hover:scale-105"
+  aria-label="阅读清单"
+  title="阅读清单"
+>
+  <svg class="w-5 h-5 text-slate-600 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+  </svg>
+  <span id="reading-list-count" class="absolute -top-1 -right-1 w-5 h-5 bg-primary text-white text-xs rounded-full flex items-center justify-center hidden">0</span>
+</button>
+
+<!-- Reading List Panel -->
+<div id="reading-list-panel" class="hidden fixed top-0 right-0 bottom-0 w-80 z-[100] bg-white dark:bg-slate-800 shadow-2xl transform transition-transform duration-300 translate-x-full">
+  <div class="flex flex-col h-full">
+    <div class="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700">
+      <h3 class="text-lg font-bold text-slate-900 dark:text-white">阅读清单</h3>
+      <button id="close-reading-list" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+        <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <div id="reading-list-content" class="flex-1 overflow-y-auto p-4">
+      <div id="reading-list-empty" class="text-center py-12">
+        <span class="text-4xl mb-4 block">📚</span>
+        <p class="text-slate-500 dark:text-slate-400">暂无收藏文章</p>
+        <p class="text-sm text-slate-400 dark:text-slate-500 mt-1">点击文章底部的书签添加</p>
+      </div>
+      <div id="reading-list-items" class="space-y-3 hidden"></div>
+    </div>
+
+    <div class="p-4 border-t border-slate-200 dark:border-slate-700">
+      <button id="clear-reading-list" class="w-full py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">
+        清空清单
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Overlay -->
+<div id="reading-list-overlay" class="hidden fixed inset-0 bg-black/30 z-[90]"></div>
+
+<!-- Add to list button (shown on posts) -->
+<button
+  id="add-to-reading-list"
+  class="flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-700 hover:bg-primary hover:text-white text-slate-600 dark:text-slate-300 transition-colors"
+  title="添加到阅读清单"
+>
+  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+  </svg>
+  <span>添加收藏</span>
+</button>
+
+<script>
+  function initReadingList() {
+    const STORAGE_KEY = 'reading-list';
+    const panel = document.getElementById('reading-list-panel');
+    const btn = document.getElementById('reading-list-btn');
+    const closeBtn = document.getElementById('close-reading-list');
+    const overlay = document.getElementById('reading-list-overlay');
+    const content = document.getElementById('reading-list-items');
+    const empty = document.getElementById('reading-list-empty');
+    const countEl = document.getElementById('reading-list-count');
+    const clearBtn = document.getElementById('clear-reading-list');
+    const addBtn = document.getElementById('add-to-reading-list');
+
+    if (!panel || !btn) return;
+
+    function getList() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      } catch {
+        return [];
+      }
+    }
+
+    function saveList(list: any[]) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+      updateUI();
+    }
+
+    function updateUI() {
+      const list = getList();
+      const count = list.length;
+
+      // Update count badge
+      if (count > 0) {
+        countEl?.classList.remove('hidden');
+        if (countEl) countEl.textContent = count.toString();
+      } else {
+        countEl?.classList.add('hidden');
+      }
+
+      // Update panel content
+      if (list.length === 0) {
+        content?.classList.add('hidden');
+        empty?.classList.remove('hidden');
+      } else {
+        content?.classList.remove('hidden');
+        empty?.classList.add('hidden');
+
+        if (content) {
+          content.innerHTML = list.map((item: any) => `
+            <a href="${item.url}" class="block p-3 rounded-xl bg-slate-50 dark:bg-slate-700/50 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+              <h4 class="text-sm font-medium text-slate-900 dark:text-white line-clamp-2">${item.title}</h4>
+              <span class="text-xs text-slate-400 mt-1 block">${item.date}</span>
+            </a>
+          `).join('');
+        }
+      }
+    }
+
+    function openPanel() {
+      panel?.classList.remove('hidden');
+      overlay?.classList.remove('hidden');
+      setTimeout(() => {
+        panel?.classList.remove('translate-x-full');
+      }, 10);
+    }
+
+    function closePanel() {
+      panel?.classList.add('translate-x-full');
+      setTimeout(() => {
+        panel?.classList.add('hidden');
+        overlay?.classList.add('hidden');
+      }, 300);
+    }
+
+    btn.addEventListener('click', openPanel);
+    closeBtn?.addEventListener('click', closePanel);
+    overlay?.addEventListener('click', closePanel);
+
+    clearBtn?.addEventListener('click', () => {
+      if (confirm('确定要清空阅读清单吗？')) {
+        saveList([]);
+      }
+    });
+
+    // Add to list button on posts
+    addBtn?.addEventListener('click', () => {
+      const title = document.querySelector('h1')?.textContent?.trim() || '';
+      const url = window.location.pathname;
+      const date = new Date().toLocaleDateString('zh-CN');
+
+      if (!title) return;
+
+      const list = getList();
+      if (!list.some((item: any) => item.url === url)) {
+        list.unshift({ title, url, date });
+        saveList(list);
+        addBtn.innerHTML = `
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+          </svg>
+          <span>已收藏</span>
+        `;
+        addBtn.classList.add('text-primary');
+      }
+    });
+
+    // Check if current page is already in list
+    const currentUrl = window.location.pathname;
+    const list = getList();
+    if (list.some((item: any) => item.url === currentUrl) && addBtn) {
+      addBtn.innerHTML = `
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+        </svg>
+        <span>已收藏</span>
+      `;
+      addBtn.classList.add('text-primary');
+    }
+
+    updateUI();
+  }
+
+  initReadingList();
+  document.addEventListener('astro:after-swap', initReadingList);
+</script>

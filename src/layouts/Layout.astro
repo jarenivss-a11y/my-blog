@@ -15,6 +15,7 @@ import KeyboardShortcuts from '../components/KeyboardShortcuts.astro';
 import Newsletter from '../components/Newsletter.astro';
 import AnnouncementBanner from '../components/AnnouncementBanner.astro';
 import CopyLinkBubble from '../components/CopyLinkBubble.astro';
+import ReadingList from '../components/ReadingList.astro';
 import BackButton from '../components/BackButton.astro';
 
 interface Props {
@@ -409,5 +410,6 @@ const currentPath = Astro.url.pathname;
     <Newsletter />
     <CopyLinkBubble />
     <BackButton />
+    <ReadingList />
   </body>
 </html>
