@@ -148,7 +148,7 @@ const category = categoryInfo[post.data.category] || { name: '未知', icon: '�
           >
             ← 返回{category.name}
           </a>
-          <SocialShare title={post.data.title} url={`${SITE_URL}/post/${post.id}`} />
+          <SocialShare title={post.data.title} url={`${SITE_URL}/post/${post.id}`} category={category.name} />
         </div>
       </footer>
 

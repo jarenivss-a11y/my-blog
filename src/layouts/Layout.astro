@@ -8,6 +8,8 @@ import VisitorStats from '../components/VisitorStats.astro';
 import SEO from '../components/SEO.astro';
 import CopyButton from '../components/CopyButton.astro';
 import Lightbox from '../components/Lightbox.astro';
+import ThemeColorPicker from '../components/ThemeColorPicker.astro';
+import ShareCard from '../components/ShareCard.astro';
 
 interface Props {
   title: string;
@@ -215,6 +217,13 @@ const currentPath = Astro.url.pathname;
         background: rgba(99, 102, 241, 0.6);
       }
 
+      /* Theme Color Variables */
+      :root {
+        --color-primary: #6366f1;
+        --color-primary-light: rgba(99, 102, 241, 0.12);
+        --color-primary-dark: rgba(99, 102, 241, 0.25);
+      }
+
       /* Focus Styles for Accessibility */
       :focus-visible {
         outline: 2px solid rgba(99, 102, 241, 0.6);
@@ -315,5 +324,7 @@ const currentPath = Astro.url.pathname;
     </script>
     <CopyButton />
     <Lightbox />
+    <ThemeColorPicker />
+    <ShareCard />
   </body>
 </html>

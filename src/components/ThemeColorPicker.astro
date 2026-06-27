@@ -1,0 +1,104 @@
+---
+// Theme Color Picker Component
+---
+
+<div id="theme-color-picker" class="fixed bottom-24 right-4 z-50">
+  <button
+    id="color-picker-toggle"
+    class="p-3 rounded-full backdrop-blur-xl bg-white/80 dark:bg-slate-800/80 border border-white/50 dark:border-slate-700/50 shadow-lg hover:shadow-xl transition-all"
+    aria-label="切换主题色"
+  >
+    <svg class="w-5 h-5 text-slate-600 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
+    </svg>
+  </button>
+
+  <div id="color-picker-panel" class="hidden absolute bottom-14 right-0 p-4 rounded-2xl backdrop-blur-xl bg-white/90 dark:bg-slate-800/90 border border-white/50 dark:border-slate-700/50 shadow-xl min-w-[200px]">
+    <h4 class="text-xs font-medium text-slate-400 uppercase tracking-widest mb-3">主题色</h4>
+    <div class="grid grid-cols-6 gap-2 mb-4">
+      <button class="color-option w-8 h-8 rounded-full bg-indigo-500 hover:ring-2 ring-offset-2 ring-indigo-400 transition-all" data-color="#6366f1" data-primary="indigo"></button>
+      <button class="color-option w-8 h-8 rounded-full bg-pink-500 hover:ring-2 ring-offset-2 ring-pink-400 transition-all" data-color="#ec4899" data-primary="pink"></button>
+      <button class="color-option w-8 h-8 rounded-full bg-purple-500 hover:ring-2 ring-offset-2 ring-purple-400 transition-all" data-color="#a855f7" data-primary="purple"></button>
+      <button class="color-option w-8 h-8 rounded-full bg-blue-500 hover:ring-2 ring-offset-2 ring-blue-400 transition-all" data-color="#3b82f6" data-primary="blue"></button>
+      <button class="color-option w-8 h-8 rounded-full bg-cyan-500 hover:ring-2 ring-offset-2 ring-cyan-400 transition-all" data-color="#06b6d4" data-primary="cyan"></button>
+      <button class="color-option w-8 h-8 rounded-full bg-teal-500 hover:ring-2 ring-offset-2 ring-teal-400 transition-all" data-color="#14b8a6" data-primary="teal"></button>
+      <button class="color-option w-8 h-8 rounded-full bg-green-500 hover:ring-2 ring-offset-2 ring-green-400 transition-all" data-color="#22c55e" data-primary="green"></button>
+      <button class="color-option w-8 h-8 rounded-full bg-emerald-500 hover:ring-2 ring-offset-2 ring-emerald-400 transition-all" data-color="#10b981" data-primary="emerald"></button>
+      <button class="color-option w-8 h-8 rounded-full bg-amber-500 hover:ring-2 ring-offset-2 ring-amber-400 transition-all" data-color="#f59e0b" data-primary="amber"></button>
+      <button class="color-option w-8 h-8 rounded-full bg-orange-500 hover:ring-2 ring-offset-2 ring-orange-400 transition-all" data-color="#f97316" data-primary="orange"></button>
+      <button class="color-option w-8 h-8 rounded-full bg-red-500 hover:ring-2 ring-offset-2 ring-red-400 transition-all" data-color="#ef4444" data-primary="red"></button>
+      <button class="color-option w-8 h-8 rounded-full bg-rose-500 hover:ring-2 ring-offset-2 ring-rose-400 transition-all" data-color="#f43f5e" data-primary="rose"></button>
+    </div>
+    <div class="flex items-center gap-2">
+      <input type="color" id="custom-color" value="#6366f1" class="w-8 h-8 rounded cursor-pointer border-0 bg-transparent" />
+      <span class="text-sm text-slate-500 dark:text-slate-400">自定义颜色</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  const STORAGE_KEY = 'blog-theme-color';
+
+  function initThemeColorPicker() {
+    const toggle = document.getElementById('color-picker-toggle');
+    const panel = document.getElementById('color-picker-panel');
+    const colorOptions = document.querySelectorAll('.color-option');
+    const customColor = document.getElementById('custom-color') as HTMLInputElement;
+
+    if (!toggle || !panel) return;
+
+    toggle.addEventListener('click', () => {
+      panel.classList.toggle('hidden');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!toggle.contains(e.target as Node) && !panel.contains(e.target as Node)) {
+        panel.classList.add('hidden');
+      }
+    });
+
+    const savedColor = localStorage.getItem(STORAGE_KEY);
+    if (savedColor) {
+      applyThemeColor(savedColor);
+    }
+
+    colorOptions.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const color = btn.getAttribute('data-color');
+        if (color) {
+          applyThemeColor(color);
+          localStorage.setItem(STORAGE_KEY, color);
+        }
+      });
+    });
+
+    if (customColor) {
+      customColor.addEventListener('input', () => {
+        applyThemeColor(customColor.value);
+        localStorage.setItem(STORAGE_KEY, customColor.value);
+      });
+    }
+  }
+
+  function applyThemeColor(color: string) {
+    document.documentElement.style.setProperty('--color-primary', color);
+    document.documentElement.style.setProperty('--color-primary-light', color + '20');
+    document.documentElement.style.setProperty('--color-primary-dark', color + '40');
+
+    const customColor = document.getElementById('custom-color') as HTMLInputElement;
+    if (customColor) {
+      customColor.value = color;
+    }
+
+    document.querySelectorAll('.color-option').forEach(btn => {
+      if (btn.getAttribute('data-color') === color) {
+        btn.classList.add('ring-2', 'ring-offset-2');
+      } else {
+        btn.classList.remove('ring-2', 'ring-offset-2');
+      }
+    });
+  }
+
+  initThemeColorPicker();
+  document.addEventListener('astro:after-swap', initThemeColorPicker);
+</script>

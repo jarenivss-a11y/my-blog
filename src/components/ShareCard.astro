@@ -1,0 +1,199 @@
+---
+// Share Card Generator - generates OG image for social sharing
+interface Props {
+  title: string;
+  category?: string;
+  date?: string;
+}
+
+const { title, category, date } = Astro.props;
+---
+
+<div id="share-card-generator" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm">
+  <div class="bg-white dark:bg-slate-900 rounded-3xl p-8 shadow-2xl max-w-lg w-full mx-4">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="text-lg font-serif font-bold text-slate-900 dark:text-white">生成分享图</h3>
+      <button id="close-share-card" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+        <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <div id="share-card-preview" class="bg-gradient-to-br from-primary/20 to-slate-100 dark:from-primary/10 dark:to-slate-800 rounded-2xl p-8 mb-6">
+      <div class="text-xs text-slate-400 mb-4">{category || '博客文章'}</div>
+      <h2 id="share-card-title" class="text-2xl font-serif font-bold text-slate-900 dark:text-white mb-6 line-clamp-3">{title}</h2>
+      <div class="flex items-center justify-between text-sm text-slate-500">
+        <span>{date || new Date().toLocaleDateString('zh-CN')}</span>
+        <span class="font-medium text-primary">我的博客</span>
+      </div>
+    </div>
+
+    <div class="flex gap-3">
+      <button id="download-share-card" class="flex-1 py-3 px-4 bg-primary text-white rounded-xl font-medium hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+        </svg>
+        下载图片
+      </button>
+      <button id="copy-share-card" class="py-3 px-4 border border-slate-200 dark:border-slate-700 rounded-xl font-medium hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors flex items-center justify-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+        </svg>
+        复制
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function initShareCard() {
+    const modal = document.getElementById('share-card-generator');
+    const closeBtn = document.getElementById('close-share-card');
+    const downloadBtn = document.getElementById('download-share-card');
+    const copyBtn = document.getElementById('copy-share-card');
+    const preview = document.getElementById('share-card-preview');
+
+    if (!modal || !closeBtn || !downloadBtn || !copyBtn || !preview) return;
+
+    window.showShareCard = (title: string, category?: string) => {
+      modal.classList.remove('hidden');
+      const titleEl = document.getElementById('share-card-title');
+      if (titleEl) titleEl.textContent = title;
+    };
+
+    closeBtn.addEventListener('click', () => {
+      modal.classList.add('hidden');
+    });
+
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.classList.add('hidden');
+      }
+    });
+
+    downloadBtn.addEventListener('click', async () => {
+      try {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        canvas.width = 1200;
+        canvas.height = 630;
+
+        // Background gradient
+        const gradient = ctx.createLinearGradient(0, 0, 1200, 630);
+        gradient.addColorStop(0, 'rgba(99, 102, 241, 0.2)');
+        gradient.addColorStop(1, 'rgba(248, 250, 252, 1)');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 1200, 630);
+
+        // Category
+        ctx.fillStyle = '#9ca3af';
+        ctx.font = '24px system-ui, sans-serif';
+        ctx.fillText(category || '博客文章', 60, 100);
+
+        // Title
+        ctx.fillStyle = '#1e293b';
+        ctx.font = 'bold 56px "Noto Serif SC", serif';
+        const titleEl = document.getElementById('share-card-title');
+        const title = titleEl?.textContent || '';
+        const lines = wrapText(ctx, title, 900, 56);
+        lines.slice(0, 3).forEach((line, i) => {
+          ctx.fillText(line, 60, 200 + i * 80);
+        });
+
+        // Date and brand
+        ctx.fillStyle = '#64748b';
+        ctx.font = '28px system-ui, sans-serif';
+        const date = new Date().toLocaleDateString('zh-CN');
+        ctx.fillText(date, 60, 560);
+        ctx.fillStyle = '#6366f1';
+        ctx.font = 'bold 28px system-ui, sans-serif';
+        ctx.fillText('我的博客', 960, 560);
+
+        // Download
+        const link = document.createElement('a');
+        link.download = 'share-card.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+
+        modal.classList.add('hidden');
+      } catch (err) {
+        console.error('Failed to generate image:', err);
+      }
+    });
+
+    copyBtn.addEventListener('click', async () => {
+      try {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        canvas.width = 1200;
+        canvas.height = 630;
+
+        const gradient = ctx.createLinearGradient(0, 0, 1200, 630);
+        gradient.addColorStop(0, 'rgba(99, 102, 241, 0.2)');
+        gradient.addColorStop(1, 'rgba(248, 250, 252, 1)');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 1200, 630);
+
+        ctx.fillStyle = '#9ca3af';
+        ctx.font = '24px system-ui, sans-serif';
+        ctx.fillText(category || '博客文章', 60, 100);
+
+        ctx.fillStyle = '#1e293b';
+        ctx.font = 'bold 56px "Noto Serif SC", serif';
+        const titleEl = document.getElementById('share-card-title');
+        const title = titleEl?.textContent || '';
+        const lines = wrapText(ctx, title, 900, 56);
+        lines.slice(0, 3).forEach((line, i) => {
+          ctx.fillText(line, 60, 200 + i * 80);
+        });
+
+        ctx.fillStyle = '#64748b';
+        ctx.font = '28px system-ui, sans-serif';
+        ctx.fillText(new Date().toLocaleDateString('zh-CN'), 60, 560);
+        ctx.fillStyle = '#6366f1';
+        ctx.font = 'bold 28px system-ui, sans-serif';
+        ctx.fillText('我的博客', 960, 560);
+
+        canvas.toBlob(async (blob) => {
+          if (blob) {
+            await navigator.clipboard.write([
+              new ClipboardItem({ 'image/png': blob })
+            ]);
+            alert('图片已复制到剪贴板');
+            modal.classList.add('hidden');
+          }
+        });
+      } catch (err) {
+        console.error('Failed to copy image:', err);
+      }
+    });
+  }
+
+  function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number, fontSize: number): string[] {
+    ctx.font = `bold ${fontSize}px "Noto Serif SC", serif`;
+    const words = text.split('');
+    const lines: string[] = [];
+    let currentLine = '';
+
+    for (const char of words) {
+      const testLine = currentLine + char;
+      const metrics = ctx.measureText(testLine);
+      if (metrics.width > maxWidth && currentLine) {
+        lines.push(currentLine);
+        currentLine = char;
+      } else {
+        currentLine = testLine;
+      }
+    }
+    if (currentLine) lines.push(currentLine);
+    return lines;
+  }
+
+  initShareCard();
+  document.addEventListener('astro:after-swap', initShareCard);
+</script>
