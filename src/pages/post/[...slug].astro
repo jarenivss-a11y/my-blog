@@ -10,6 +10,7 @@ import Breadcrumb from '../../components/Breadcrumb.astro';
 import Reaction from '../../components/Reaction.astro';
 import JumpToComments from '../../components/JumpToComments.astro';
 import ReadingMode from '../../components/ReadingMode.astro';
+import ReadAloud from '../../components/ReadAloud.astro';
 
 const BASE = '/my-blog';
 const SITE_URL = 'https://jarenivss-a11y.github.io/my-blog';
@@ -175,6 +176,9 @@ const category = categoryInfo[post.data.category] || { name: '未知', icon: '�
 
       <!-- Reading Mode -->
       <ReadingMode />
+
+      <!-- Read Aloud -->
+      <ReadAloud />
 
       <!-- Comments -->
       <Comments title={post.data.title} />
