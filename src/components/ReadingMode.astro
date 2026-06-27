@@ -1,0 +1,65 @@
+---
+// Reading Mode - Distraction-free reading mode
+---
+
+<button
+  id="reading-mode-btn"
+  class="fixed top-20 right-4 z-50 p-2 rounded-lg backdrop-blur-xl bg-white/80 dark:bg-slate-800/80 border border-white/50 dark:border-slate-700/50 shadow-lg hover:shadow-xl transition-all hover:scale-105"
+  aria-label="阅读模式"
+  title="阅读模式"
+>
+  <svg class="w-5 h-5 text-slate-600 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+  </svg>
+</button>
+
+<script>
+  function initReadingMode() {
+    const btn = document.getElementById('reading-mode-btn');
+    const body = document.body;
+
+    if (!btn) return;
+
+    const STORAGE_KEY = 'reading-mode';
+
+    // Check saved preference
+    if (localStorage.getItem(STORAGE_KEY) === 'true') {
+      body.classList.add('reading-mode');
+    }
+
+    btn.addEventListener('click', () => {
+      const isReadingMode = body.classList.toggle('reading-mode');
+      localStorage.setItem(STORAGE_KEY, isReadingMode.toString());
+
+      // Update button appearance
+      btn.classList.toggle('bg-primary', isReadingMode);
+      btn.classList.toggle('text-white', isReadingMode);
+      btn.classList.toggle('bg-white/80', !isReadingMode);
+      btn.classList.toggle('text-slate-600', !isReadingMode);
+    });
+  }
+
+  initReadingMode();
+  document.addEventListener('astro:after-swap', initReadingMode);
+</script>
+
+<style is:global>
+  .reading-mode header,
+  .reading-mode footer,
+  .reading-mode aside,
+  .reading-mode nav:not(.reading-mode-nav),
+  .reading-mode .fixed:not(#reading-mode-btn),
+  .reading-mode #comments,
+  .reading-mode #related-posts {
+    display: none !important;
+  }
+  .reading-mode #main-content {
+    @apply pt-8;
+  }
+  .reading-mode article {
+    @apply max-w-2xl mx-auto;
+  }
+  .reading-mode .prose {
+    @apply text-lg leading-relaxed;
+  }
+</style>
