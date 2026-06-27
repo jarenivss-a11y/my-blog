@@ -2,32 +2,63 @@
 import Layout from '../layouts/Layout.astro';
 
 const BASE = '/my-blog';
+
+const messages = [
+  '这个页面好像迷路了...',
+  '糟糕，你发现了一个隐藏的虫虫！',
+  '页面正在度假中，请稍后再试~',
+  'Oops! 这个页面不存在。',
+  '页面走丢了，让我带你回家吧！',
+];
+
+const randomMessage = messages[Math.floor(Math.random() * messages.length)];
 ---
 
 <Layout title="页面未找到 | 我的博客" description="抱歉，您访问的页面不存在">
   <div class="min-h-[70vh] flex items-center justify-center">
-    <div class="text-center px-4">
-      <div class="text-8xl font-black text-primary font-serif mb-6">404</div>
+    <div class="text-center px-4 animate-on-scroll">
+      <div class="relative mb-8">
+        <div class="text-[150px] md:text-[200px] font-black text-primary/10 font-serif leading-none select-none">404</div>
+        <div class="absolute inset-0 flex items-center justify-center">
+          <span class="text-7xl md:text-8xl">🔍</span>
+        </div>
+      </div>
 
       <h1 class="text-2xl font-serif font-bold text-slate-900 dark:text-white mb-4">页面未找到</h1>
-      <p class="text-slate-500 dark:text-slate-400 mb-8">抱歉，您访问的页面不存在或已被移除。</p>
+      <p class="text-slate-500 dark:text-slate-400 mb-2">{randomMessage}</p>
+      <p class="text-slate-400 dark:text-slate-500 text-sm mb-8">别担心，你可以从这里继续探索：</p>
 
-      <div class="flex flex-wrap items-center justify-center gap-3">
+      <div class="flex flex-wrap items-center justify-center gap-3 mb-8">
         <a
           href={BASE}
-          class="px-6 py-3 rounded-full bg-primary text-white font-medium hover:bg-primary transition-colors"
+          class="px-6 py-3 rounded-full bg-primary text-white font-medium hover:bg-primary/90 transition-colors flex items-center gap-2"
         >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+          </svg>
           返回首页
         </a>
         <a
           href={`${BASE}/search`}
-          class="px-6 py-3 rounded-full backdrop-blur-xl bg-white/70 dark:bg-slate-800/70 border border-white/50 dark:border-slate-700/50 text-slate-600 dark:text-slate-300 font-medium hover:text-primary hover:border-primary transition-all"
+          class="px-6 py-3 rounded-full backdrop-blur-xl bg-white/70 dark:bg-slate-800/70 border border-white/50 dark:border-slate-700/50 text-slate-600 dark:text-slate-300 font-medium hover:text-primary hover:border-primary transition-all flex items-center gap-2"
         >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
           搜索文章
+        </a>
+        <a
+          href={`${BASE}/archive`}
+          class="px-6 py-3 rounded-full backdrop-blur-xl bg-white/70 dark:bg-slate-800/70 border border-white/50 dark:border-slate-700/50 text-slate-600 dark:text-slate-300 font-medium hover:text-primary hover:border-primary transition-all flex items-center gap-2"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+          </svg>
+          浏览归档
         </a>
       </div>
 
-      <div class="mt-12 flex flex-wrap gap-3 justify-center">
+      <div class="flex flex-wrap gap-3 justify-center">
         <a href={`${BASE}/category/daily`} class="px-4 py-2 rounded-xl backdrop-blur-xl bg-white/50 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50 text-sm text-slate-600 dark:text-slate-300 hover:text-primary hover:border-primary transition-all">
           🏠 日常生活
         </a>
