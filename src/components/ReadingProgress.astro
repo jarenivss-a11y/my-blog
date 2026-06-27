@@ -2,24 +2,63 @@
 // Reading Progress Bar - shows at the top of the page
 ---
 
-<div id="reading-progress" class="fixed top-0 left-0 right-0 z-[100] h-1 bg-transparent">
+<div id="reading-progress" class="fixed top-0 left-0 right-0 z-[100]">
   <div
     id="progress-bar"
-    class="h-full bg-gradient-to-r from-primary to-primary transition-all duration-100 ease-out"
+    class="h-1 bg-gradient-to-r from-primary to-primary transition-all duration-100 ease-out"
     style="width: 0%;"
   ></div>
+  <!-- Reading stats tooltip -->
+  <div id="reading-stats" class="hidden absolute right-4 top-3 px-3 py-1.5 rounded-lg backdrop-blur-xl bg-white/90 dark:bg-slate-800/90 border border-white/50 dark:border-slate-700/50 shadow-lg text-xs text-slate-500 dark:text-slate-400 flex items-center gap-3">
+    <span id="reading-percent">0%</span>
+    <span class="text-slate-300 dark:text-slate-600">·</span>
+    <span id="reading-time-left"></span>
+  </div>
 </div>
 
 <script>
   function initReadingProgress() {
     const progressBar = document.getElementById('progress-bar');
+    const statsEl = document.getElementById('reading-stats');
+    const percentEl = document.getElementById('reading-percent');
+    const timeLeftEl = document.getElementById('reading-time-left');
+
     if (!progressBar) return;
+
+    // Estimate reading speed (words per minute)
+    const WPM = 400;
 
     const updateProgress = () => {
       const scrollTop = window.scrollY;
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
       const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
       progressBar.style.width = `${Math.min(100, Math.max(0, progress))}%`;
+
+      // Update stats
+      if (percentEl) {
+        percentEl.textContent = `${Math.round(progress)}%`;
+      }
+
+      // Calculate time left
+      if (timeLeftEl) {
+        const articleEl = document.querySelector('article');
+        if (articleEl) {
+          const text = articleEl.textContent || '';
+          const words = text.split(/\s+/).length;
+          const totalMinutes = words / WPM;
+          const minutesLeft = Math.ceil(totalMinutes * (1 - progress / 100));
+          if (minutesLeft > 0) {
+            timeLeftEl.textContent = `约 ${minutesLeft} 分钟剩余`;
+          } else {
+            timeLeftEl.textContent = '阅读完成';
+          }
+        }
+      }
+
+      // Show stats on hover/focus
+      if (statsEl) {
+        statsEl.classList.toggle('hidden', progress < 5 || progress >= 100);
+      }
     };
 
     window.addEventListener('scroll', updateProgress, { passive: true });
