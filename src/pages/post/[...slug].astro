@@ -8,6 +8,7 @@ import ArticleSEO from '../../components/ArticleSEO.astro';
 import RelatedPosts from '../../components/RelatedPosts.astro';
 import Breadcrumb from '../../components/Breadcrumb.astro';
 import Reaction from '../../components/Reaction.astro';
+import JumpToComments from '../../components/JumpToComments.astro';
 
 const BASE = '/my-blog';
 const SITE_URL = 'https://jarenivss-a11y.github.io/my-blog';
@@ -167,6 +168,9 @@ const category = categoryInfo[post.data.category] || { name: '未知', icon: '�
 
       <!-- Reaction -->
       <Reaction postId={post.id} />
+
+      <!-- Jump to Comments -->
+      <JumpToComments />
 
       <!-- Comments -->
       <Comments title={post.data.title} />
