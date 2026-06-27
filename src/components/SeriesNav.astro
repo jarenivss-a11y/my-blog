@@ -1,0 +1,44 @@
+---
+// SeriesNav - shows navigation for posts in a series
+---
+
+<script>
+  function initSeriesNav() {
+    const seriesLinks = document.querySelectorAll('.series-link');
+    if (seriesLinks.length <= 1) return;
+
+    const currentPath = window.location.pathname;
+    let currentIndex = -1;
+
+    seriesLinks.forEach((link, index) => {
+      if (link.getAttribute('href') === currentPath) {
+        currentIndex = index;
+      }
+    });
+
+    if (currentIndex === -1) return;
+
+    const prevLink = seriesLinks[currentIndex - 1] as HTMLAnchorElement;
+    const nextLink = seriesLinks[currentIndex + 1] as HTMLAnchorElement;
+
+    const prevEl = document.getElementById('series-prev');
+    const nextEl = document.getElementById('series-next');
+
+    if (prevEl && prevLink) {
+      prevEl.querySelector('a').href = prevLink.href;
+      prevEl.querySelector('.series-title').textContent = prevLink.textContent;
+      prevEl.classList.remove('hidden');
+    }
+
+    if (nextEl && nextLink) {
+      nextEl.querySelector('a').href = nextLink.href;
+      nextEl.querySelector('.series-title').textContent = nextLink.textContent;
+      nextEl.classList.remove('hidden');
+    }
+  }
+
+  initSeriesNav();
+  document.addEventListener('astro:after-swap', initSeriesNav);
+</script>
+
+<!-- Series Navigation will be shown if there are series posts -->
