@@ -203,7 +203,7 @@ const category = categoryInfo[post.data.category] || { name: '未知', icon: '�
       <Comments title={post.data.title} />
 
       <!-- Related Posts -->
-      <RelatedPosts currentPostId={post.id} category={post.data.category} />
+      <RelatedPosts currentPostId={post.id} category={post.data.category} tags={post.data.tags} />
     </div>
   </article>
 

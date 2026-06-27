@@ -4,35 +4,72 @@ import { getCollection } from 'astro:content';
 interface Props {
   currentPostId: string;
   category: string;
+  tags?: string[];
   limit?: number;
 }
 
-const { currentPostId, category, limit = 4 } = Astro.props;
+const { currentPostId, category, tags = [], limit = 4 } = Astro.props;
 
 const allPosts = await getCollection('blog');
-const relatedPosts = allPosts
+const currentPost = allPosts.find(p => p.id === currentPostId);
+
+// Get posts from same category first
+const categoryPosts = allPosts
   .filter(p => p.data.category === category && p.id !== currentPostId && !p.data.draft)
-  .sort((a, b) => b.data.published.getTime() - a.data.published.getTime())
-  .slice(0, limit);
+  .sort((a, b) => b.data.published.getTime() - a.data.published.getTime());
+
+// Get posts with matching tags (excluding already shown from same category)
+const tagPosts = allPosts
+  .filter(p => {
+    if (p.id === currentPostId || p.data.draft) return false;
+    if (p.data.category === category) return false; // Already shown
+    const postTags = p.data.tags || [];
+    return tags.some(tag => postTags.includes(tag));
+  })
+  .sort((a, b) => {
+    // Sort by number of matching tags
+    const aMatches = (a.data.tags || []).filter(t => tags.includes(t)).length;
+    const bMatches = (b.data.tags || []).filter(t => tags.includes(t)).length;
+    return bMatches - aMatches;
+  });
+
+// Combine: category posts first, then tag-based posts
+const combinedPosts = [...categoryPosts, ...tagPosts];
+const relatedPosts = combinedPosts.slice(0, limit);
 
 if (relatedPosts.length === 0) return;
+
+const categoryInfo: Record<string, { name: string; icon: string }> = {
+  daily: { name: '日常生活', icon: '🏠' },
+  music: { name: '音乐分析', icon: '🎵' },
+  books: { name: '读书鉴赏', icon: '📚' },
+  ecommerce: { name: '电商运营', icon: '🛒' },
+  pokemon: { name: '宝可梦', icon: '⚡' },
+};
 ---
 
 <section class="mt-8 p-6 rounded-2xl backdrop-blur-xl bg-white/50 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50">
   <h2 class="text-lg font-serif font-bold text-slate-900 dark:text-white mb-4">相关文章</h2>
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-    {relatedPosts.map((post) => (
-      <a
-        href={`/my-blog/post/${post.id}`}
-        class="group p-4 rounded-xl bg-white/50 dark:bg-slate-700/50 hover:bg-primary hover:border-primary border border-transparent transition-all"
-      >
-        <h3 class="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-primary transition-colors line-clamp-2 mb-2">
-          {post.data.title}
-        </h3>
-        <span class="text-xs text-slate-400">
-          {post.data.published.toLocaleDateString('zh-CN')}
-        </span>
-      </a>
-    ))}
+    {relatedPosts.map((post) => {
+      const cat = categoryInfo[post.data.category] || { name: '未知', icon: '📁' };
+      return (
+        <a
+          href={`/my-blog/post/${post.id}`}
+          class="group p-4 rounded-xl bg-white/50 dark:bg-slate-700/50 hover:bg-primary hover:border-primary border border-transparent transition-all"
+        >
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-xs">{cat.icon}</span>
+            <span class="text-xs text-slate-400">{cat.name}</span>
+          </div>
+          <h3 class="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-white transition-colors line-clamp-2 mb-2">
+            {post.data.title}
+          </h3>
+          <span class="text-xs text-slate-400 group-hover:text-white/70">
+            {post.data.published.toLocaleDateString('zh-CN')}
+          </span>
+        </a>
+      );
+    })}
   </div>
 </section>
