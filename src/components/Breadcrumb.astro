@@ -4,24 +4,52 @@ interface Props {
 }
 
 const { items } = Astro.props;
+
+const siteUrl = "https://jarenivss-a11y.github.io/my-blog";
+
+// Build breadcrumb items for JSON-LD
+const breadcrumbItems = [
+  { "@type": "ListItem", "position": 1, "name": "首页", "item": siteUrl },
+  ...items.map((item, index) => ({
+    "@type": "ListItem",
+    "position": index + 2,
+    "name": item.name,
+    "item": item.href ? `${siteUrl}${item.href}` : undefined
+  }))
+].filter(item => item["@type"]);
 ---
 
 <nav aria-label="面包屑导航" class="mb-6">
-  <ol class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
-    <li>
-      <a href="/my-blog/" class="hover:text-primary transition-colors">首页</a>
+  <ol class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400" itemscope itemtype="https://schema.org/BreadcrumbList">
+    <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+      <a href="/my-blog/" class="hover:text-primary transition-colors" itemprop="item">
+        <span itemprop="name">首页</span>
+      </a>
+      <meta itemprop="position" content="1" />
     </li>
     {items.map((item, index) => (
-      <>
-        <li class="text-slate-300 dark:text-slate-600">/</li>
+      <li class="text-slate-300 dark:text-slate-600">/</li>
+    ))}
+    {items.map((item, index) => (
+      <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
         {item.href ? (
-          <li>
-            <a href={item.href} class="hover:text-primary transition-colors">{item.name}</a>
-          </li>
+          <a href={item.href} class="hover:text-primary transition-colors" itemprop="item">
+            <span itemprop="name">{item.name}</span>
+          </a>
         ) : (
-          <li class="text-slate-700 dark:text-slate-200" aria-current="page">{item.name}</li>
+          <span class="text-slate-700 dark:text-slate-200" itemprop="item">
+            <span itemprop="name">{item.name}</span>
+          </span>
         )}
-      </>
+        <meta itemprop="position" content={String(index + 2)} />
+      </li>
     ))}
   </ol>
 </nav>
+
+<!-- BreadcrumbList JSON-LD -->
+<script type="application/ld+json" set:html={JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": breadcrumbItems
+})} />

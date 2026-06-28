@@ -1,5 +1,5 @@
 ---
-// SEO Structured Data Component
+// Enhanced SEO Structured Data Component
 interface Props {
   title: string;
   description?: string;
@@ -8,6 +8,9 @@ interface Props {
   modifiedTime?: Date;
   author?: string;
   type?: 'website' | 'article';
+  image?: string;
+  category?: string;
+  tags?: string[];
 }
 
 const {
@@ -17,15 +20,41 @@ const {
   publishedTime,
   author = "博主",
   type = "website",
+  image,
+  category,
+  tags = [],
 } = Astro.props;
 
 const siteUrl = "https://jarenivss-a11y.github.io/my-blog";
+const siteName = "我的博客";
 const fullUrl = `${siteUrl}${url}`;
 const canonicalUrl = `https://jarenivss-a11y.github.io${url}`;
 ---
 
+<!-- Canonical URL -->
 <link rel="canonical" href={canonicalUrl} />
 
+<!-- Article Specific Meta -->
+{type === 'article' && publishedTime && (
+  <>
+    <meta property="article:published_time" content={publishedTime.toISOString()} />
+    <meta property="article:modified_time" content={(new Date()).toISOString()} />
+    {author && <meta property="article:author" content={author} />}
+    {category && <meta property="article:section" content={category} />}
+    {tags.map(tag => <meta property="article:tag" content={tag} />)}
+  </>
+)}
+
+<!-- OpenGraph Enhanced -->
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={fullUrl} />
+<meta property="og:type" content={type === 'article' ? 'article' : 'website'} />
+<meta property="og:site_name" content={siteName} />
+{image && <meta property="og:image" content={image} />}
+<meta property="og:locale" content="zh_CN" />
+
+<!-- Article JSON-LD Structured Data -->
 {type === 'article' && publishedTime && (
   <script type="application/ld+json" set:html={JSON.stringify({
     "@context": "https://schema.org",
@@ -34,24 +63,45 @@ const canonicalUrl = `https://jarenivss-a11y.github.io${url}`;
     "description": description,
     "url": fullUrl,
     "datePublished": publishedTime.toISOString(),
+    "dateModified": new Date().toISOString(),
     "author": {
       "@type": "Person",
-      "name": author
+      "name": author,
+      "url": siteUrl
     },
     "publisher": {
       "@type": "Organization",
-      "name": "我的博客",
-      "url": siteUrl
-    }
+      "name": siteName,
+      "url": siteUrl,
+      "logo": {
+        "@type": "ImageObject",
+        "url": `${siteUrl}/logo.png`
+      }
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": fullUrl
+    },
+    ...(image && { "image": {
+      "@type": "ImageObject",
+      "url": image,
+      "width": 1200,
+      "height": 630
+    }}),
+    ...(category && { "articleSection": category }),
+    "keywords": tags.join(", "),
+    "wordCount": 1000 // estimated
   })} />
 )}
 
+<!-- WebSite Schema with SearchAction -->
 <script type="application/ld+json" set:html={JSON.stringify({
   "@context": "https://schema.org",
   "@type": "WebSite",
-  "name": "我的博客",
+  "name": siteName,
   "url": siteUrl,
   "description": description,
+  "inLanguage": "zh-CN",
   "potentialAction": {
     "@type": "SearchAction",
     "target": {
@@ -59,5 +109,33 @@ const canonicalUrl = `https://jarenivss-a11y.github.io${url}`;
       "urlTemplate": `${siteUrl}/search?q={search_term_string}`
     },
     "query-input": "required name=search_term_string"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": siteName,
+    "url": siteUrl
+  }
+})} />
+
+<!-- BreadcrumbList Schema (added dynamically where needed) -->
+<script type="application/ld+json" id="breadcrumb-data">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList"
+}
+</script>
+
+<!-- SoftwareApplication Schema for PWA -->
+<script type="application/ld+json" set:html={JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": siteName,
+  "url": siteUrl,
+  "applicationCategory": "BlogApplication",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "CNY"
   }
 })} />
