@@ -29,6 +29,26 @@
   </button>
 </div>
 
+<style is:global>
+  /* Font size classes */
+  .font-size-14 .prose { font-size: 14px !important; }
+  .font-size-14 .prose p, .font-size-14 .prose li { font-size: 14px !important; }
+  .font-size-16 .prose { font-size: 16px !important; }
+  .font-size-16 .prose p, .font-size-16 .prose li { font-size: 16px !important; }
+  .font-size-18 .prose { font-size: 18px !important; }
+  .font-size-18 .prose p, .font-size-18 .prose li { font-size: 18px !important; }
+  .font-size-20 .prose { font-size: 20px !important; }
+  .font-size-20 .prose p, .font-size-20 .prose li { font-size: 20px !important; }
+  .font-size-22 .prose { font-size: 22px !important; }
+  .font-size-22 .prose p, .font-size-22 .prose li { font-size: 22px !important; }
+  .font-size-24 .prose { font-size: 24px !important; }
+  .font-size-24 .prose p, .font-size-24 .prose li { font-size: 24px !important; }
+  .font-size-26 .prose { font-size: 26px !important; }
+  .font-size-26 .prose p, .font-size-26 .prose li { font-size: 26px !important; }
+  .font-size-28 .prose { font-size: 28px !important; }
+  .font-size-28 .prose p, .font-size-28 .prose li { font-size: 28px !important; }
+</style>
+
 <script is:inline>
   (function() {
     var controls = document.getElementById('font-size-controls');
@@ -39,49 +59,45 @@
     if (!controls || !decreaseBtn || !resetBtn || !increaseBtn) return;
 
     var STORAGE_KEY = 'blog-font-size';
-    var MIN_SIZE = 14;
-    var MAX_SIZE = 28;
-    var DEFAULT_SIZE = 18;
-    var STEP = 2;
+    var SIZES = [14, 16, 18, 20, 22, 24, 26, 28];
+    var DEFAULT_INDEX = 2; // 18px
 
-    function getSize() {
+    function getIndex() {
       var saved = localStorage.getItem(STORAGE_KEY);
-      return saved ? parseInt(saved, 10) : DEFAULT_SIZE;
-    }
-
-    function applySize(size) {
-      var article = document.querySelector('article');
-      if (!article) return;
-      var proseEl = article.querySelector('.prose');
-      if (proseEl) {
-        proseEl.style.setProperty('font-size', size + 'px', 'important');
+      if (saved) {
+        var idx = SIZES.indexOf(parseInt(saved, 10));
+        if (idx !== -1) return idx;
       }
-      // Also apply to all direct children of prose for better coverage
-      var allElements = article.querySelectorAll('.prose p, .prose li, .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6');
-      allElements.forEach(function(el) {
-        if (el.tagName.match(/^H[1-6]$/)) {
-          el.style.setProperty('font-size', Math.min(size + 4, size * 1.3) + 'px', 'important');
-        } else {
-          el.style.setProperty('font-size', size + 'px', 'important');
-        }
+      return DEFAULT_INDEX;
+    }
+
+    function applySize(index) {
+      var size = SIZES[index];
+      var body = document.body;
+
+      // Remove all font size classes
+      SIZES.forEach(function(s) {
+        body.classList.remove('font-size-' + s);
       });
+
+      // Add current font size class
+      body.classList.add('font-size-' + size);
+
+      // Save to localStorage
+      localStorage.setItem(STORAGE_KEY, size.toString());
+
+      // Update button states
+      updateButtons(index);
     }
 
-    function setSize(size) {
-      var clampedSize = Math.min(MAX_SIZE, Math.max(MIN_SIZE, size));
-      localStorage.setItem(STORAGE_KEY, clampedSize.toString());
-      applySize(clampedSize);
-      updateButtons(clampedSize);
-    }
-
-    function updateButtons(currentSize) {
-      decreaseBtn.classList.toggle('opacity-50', currentSize <= MIN_SIZE);
-      increaseBtn.classList.toggle('opacity-50', currentSize >= MAX_SIZE);
+    function updateButtons(index) {
+      decreaseBtn.classList.toggle('opacity-50', index <= 0);
+      increaseBtn.classList.toggle('opacity-50', index >= SIZES.length - 1);
     }
 
     // Initialize
-    var initialSize = getSize();
-    setSize(initialSize);
+    var currentIndex = getIndex();
+    applySize(currentIndex);
 
     // Show controls on article pages
     var article = document.querySelector('article');
@@ -90,15 +106,22 @@
     }
 
     decreaseBtn.addEventListener('click', function() {
-      setSize(getSize() - STEP);
+      if (currentIndex > 0) {
+        currentIndex--;
+        applySize(currentIndex);
+      }
     });
 
     resetBtn.addEventListener('click', function() {
-      setSize(DEFAULT_SIZE);
+      currentIndex = DEFAULT_INDEX;
+      applySize(currentIndex);
     });
 
     increaseBtn.addEventListener('click', function() {
-      setSize(getSize() + STEP);
+      if (currentIndex < SIZES.length - 1) {
+        currentIndex++;
+        applySize(currentIndex);
+      }
     });
   })();
 </script>
