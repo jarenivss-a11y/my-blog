@@ -29,61 +29,58 @@
   </button>
 </div>
 
-<script>
-  function initFontSize() {
-    const controls = document.getElementById('font-size-controls');
-    const decreaseBtn = document.getElementById('font-decrease');
-    const resetBtn = document.getElementById('font-reset');
-    const increaseBtn = document.getElementById('font-increase');
+<script is:inline>
+  (function() {
+    var controls = document.getElementById('font-size-controls');
+    var decreaseBtn = document.getElementById('font-decrease');
+    var resetBtn = document.getElementById('font-reset');
+    var increaseBtn = document.getElementById('font-increase');
 
     if (!controls || !decreaseBtn || !resetBtn || !increaseBtn) return;
 
-    const STORAGE_KEY = 'font-size';
-    const MIN_SIZE = 14;
-    const MAX_SIZE = 24;
-    const DEFAULT_SIZE = 18;
-    const STEP = 2;
+    var STORAGE_KEY = 'font-size';
+    var MIN_SIZE = 14;
+    var MAX_SIZE = 24;
+    var DEFAULT_SIZE = 18;
+    var STEP = 2;
 
     function getSize() {
-      const saved = localStorage.getItem(STORAGE_KEY);
+      var saved = localStorage.getItem(STORAGE_KEY);
       return saved ? parseInt(saved, 10) : DEFAULT_SIZE;
     }
 
-    function setSize(size: number) {
-      const clampedSize = Math.min(MAX_SIZE, Math.max(MIN_SIZE, size));
+    function setSize(size) {
+      var clampedSize = Math.min(MAX_SIZE, Math.max(MIN_SIZE, size));
       localStorage.setItem(STORAGE_KEY, clampedSize.toString());
-      document.documentElement.style.setProperty('--article-font-size', `${clampedSize}px`);
+      document.documentElement.style.setProperty('--article-font-size', clampedSize + 'px');
       updateButtons(clampedSize);
     }
 
-    function updateButtons(currentSize: number) {
+    function updateButtons(currentSize) {
       decreaseBtn.classList.toggle('opacity-50', currentSize <= MIN_SIZE);
       increaseBtn.classList.toggle('opacity-50', currentSize >= MAX_SIZE);
     }
 
     // Initialize
-    const initialSize = getSize();
+    var initialSize = getSize();
     setSize(initialSize);
 
     // Show controls on article pages
-    const article = document.querySelector('article');
+    var article = document.querySelector('article');
     if (article) {
       controls.classList.remove('hidden');
     }
 
-    decreaseBtn.addEventListener('click', () => {
+    decreaseBtn.addEventListener('click', function() {
       setSize(getSize() - STEP);
     });
 
-    resetBtn.addEventListener('click', () => {
+    resetBtn.addEventListener('click', function() {
       setSize(DEFAULT_SIZE);
     });
 
-    increaseBtn.addEventListener('click', () => {
+    increaseBtn.addEventListener('click', function() {
       setSize(getSize() + STEP);
     });
-  }
-
-  initFontSize();
-  document.addEventListener('astro:after-swap', initFontSize);
+  })();
 </script>
