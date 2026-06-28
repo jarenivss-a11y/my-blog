@@ -54,15 +54,15 @@
       if (!article) return;
       var proseEl = article.querySelector('.prose');
       if (proseEl) {
-        proseEl.style.fontSize = size + 'px';
+        proseEl.style.setProperty('font-size', size + 'px', 'important');
       }
       // Also apply to all direct children of prose for better coverage
-      var allElements = article.querySelectorAll('.prose, .prose p, .prose li, .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6');
+      var allElements = article.querySelectorAll('.prose p, .prose li, .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6');
       allElements.forEach(function(el) {
         if (el.tagName.match(/^H[1-6]$/)) {
-          el.style.fontSize = Math.min(size + 4, size * 1.3) + 'px';
+          el.style.setProperty('font-size', Math.min(size + 4, size * 1.3) + 'px', 'important');
         } else {
-          el.style.fontSize = size + 'px';
+          el.style.setProperty('font-size', size + 'px', 'important');
         }
       });
     }
