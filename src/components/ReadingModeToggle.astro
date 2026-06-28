@@ -1,0 +1,69 @@
+---
+// ReadingModeToggle - adds a quick toggle for reading mode
+---
+
+<button
+  id="reading-mode-fab"
+  class="fixed right-4 bottom-40 z-40 p-4 rounded-full backdrop-blur-xl bg-primary text-white shadow-lg hover:shadow-xl transition-all hover:scale-105 md:hidden"
+  aria-label="切换阅读模式"
+  title="阅读模式"
+>
+  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+  </svg>
+</button>
+
+<script>
+  function initReadingModeToggle() {
+    const fab = document.getElementById('reading-mode-fab');
+    if (!fab) return;
+
+    fab.addEventListener('click', () => {
+      document.documentElement.classList.toggle('reading-mode');
+      const isActive = document.documentElement.classList.contains('reading-mode');
+      fab.classList.toggle('bg-primary', !isActive);
+      fab.classList.toggle('bg-green-500', isActive);
+    });
+  }
+
+  initReadingModeToggle();
+  document.addEventListener('astro:after-swap', initReadingModeToggle);
+</script>
+
+<style is:global>
+  .reading-mode {
+    --tw-bg-opacity: 1;
+    background-color: rgb(253 253 252 / var(--tw-bg-opacity)) !important;
+  }
+  .reading-mode body,
+  .reading-mode main {
+    background-color: #fdfcfc !important;
+  }
+  .reading-mode article > *:not(.reading-mode-exclude) {
+    max-width: 65ch !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+  .reading-mode header,
+  .reading-mode footer,
+  .reading-mode nav,
+  .reading-mode #toc,
+  .reading-mode #reading-progress,
+  .reading-mode .back-to-top,
+  .reading-mode #back-to-top,
+  .reading-mode #theme-toggle-wrapper,
+  .reading-mode #reading-list-btn,
+  .reading-mode #reading-stats-widget,
+  .reading-mode #floating-share,
+  .reading-mode #shortcut-help-btn,
+  .reading-mode #battery-saver-btn {
+    opacity: 0.3 !important;
+    transition: opacity 0.3s;
+  }
+  .reading-mode header:hover,
+  .reading-mode footer:hover,
+  .reading-mode nav:hover {
+    opacity: 1 !important;
+  }
+</style>

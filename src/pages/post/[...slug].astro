@@ -16,6 +16,7 @@ import ReadingPosition from '../../components/ReadingPosition.astro';
 import CopyAllCode from '../../components/CopyAllCode.astro';
 import ReadingCompletion from '../../components/ReadingCompletion.astro';
 import CollapsibleSections from '../../components/CollapsibleSections.astro';
+import ReadingModeToggle from '../../components/ReadingModeToggle.astro';
 
 const BASE = '/my-blog';
 const SITE_URL = 'https://jarenivss-a11y.github.io/my-blog';
@@ -221,6 +222,9 @@ const category = categoryInfo[post.data.category] || { name: '未知', icon: '�
 
       <!-- Collapsible Sections -->
       <CollapsibleSections />
+
+      <!-- Reading Mode Toggle (Mobile) -->
+      <ReadingModeToggle />
 
       <!-- Comments -->
       <Comments title={post.data.title} />
