@@ -1,0 +1,64 @@
+---
+// HeadingLinks - adds copy link functionality to article headings
+---
+
+<script>
+  function initHeadingLinks() {
+    const article = document.querySelector('article');
+    if (!article) return;
+
+    const headings = article.querySelectorAll('h2, h3');
+
+    headings.forEach((heading) => {
+      if (!heading.id) {
+        // Generate id from text content
+        heading.id = heading.textContent
+          ?.toLowerCase()
+          .replace(/[^\w\s-]/g, '')
+          .replace(/\s+/g, '-')
+          .trim() || '';
+      }
+
+      const linkIcon = document.createElement('span');
+      linkIcon.className = 'heading-link-icon ml-2 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer';
+      linkIcon.innerHTML = `
+        <svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+        </svg>
+      `;
+
+      // Make heading clickable
+      heading.classList.add('group', 'cursor-pointer');
+      heading.insertBefore(linkIcon, heading.firstChild);
+
+      heading.addEventListener('click', () => {
+        const url = `${window.location.origin}${window.location.pathname}#${heading.id}`;
+        navigator.clipboard.writeText(url).then(() => {
+          // Show feedback
+          const originalText = linkIcon.innerHTML;
+          linkIcon.innerHTML = `
+            <svg class="w-4 h-4 inline-block text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+          `;
+          setTimeout(() => {
+            linkIcon.innerHTML = originalText;
+          }, 1500);
+        });
+      });
+    });
+  }
+
+  initHeadingLinks();
+  document.addEventListener('astro:after-swap', initHeadingLinks);
+</script>
+
+<style is:global>
+  .heading-link-icon {
+    vertical-align: middle;
+  }
+  h2:hover .heading-link-icon,
+  h3:hover .heading-link-icon {
+    opacity: 1;
+  }
+</style>
