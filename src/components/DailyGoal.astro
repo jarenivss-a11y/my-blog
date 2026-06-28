@@ -1,0 +1,186 @@
+---
+// DailyGoal - tracks daily reading goals
+---
+
+<div id="daily-goal-widget" class="fixed right-4 top-32 z-30 hidden md:block">
+  <button
+    id="goal-toggle"
+    class="p-3 rounded-full backdrop-blur-xl bg-white/80 dark:bg-slate-800/80 border border-white/50 dark:border-slate-700/50 shadow-lg hover:shadow-xl transition-all hover:scale-105"
+    aria-label="每日阅读目标"
+  >
+    <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    </svg>
+  </button>
+</div>
+
+<!-- Daily Goal Modal -->
+<div id="goal-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center">
+  <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="goal-overlay"></div>
+  <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-sm w-full mx-4 overflow-hidden">
+    <div class="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-700">
+      <h3 class="text-lg font-bold text-slate-900 dark:text-white">📖 每日阅读目标</h3>
+      <button id="goal-close" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+        <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <div class="p-6">
+      <div class="text-center mb-6">
+        <div class="text-5xl font-bold text-primary mb-2" id="goal-progress">0%</div>
+        <div class="text-slate-500 dark:text-slate-400" id="goal-status">今日阅读 0 分钟</div>
+      </div>
+
+      <div class="mb-6">
+        <div class="flex justify-between text-sm mb-2">
+          <span class="text-slate-500 dark:text-slate-400">目标</span>
+          <span class="text-slate-700 dark:text-slate-200" id="goal-target">30 分钟/天</span>
+        </div>
+        <div class="h-4 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+          <div id="goal-bar" class="h-full bg-gradient-to-r from-primary to-purple-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <div class="space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-slate-500 dark:text-slate-400">设置每日目标</span>
+        </div>
+        <div class="flex gap-2">
+          {[15, 30, 45, 60].map((mins) => (
+            <button
+              class="goal-option flex-1 py-2 px-3 text-sm rounded-lg border border-slate-200 dark:border-slate-600 hover:border-primary transition-colors"
+              data-mins={mins}
+            >
+              {mins} 分钟
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700">
+        <div class="flex justify-between text-sm mb-2">
+          <span class="text-slate-500 dark:text-slate-400">本周进度</span>
+          <span class="text-slate-700 dark:text-slate-200" id="weekly-progress">0/0 天</span>
+        </div>
+        <div class="flex gap-1 justify-center">
+          {['一', '二', '三', '四', '五', '六', '日'].map((day, i) => (
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-medium goal-day" data-day={i}>
+              <span class="text-slate-400">{day}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function initDailyGoal() {
+    const widget = document.getElementById('daily-goal-widget');
+    const toggleBtn = document.getElementById('goal-toggle');
+    const modal = document.getElementById('goal-modal');
+    const closeBtn = document.getElementById('goal-close');
+    const overlay = document.getElementById('goal-overlay');
+
+    if (!widget || !toggleBtn || !modal) return;
+
+    const TIME_KEY = 'daily-reading-time';
+    const GOAL_KEY = 'daily-reading-goal';
+    const WEEKLY_KEY = 'weekly-reading';
+
+    function getToday() {
+      return new Date().toDateString();
+    }
+
+    function getGoal() {
+      return parseInt(localStorage.getItem(GOAL_KEY) || '30', 10);
+    }
+
+    function getTodayTime() {
+      const data = JSON.parse(localStorage.getItem(TIME_KEY) || '{"date":"","minutes":0}');
+      if (data.date !== getToday()) {
+        return 0;
+      }
+      return data.minutes;
+    }
+
+    function saveTodayTime(minutes) {
+      const data = { date: getToday(), minutes };
+      localStorage.setItem(TIME_KEY, JSON.stringify(data));
+    }
+
+    function updateWeeklyProgress() {
+      const weekly = JSON.parse(localStorage.getItem(WEEKLY_KEY) || '[]');
+      const today = new Date();
+      const dayOfWeek = today.getDay();
+      const weekStart = new Date(today);
+      weekStart.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+
+      const days = document.querySelectorAll('.goal-day');
+      days.forEach((day, i) => {
+        const date = new Date(weekStart);
+        date.setDate(weekStart.getDate() + i);
+        const dateStr = date.toDateString();
+        const hasData = weekly.some((w: any) => w.date === dateStr && w.completed);
+
+        day.classList.toggle('bg-primary', hasData);
+        day.classList.toggle('text-white', hasData);
+        day.classList.toggle('bg-slate-100', !hasData);
+        day.classList.toggle('dark:bg-slate-700', !hasData);
+        day.classList.toggle('text-slate-700', !hasData);
+        day.classList.toggle('dark:text-slate-200', !hasData);
+      });
+    }
+
+    function updateUI() {
+      const todayTime = getTodayTime();
+      const goal = getGoal();
+      const progress = Math.min(100, Math.round((todayTime / goal) * 100));
+
+      document.getElementById('goal-progress').textContent = `${progress}%`;
+      document.getElementById('goal-status').textContent = `今日阅读 ${todayTime} 分钟`;
+      document.getElementById('goal-target').textContent = `${goal} 分钟/天`;
+      document.getElementById('goal-bar').style.width = `${progress}%`;
+
+      // Update weekly progress
+      const weekly = JSON.parse(localStorage.getItem(WEEKLY_KEY) || '[]');
+      const completedDays = weekly.filter((w: any) => w.completed).length;
+      document.getElementById('weekly-progress').textContent = `${completedDays}/7 天`;
+
+      updateWeeklyProgress();
+    }
+
+    function openModal() {
+      updateUI();
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      modal.classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    toggleBtn.addEventListener('click', openModal);
+    closeBtn?.addEventListener('click', closeModal);
+    overlay?.addEventListener('click', closeModal);
+
+    document.querySelectorAll('.goal-option').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const mins = parseInt(btn.getAttribute('data-mins') || '30', 10);
+        localStorage.setItem(GOAL_KEY, mins.toString());
+        updateUI();
+      });
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+        closeModal();
+      }
+    });
+  }
+
+  initDailyGoal();
+  document.addEventListener('astro:after-swap', initDailyGoal);
+</script>
