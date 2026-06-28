@@ -1,0 +1,160 @@
+---
+// ReadingStreak - tracks consecutive days of reading
+---
+
+<div id="reading-streak-widget" class="fixed left-4 top-32 z-30 hidden md:block">
+  <button
+    id="streak-toggle"
+    class="p-3 rounded-full backdrop-blur-xl bg-white/80 dark:bg-slate-800/80 border border-white/50 dark:border-slate-700/50 shadow-lg hover:shadow-xl transition-all hover:scale-105"
+    aria-label="阅读连续天数"
+    title="阅读连续天数"
+  >
+    <svg class="w-5 h-5 text-orange-500" fill="currentColor" viewBox="0 0 24 24">
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+    </svg>
+  </button>
+</div>
+
+<!-- Reading Streak Modal -->
+<div id="streak-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center">
+  <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" id="streak-overlay"></div>
+  <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-sm w-full mx-4 overflow-hidden">
+    <div class="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-700">
+      <h3 class="text-lg font-bold text-slate-900 dark:text-white">🔥 阅读连续天数</h3>
+      <button id="streak-close" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+        <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <div class="p-6 text-center">
+      <div class="text-6xl font-bold text-orange-500 mb-2" id="streak-count">0</div>
+      <div class="text-slate-500 dark:text-slate-400 mb-6">天连续阅读</div>
+
+      <div class="grid grid-cols-7 gap-2 mb-4">
+        {Array.from({ length: 28 }).map((_, i) => (
+          <div
+            class={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-medium streak-day ${i < 7 ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-500' : 'bg-slate-100 dark:bg-slate-700/50 text-slate-400'}`}
+            data-day={i}
+          >
+            {i + 1}
+          </div>
+        ))}
+      </div>
+
+      <p class="text-sm text-slate-500 dark:text-slate-400">
+        保持连续阅读，养成好习惯！
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+  function initReadingStreak() {
+    const widget = document.getElementById('reading-streak-widget');
+    const toggleBtn = document.getElementById('streak-toggle');
+    const modal = document.getElementById('streak-modal');
+    const closeBtn = document.getElementById('streak-close');
+    const overlay = document.getElementById('streak-overlay');
+
+    if (!widget || !toggleBtn || !modal) return;
+
+    const STREAK_KEY = 'reading-streak';
+    const VISITS_KEY = 'reading-visits';
+
+    function getStreakData() {
+      try {
+        return JSON.parse(localStorage.getItem(STREAK_KEY) || '{"current":0,"longest":0,"lastDate":""}');
+      } catch {
+        return { current: 0, longest: 0, lastDate: '' };
+      }
+    }
+
+    function getVisits() {
+      try {
+        return JSON.parse(localStorage.getItem(VISITS_KEY) || '[]');
+      } catch {
+        return [];
+      }
+    }
+
+    function updateStreak() {
+      const today = new Date().toDateString();
+      const data = getStreakData();
+
+      if (data.lastDate === today) {
+        return; // Already recorded today
+      }
+
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+
+      if (data.lastDate === yesterday.toDateString()) {
+        data.current += 1;
+      } else if (data.lastDate !== today) {
+        data.current = 1;
+      }
+
+      data.lastDate = today;
+      data.longest = Math.max(data.longest, data.current);
+
+      localStorage.setItem(STREAK_KEY, JSON.stringify(data));
+
+      // Add to visits
+      const visits = getVisits();
+      visits.push({ date: today, timestamp: Date.now() });
+      if (visits.length > 30) visits.shift();
+      localStorage.setItem(VISITS_KEY, JSON.stringify(visits));
+    }
+
+    function showStreak() {
+      const data = getStreakData();
+      document.getElementById('streak-count').textContent = data.current;
+
+      // Update streak days
+      const days = document.querySelectorAll('.streak-day');
+      const visits = getVisits();
+      const today = new Date();
+
+      days.forEach((day, i) => {
+        const date = new Date(today);
+        date.setDate(date.getDate() - (27 - i));
+        const dateStr = date.toDateString();
+        const hasVisit = visits.some((v: any) => v.date === dateStr);
+
+        if (hasVisit) {
+          day.classList.remove('bg-slate-100', 'dark:bg-slate-700/50', 'text-slate-400');
+          day.classList.add('bg-orange-100', 'dark:bg-orange-900/30', 'text-orange-500');
+        }
+      });
+    }
+
+    function openModal() {
+      updateStreak();
+      showStreak();
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      modal.classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    toggleBtn.addEventListener('click', openModal);
+    closeBtn?.addEventListener('click', closeModal);
+    overlay?.addEventListener('click', closeModal);
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+        closeModal();
+      }
+    });
+
+    // Update streak on page load
+    updateStreak();
+  }
+
+  initReadingStreak();
+  document.addEventListener('astro:after-swap', initReadingStreak);
+</script>

@@ -14,6 +14,7 @@ import ReadAloud from '../../components/ReadAloud.astro';
 import ParagraphCopy from '../../components/ParagraphCopy.astro';
 import ReadingPosition from '../../components/ReadingPosition.astro';
 import CopyAllCode from '../../components/CopyAllCode.astro';
+import ReadingCompletion from '../../components/ReadingCompletion.astro';
 
 const BASE = '/my-blog';
 const SITE_URL = 'https://jarenivss-a11y.github.io/my-blog';
@@ -213,6 +214,9 @@ const category = categoryInfo[post.data.category] || { name: '未知', icon: '�
 
       <!-- Copy All Code -->
       <CopyAllCode />
+
+      <!-- Reading Completion -->
+      <ReadingCompletion />
 
       <!-- Comments -->
       <Comments title={post.data.title} />

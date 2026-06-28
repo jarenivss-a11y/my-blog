@@ -1,0 +1,89 @@
+---
+// ReadingCompletion - shows celebration when article is finished
+---
+
+<script>
+  function initReadingCompletion() {
+    const STORAGE_KEY = 'article-completions';
+    const confettiContainer = document.createElement('div');
+    confettiContainer.id = 'confetti-container';
+    confettiContainer.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;overflow:hidden;';
+    document.body.appendChild(confettiContainer);
+
+    function showCompletion() {
+      // Create confetti
+      const colors = ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981'];
+      const confettiCount = 50;
+
+      for (let i = 0; i < confettiCount; i++) {
+        const confetti = document.createElement('div');
+        confetti.style.cssText = `
+          position: absolute;
+          width: 10px;
+          height: 10px;
+          background: ${colors[Math.floor(Math.random() * colors.length)]};
+          left: ${Math.random() * 100}%;
+          top: -10px;
+          border-radius: ${Math.random() > 0.5 ? '50%' : '0'};
+          animation: confetti-fall ${2 + Math.random() * 2}s linear forwards;
+          animation-delay: ${Math.random() * 0.5}s;
+        `;
+        confettiContainer.appendChild(confetti);
+      }
+
+      // Remove confetti after animation
+      setTimeout(() => {
+        confettiContainer.innerHTML = '';
+      }, 5000);
+
+      // Save completion
+      const completions = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      completions.push({
+        url: window.location.href,
+        title: document.title,
+        timestamp: Date.now()
+      });
+      if (completions.length > 50) completions.shift();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(completions));
+    }
+
+    // Add confetti animation styles
+    if (!document.getElementById('confetti-styles')) {
+      const style = document.createElement('style');
+      style.id = 'confetti-styles';
+      style.textContent = `
+        @keyframes confetti-fall {
+          0% {
+            transform: translateY(0) rotate(0deg);
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(100vh) rotate(720deg);
+            opacity: 0;
+          }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    // Listen for scroll completion
+    let hasShownCompletion = false;
+    const checkCompletion = () => {
+      if (hasShownCompletion) return;
+
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+
+      if (progress >= 95) {
+        hasShownCompletion = true;
+        showCompletion();
+      }
+    };
+
+    window.addEventListener('scroll', checkCompletion, { passive: true });
+  }
+
+  initReadingCompletion();
+  document.addEventListener('astro:after-swap', initReadingCompletion);
+</script>
