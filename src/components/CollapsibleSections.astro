@@ -1,0 +1,72 @@
+---
+// CollapsibleSections - allows collapsing/expanding article sections
+---
+
+<script>
+  function initCollapsibleSections() {
+    const article = document.querySelector('article');
+    if (!article) return;
+
+    const headings = article.querySelectorAll('h2, h3');
+
+    headings.forEach((heading, index) => {
+      const nextElement = heading.nextElementSibling;
+      if (!nextElement || nextElement.tagName === 'H2' || nextElement.tagName === 'H3') return;
+
+      // Create wrapper
+      const wrapper = document.createElement('div');
+      wrapper.className = 'collapsible-section relative';
+
+      // Create toggle button
+      const toggleBtn = document.createElement('button');
+      toggleBtn.className = 'absolute -left-8 top-0 p-1 text-slate-400 hover:text-primary transition-colors';
+      toggleBtn.innerHTML = `
+        <svg class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+        </svg>
+      `;
+      toggleBtn.setAttribute('aria-label', '折叠部分');
+
+      // Wrap content until next heading
+      const content = document.createElement('div');
+      content.className = 'collapsible-content';
+
+      let current = nextElement;
+      while (current && current.tagName !== 'H2' && current.tagName !== 'H3') {
+        const next = current.nextElementSibling;
+        content.appendChild(current);
+        current = next;
+      }
+
+      // Insert wrapper after heading
+      heading.parentNode?.insertBefore(wrapper, heading.nextElementSibling);
+      wrapper.appendChild(heading.cloneNode(true));
+      wrapper.appendChild(content);
+
+      // Remove original heading (we moved it)
+      heading.remove();
+
+      // Add button to wrapper's heading
+      const newHeading = wrapper.querySelector('h2, h3');
+      if (newHeading) {
+        newHeading.classList.add('relative');
+        newHeading.insertBefore(toggleBtn, newHeading.firstChild);
+      }
+
+      // Toggle functionality
+      let isExpanded = true;
+
+      toggleBtn.addEventListener('click', () => {
+        isExpanded = !isExpanded;
+        content.classList.toggle('hidden', !isExpanded);
+        const icon = toggleBtn.querySelector('svg');
+        if (icon) {
+          icon.style.transform = isExpanded ? 'rotate(0deg)' : 'rotate(-90deg)';
+        }
+      });
+    });
+  }
+
+  initCollapsibleSections();
+  document.addEventListener('astro:after-swap', initCollapsibleSections);
+</script>
