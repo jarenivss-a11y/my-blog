@@ -1,78 +1,45 @@
 ---
-// Sakura animation - 樱花飘落动画（亮色模式）
+// Sakura animation - colorful sakura petals (always visible)
 ---
 
 <div id="sakura-container" class="fixed inset-0 w-full h-full pointer-events-none z-10 overflow-hidden">
   <style>
     @keyframes sakuraFall {
-      0% { transform: translate(0, -10vh) rotate(0deg); opacity: 0; }
-      10% { opacity: 1; }
-      80% { opacity: 1; }
-      100% { transform: translate(15vw, 110vh) rotate(360deg); opacity: 0; }
+      0% { transform: translate(0, -10vh) rotate(0deg) scale(1); opacity: 0; }
+      5% { opacity: 1; }
+      25% { transform: translate(10vw, 25vh) rotate(90deg) scale(1.1); }
+      50% { transform: translate(-8vw, 50vh) rotate(180deg) scale(1); }
+      75% { transform: translate(15vw, 75vh) rotate(270deg) scale(0.9); }
+      90% { opacity: 1; }
+      100% { transform: translate(5vw, 110vh) rotate(360deg) scale(0.8); opacity: 0; }
     }
-    .sakura-petal {
-      position: absolute;
-      top: 0;
-      background: linear-gradient(135deg, rgba(255, 182, 193, 0.8), rgba(255, 192, 203, 0.6));
-      border-radius: 100% 0 100% 0;
-      box-shadow: 0 0 5px rgba(255, 182, 193, 0.6);
-    }
+    .sakura-petal { position: absolute; top: 0; border-radius: 100% 0 100% 0; }
   </style>
 </div>
 
 <script>
-  interface Petal {
-    id: number;
-    left: string;
-    size: number;
-    duration: number;
-    delay: number;
-  }
+  const colorPalettes = [
+    'linear-gradient(135deg, rgba(255, 182, 193, 0.9), rgba(255, 192, 203, 0.7))',
+    'linear-gradient(135deg, rgba(255, 192, 203, 0.9), rgba(255, 218, 233, 0.7))',
+    'linear-gradient(135deg, rgba(255, 160, 180, 0.9), rgba(255, 182, 193, 0.6))',
+    'linear-gradient(135deg, rgba(253, 200, 208, 0.9), rgba(255, 182, 193, 0.8))',
+    'linear-gradient(135deg, rgba(255, 105, 180, 0.6), rgba(255, 182, 193, 0.8))',
+    'linear-gradient(135deg, rgba(255, 255, 240, 0.8), rgba(255, 250, 245, 0.6))',
+  ];
 
   function createSakura() {
     const container = document.getElementById('sakura-container');
     if (!container) return;
 
-    const petals: Petal[] = Array.from({ length: 25 }).map((_, i) => ({
-      id: i,
-      left: `${Math.random() * 100}%`,
-      size: 8 + Math.random() * 12,
-      duration: 6 + Math.random() * 8,
-      delay: Math.random() * -15,
-    }));
-
-    petals.forEach(p => {
+    Array.from({ length: 30 }).forEach((_, i) => {
       const petal = document.createElement('div');
       petal.className = 'sakura-petal';
-      petal.style.cssText = `
-        left: ${p.left};
-        width: ${p.size}px;
-        height: ${p.size * 1.2}px;
-        animation: sakuraFall ${p.duration}s linear infinite;
-        animation-delay: ${p.delay}s;
-      `;
+      const size = 8 + Math.random() * 14;
+      const color = colorPalettes[Math.floor(Math.random() * colorPalettes.length)];
+      petal.style.cssText = 'left:' + (Math.random() * 110) + '%;width:' + size + 'px;height:' + (size * 1.2) + 'px;background:' + color + ';filter:blur(' + (Math.random() * 2) + 'px);box-shadow:0 0 ' + (size/2) + 'px rgba(255,182,193,0.5);animation:sakuraFall ' + (8 + Math.random() * 10) + 's ease-in-out infinite;animation-delay:' + (Math.random() * -20) + 's;';
       container.appendChild(petal);
     });
   }
 
-  function updateSakuraVisibility() {
-    const container = document.getElementById('sakura-container');
-    if (container) {
-      const isDark = document.documentElement.classList.contains('dark');
-      container.style.display = isDark ? 'none' : 'block';
-    }
-  }
-
-  // Theme observer - set up immediately for visibility control
-  const observer = new MutationObserver(updateSakuraVisibility);
-  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-
-  // Defer petal creation to avoid blocking page load
-  if ('requestIdleCallback' in window) {
-    requestIdleCallback(() => {
-      createSakura();
-    }, { timeout: 2000 });
-  } else {
-    setTimeout(createSakura, 500);
-  }
+  createSakura();
 </script>

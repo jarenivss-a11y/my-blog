@@ -1,8 +1,8 @@
 ---
-// Fireflies animation - 萤火虫动画（暗色模式）
+// Fireflies animation - Colorful fireflies (always visible)
 ---
 
-<div id="fireflies-container" class="fixed inset-0 w-full h-full pointer-events-none z-10 overflow-hidden mix-blend-screen" style="display: none;">
+<div id="fireflies-container" class="fixed inset-0 w-full h-full pointer-events-none z-10 overflow-hidden">
 </div>
 
 <script>
@@ -16,60 +16,101 @@
     floatDuration: number;
     floatDelay: number;
     floatPath: string;
+    color: string;
+    glowColor: string;
   }
+
+  const colorPalettes = [
+    { color: 'rgba(255, 182, 193, 0.9)', glow: 'rgba(255, 105, 180, 0.8)' },
+    { color: 'rgba(173, 255, 47, 0.9)', glow: 'rgba(127, 255, 0, 0.8)' },
+    { color: 'rgba(255, 215, 0, 0.9)', glow: 'rgba(255, 165, 0, 0.8)' },
+    { color: 'rgba(138, 43, 226, 0.9)', glow: 'rgba(75, 0, 130, 0.8)' },
+    { color: 'rgba(0, 191, 255, 0.9)', glow: 'rgba(30, 144, 255, 0.8)' },
+    { color: 'rgba(255, 69, 0, 0.9)', glow: 'rgba(255, 99, 71, 0.8)' },
+    { color: 'rgba(50, 205, 50, 0.9)', glow: 'rgba(144, 238, 144, 0.8)' },
+    { color: 'rgba(255, 255, 0, 0.9)', glow: 'rgba(255, 215, 0, 0.8)' },
+  ];
+
+  const floatPaths = ['float1', 'float2', 'float3', 'float4', 'float5', 'float6', 'float7', 'float8'];
 
   function createFireflies() {
     const container = document.getElementById('fireflies-container');
     if (!container) return;
 
-    const flies: Firefly[] = Array.from({ length: 30 }).map((_, i) => ({
-      id: i,
-      top: `${Math.random() * 100}%`,
-      left: `${Math.random() * 100}%`,
-      size: 3 + Math.random() * 4,
-      breatheDuration: 3 + Math.random() * 5,
-      breatheDelay: Math.random() * -10,
-      floatDuration: 15 + Math.random() * 20,
-      floatDelay: Math.random() * -20,
-      floatPath: `float${Math.floor(Math.random() * 4) + 1}`,
-    }));
+    const flies = Array.from({ length: 45 }).map((_, i) => {
+      const palette = colorPalettes[Math.floor(Math.random() * colorPalettes.length)];
+      return {
+        id: i,
+        top: Math.random() * 100 + '%',
+        left: Math.random() * 100 + '%',
+        size: 4 + Math.random() * 6,
+        breatheDuration: 2 + Math.random() * 4,
+        breatheDelay: Math.random() * -8,
+        floatDuration: 12 + Math.random() * 18,
+        floatDelay: Math.random() * -20,
+        floatPath: floatPaths[Math.floor(Math.random() * floatPaths.length)],
+        color: palette.color,
+        glowColor: palette.glow,
+      };
+    });
 
     const styleEl = document.createElement('style');
     styleEl.textContent = `
       @keyframes fireflyBreathe {
-        0%, 100% { opacity: 0; transform: scale(0.3); }
-        50% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 10px 3px rgba(100, 255, 150, 0.8), 0 0 20px 6px rgba(50, 255, 100, 0.4); }
+        0%, 100% { opacity: 0.2; transform: scale(0.4); filter: blur(1px); }
+        50% { opacity: 1; transform: scale(1.4); filter: blur(0px); }
       }
       @keyframes float1 {
-        0%, 100% { transform: translate(0, 0); }
-        33% { transform: translate(10vw, -15vh); }
-        66% { transform: translate(-5vw, -20vh); }
+        0%, 100% { transform: translate(0, 0) rotate(0deg); }
+        25% { transform: translate(8vw, -12vh) rotate(90deg); }
+        50% { transform: translate(-6vw, -18vh) rotate(180deg); }
+        75% { transform: translate(10vw, -8vh) rotate(270deg); }
       }
       @keyframes float2 {
-        0%, 100% { transform: translate(0, 0); }
-        33% { transform: translate(-12vw, 10vh); }
-        66% { transform: translate(8vw, 15vh); }
+        0%, 100% { transform: translate(0, 0) rotate(0deg); }
+        25% { transform: translate(-10vw, 8vh) rotate(-45deg); }
+        50% { transform: translate(6vw, 14vh) rotate(-90deg); }
+        75% { transform: translate(-8vw, 6vh) rotate(-135deg); }
       }
       @keyframes float3 {
         0%, 100% { transform: translate(0, 0); }
-        33% { transform: translate(15vw, 15vh); }
-        66% { transform: translate(-10vw, 5vh); }
+        20% { transform: translate(12vw, -8vh); }
+        40% { transform: translate(-8vw, -16vh); }
+        60% { transform: translate(10vw, 10vh); }
+        80% { transform: translate(-12vw, 5vh); }
       }
       @keyframes float4 {
         0%, 100% { transform: translate(0, 0); }
-        33% { transform: translate(-15vw, -10vh); }
-        66% { transform: translate(10vw, -15vh); }
+        33% { transform: translate(-15vw, -12vh); }
+        66% { transform: translate(12vw, 8vh); }
       }
-      .firefly {
-        position: absolute;
-        animation-duration: inherit;
+      @keyframes float5 {
+        0%, 100% { transform: translate(0, 0) scale(1); }
+        50% { transform: translate(10vw, 15vh) scale(1.2); }
       }
+      @keyframes float6 {
+        0%, 100% { transform: translate(0, 0); }
+        25% { transform: translate(6vw, 10vh); }
+        50% { transform: translate(-8vw, -6vh); }
+        75% { transform: translate(4vw, -12vh); }
+      }
+      @keyframes float7 {
+        0%, 100% { transform: translate(0, 0); }
+        20% { transform: translate(-10vw, 12vh) rotate(45deg); }
+        40% { transform: translate(8vw, -10vh) rotate(-30deg); }
+        60% { transform: translate(-6vw, -14vh) rotate(60deg); }
+        80% { transform: translate(12vw, 8vh) rotate(-45deg); }
+      }
+      @keyframes float8 {
+        0%, 100% { transform: translate(0, 0); }
+        25% { transform: translate(15vw, 10vh) scale(0.8); }
+        50% { transform: translate(-10vw, -15vh) scale(1.2); }
+        75% { transform: translate(5vw, 20vh) scale(0.9); }
+      }
+      .firefly { position: absolute; }
       .firefly-glow {
-        width: 4px;
-        height: 4px;
-        background-color: rgba(200, 255, 200, 0.9);
         border-radius: 50%;
-        animation: fireflyBreathe 4s ease-in-out infinite;
+        animation: fireflyBreathe 3s ease-in-out infinite;
       }
     `;
     container.appendChild(styleEl);
@@ -77,45 +118,16 @@
     flies.forEach(fly => {
       const wrapper = document.createElement('div');
       wrapper.className = 'firefly';
-      wrapper.style.cssText = `
-        top: ${fly.top};
-        left: ${fly.left};
-        animation: ${fly.floatPath} ${fly.floatDuration}s ease-in-out infinite;
-        animation-delay: ${fly.floatDelay}s;
-      `;
+      wrapper.style.cssText = 'top:' + fly.top + ';left:' + fly.left + ';animation:' + fly.floatPath + ' ' + fly.floatDuration + 's ease-in-out infinite;animation-delay:' + fly.floatDelay + 's;';
 
       const glow = document.createElement('div');
       glow.className = 'firefly-glow';
-      glow.style.cssText = `
-        width: ${fly.size}px;
-        height: ${fly.size}px;
-        animation: fireflyBreathe ${fly.breatheDuration}s ease-in-out infinite;
-        animation-delay: ${fly.breatheDelay}s;
-      `;
+      glow.style.cssText = 'width:' + fly.size + 'px;height:' + fly.size + 'px;background-color:' + fly.color + ';box-shadow:0 0 ' + (fly.size * 2) + 'px ' + fly.glowColor + ',0 0 ' + (fly.size * 4) + 'px ' + fly.color + ',0 0 ' + (fly.size * 6) + 'px rgba(255,255,255,0.3);animation:fireflyBreathe ' + fly.breatheDuration + 's ease-in-out infinite;animation-delay:' + fly.breatheDelay + 's;';
 
       wrapper.appendChild(glow);
       container.appendChild(wrapper);
     });
   }
 
-  function updateFirefliesVisibility() {
-    const container = document.getElementById('fireflies-container');
-    if (container) {
-      const isDark = document.documentElement.classList.contains('dark');
-      container.style.display = isDark ? 'block' : 'none';
-    }
-  }
-
-  // Theme observer - set up immediately for visibility control
-  const observer = new MutationObserver(updateFirefliesVisibility);
-  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-
-  // Defer firefly creation to avoid blocking page load
-  if ('requestIdleCallback' in window) {
-    requestIdleCallback(() => {
-      createFireflies();
-    }, { timeout: 2000 });
-  } else {
-    setTimeout(createFireflies, 500);
-  }
+  createFireflies();
 </script>
