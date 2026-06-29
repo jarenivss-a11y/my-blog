@@ -1,7 +1,6 @@
 ---
-import OceanWaves from '../components/OceanWaves.astro';
-import WaterEffect from '../components/WaterEffect.astro';
-import OceanSound from '../components/OceanSound.astro';
+import OceanBackground from '../components/OceanBackground.astro';
+import OceanAudio from '../components/OceanAudio.astro';
 import ThemeToggle from '../components/ThemeToggle.astro';
 import FontSizeToggle from '../components/FontSizeToggle.astro';
 import BackToTop from '../components/BackToTop.astro';
@@ -126,10 +125,12 @@ const currentPath = Astro.url.pathname;
     <ReadingProgress />
 
     <!-- Background Effects -->
+    <OceanBackground />
+    <OceanAudio />
     
-    <OceanWaves />
-    <WaterEffect />
-    <OceanSound />
+    
+    
+    
     
 
     <!-- Navigation -->

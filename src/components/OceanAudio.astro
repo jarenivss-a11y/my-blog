@@ -1,0 +1,213 @@
+---
+// OceanAudio - Realistic ocean wave sounds with auto-play
+---
+
+<script>
+  function initOceanAudio() {
+    let audioContext = null;
+    let isInitialized = false;
+
+    function createOceanAudio() {
+      if (isInitialized) return;
+      isInitialized = true;
+
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+      const masterGain = audioContext.createGain();
+      masterGain.gain.value = 0.35;
+      masterGain.connect(audioContext.destination);
+
+      // Deep Ocean Rumble
+      const rumbleBuffer = audioContext.createBuffer(1, audioContext.sampleRate * 6, audioContext.sampleRate);
+      const rumbleData = rumbleBuffer.getChannelData(0);
+      let rumbleLastOut = 0;
+      for (let i = 0; i < rumbleData.length; i++) {
+        const white = Math.random() * 2 - 1;
+        rumbleData[i] = (rumbleLastOut + (0.02 * white)) / 1.02;
+        rumbleLastOut = rumbleData[i];
+        rumbleData[i] *= 3.5;
+      }
+      const rumbleSource = audioContext.createBufferSource();
+      rumbleSource.buffer = rumbleBuffer;
+      rumbleSource.loop = true;
+      const rumbleFilter = audioContext.createBiquadFilter();
+      rumbleFilter.type = 'lowpass';
+      rumbleFilter.frequency.value = 80;
+      const rumbleGain = audioContext.createGain();
+      rumbleGain.gain.value = 0.5;
+      rumbleSource.connect(rumbleFilter);
+      rumbleFilter.connect(rumbleGain);
+      rumbleGain.connect(masterGain);
+      rumbleSource.start();
+
+      // Main Ocean Wave Sound
+      const waveBuffer = audioContext.createBuffer(2, audioContext.sampleRate * 8, audioContext.sampleRate);
+      for (let channel = 0; channel < 2; channel++) {
+        const data = waveBuffer.getChannelData(channel);
+        let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+        for (let i = 0; i < data.length; i++) {
+          const white = Math.random() * 2 - 1;
+          b0 = 0.99886 * b0 + white * 0.0555179;
+          b1 = 0.99332 * b1 + white * 0.0750759;
+          b2 = 0.96900 * b2 + white * 0.1538520;
+          b3 = 0.86650 * b3 + white * 0.3104856;
+          b4 = 0.55000 * b4 + white * 0.5329522;
+          b5 = -0.7616 * b5 - white * 0.0168980;
+          data[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+          data[i] *= 0.11;
+          b6 = white * 0.115926;
+        }
+      }
+      const waveSource = audioContext.createBufferSource();
+      waveSource.buffer = waveBuffer;
+      waveSource.loop = true;
+      const waveFilter = audioContext.createBiquadFilter();
+      waveFilter.type = 'bandpass';
+      waveFilter.frequency.value = 400;
+      waveFilter.Q.value = 0.5;
+      const waveGain = audioContext.createGain();
+      waveGain.gain.value = 0.4;
+      waveSource.connect(waveFilter);
+      waveFilter.connect(waveGain);
+      waveGain.connect(masterGain);
+      waveSource.start();
+
+      // Wave envelope modulation
+      const waveLfo = audioContext.createOscillator();
+      const waveLfoGain = audioContext.createGain();
+      waveLfo.type = 'sine';
+      waveLfo.frequency.value = 0.12;
+      waveLfoGain.gain.value = 0.25;
+      waveLfo.connect(waveLfoGain);
+      waveLfoGain.connect(waveGain.gain);
+      waveLfo.start();
+
+      // High Frequency Foam/Splash
+      const foamBuffer = audioContext.createBuffer(2, audioContext.sampleRate * 4, audioContext.sampleRate);
+      for (let channel = 0; channel < 2; channel++) {
+        const data = foamBuffer.getChannelData(channel);
+        for (let i = 0; i < data.length; i++) {
+          data[i] = Math.random() * 2 - 1;
+        }
+      }
+      const foamSource = audioContext.createBufferSource();
+      foamSource.buffer = foamBuffer;
+      foamSource.loop = true;
+      const foamFilter = audioContext.createBiquadFilter();
+      foamFilter.type = 'highpass';
+      foamFilter.frequency.value = 3000;
+      const foamGain = audioContext.createGain();
+      foamGain.gain.value = 0.06;
+      foamSource.connect(foamFilter);
+      foamFilter.connect(foamGain);
+      foamGain.connect(masterGain);
+      foamSource.start();
+
+      // Foam modulation
+      const foamLfo = audioContext.createOscillator();
+      const foamLfoGain = audioContext.createGain();
+      foamLfo.type = 'sine';
+      foamLfo.frequency.value = 0.12;
+      foamLfoGain.gain.value = 0.04;
+      foamLfo.connect(foamLfoGain);
+      foamLfoGain.connect(foamGain.gain);
+      foamLfo.start();
+
+      // Tidal Swell
+      const tideBuffer = audioContext.createBuffer(1, audioContext.sampleRate * 10, audioContext.sampleRate);
+      const tideData = tideBuffer.getChannelData(0);
+      let tb0 = 0, tb1 = 0, tb2 = 0, tb3 = 0, tb4 = 0, tb5 = 0, tb6 = 0;
+      for (let i = 0; i < tideData.length; i++) {
+        const white = Math.random() * 2 - 1;
+        tb0 = 0.99886 * tb0 + white * 0.0555179;
+        tb1 = 0.99332 * tb1 + white * 0.0750759;
+        tb2 = 0.96900 * tb2 + white * 0.1538520;
+        tb3 = 0.86650 * tb3 + white * 0.3104856;
+        tb4 = 0.55000 * tb4 + white * 0.5329522;
+        tb5 = -0.7616 * tb5 - white * 0.0168980;
+        tideData[i] = tb0 + tb1 + tb2 + tb3 + tb4 + tb5 + tb6 + white * 0.5362;
+        tideData[i] *= 0.11;
+        tb6 = white * 0.115926;
+      }
+      const tideSource = audioContext.createBufferSource();
+      tideSource.buffer = tideBuffer;
+      tideSource.loop = true;
+      const tideFilter = audioContext.createBiquadFilter();
+      tideFilter.type = 'lowpass';
+      tideFilter.frequency.value = 600;
+      const tideGain = audioContext.createGain();
+      tideGain.gain.value = 0.3;
+      tideSource.connect(tideFilter);
+      tideFilter.connect(tideGain);
+      tideGain.connect(masterGain);
+      tideSource.start();
+
+      // 30-second tidal cycle
+      const tideLfo = audioContext.createOscillator();
+      const tideLfoGain = audioContext.createGain();
+      tideLfo.type = 'sine';
+      tideLfo.frequency.value = 0.033;
+      tideLfoGain.gain.value = 0.2;
+      tideLfo.connect(tideLfoGain);
+      tideLfoGain.connect(tideGain.gain);
+      tideLfo.start();
+
+      // Resume audio context
+      if (audioContext.state === 'suspended') {
+        const resumeAudio = function() {
+          audioContext && audioContext.resume();
+          document.removeEventListener('click', resumeAudio);
+          document.removeEventListener('mousemove', resumeAudio);
+          document.removeEventListener('touchstart', resumeAudio);
+        };
+        document.addEventListener('click', resumeAudio);
+        document.addEventListener('mousemove', resumeAudio);
+        document.addEventListener('touchstart', resumeAudio);
+      }
+    }
+
+    createOceanAudio();
+
+    let lastRipple = 0;
+    function playRippleSound() {
+      if (!audioContext || audioContext.state !== 'running') return;
+
+      const now = Date.now();
+      if (now - lastRipple < 60) return;
+      lastRipple = now;
+
+      const osc = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+      const filter = audioContext.createBiquadFilter();
+
+      osc.type = 'sine';
+      osc.frequency.value = 400 + Math.random() * 400;
+
+      filter.type = 'lowpass';
+      filter.frequency.value = 1000;
+
+      gain.gain.value = 0.04;
+      gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(audioContext.destination);
+
+      osc.start();
+      osc.stop(audioContext.currentTime + 0.3);
+    }
+
+    document.addEventListener('mousemove', function() {
+      if (Math.random() > 0.85) {
+        playRippleSound();
+      }
+    });
+
+    document.addEventListener('astro:after-swap', function() {
+      isInitialized = false;
+      createOceanAudio();
+    });
+  }
+
+  initOceanAudio();
+</script>
