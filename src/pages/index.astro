@@ -9,7 +9,8 @@ const allPosts = await getCollection('blog');
 const posts = allPosts
   .filter(post => !post.data.draft)
   .sort((a, b) => b.data.published.getTime() - a.data.published.getTime())
-  .slice(0, 10);
+  .slice(0, 10)
+  .map(post => ({...post, readingTime: Math.max(1, Math.ceil(post.body.split(/\s+/).length / 400))}));
 
 const categories = [
   { name: '日常生活', slug: 'daily', icon: '🏠' },
@@ -109,6 +110,12 @@ const allTags = [...new Set(allPosts.flatMap(post => post.data.tags || []))];
                 >
                   <div class="flex items-center gap-3 mb-3">
                     <span class="text-xs text-slate-400">{post.data.published.toLocaleDateString('zh-CN')}</span>
+                    <span class="flex items-center gap-1 text-xs text-slate-400">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                      {post.readingTime} 分钟
+                    </span>
                     <span class="px-2 py-0.5 text-xs bg-primary text-primary dark:bg-primary rounded-full">
                       {categoryInfo[post.data.category]?.name || '未知'}
                     </span>
@@ -150,6 +157,12 @@ const allTags = [...new Set(allPosts.flatMap(post => post.data.tags || []))];
                       {categoryInfo[post.data.category]?.name || '未知'}
                     </span>
                     <span class="text-xs text-slate-400">{post.data.published.toLocaleDateString('zh-CN')}</span>
+                    <span class="flex items-center gap-1 text-xs text-slate-400">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                      {post.readingTime} 分钟
+                    </span>
                   </div>
                   <h3 class="text-lg font-serif font-semibold text-slate-900 dark:text-white group-hover:text-primary transition-colors mb-2 line-clamp-2">
                     {post.data.title}
