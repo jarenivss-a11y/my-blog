@@ -35,14 +35,13 @@
       btn.addEventListener('click', async () => {
         try {
           await navigator.clipboard.writeText(codeText);
-          const toast = document.createElement('div');
-          toast.className = 'copy-toast fixed bottom-8 left-1/2 -translate-x-1/2 px-4 py-2 rounded-lg bg-slate-800 text-white text-sm opacity-0 transition-opacity duration-300 pointer-events-none z-50';
-          toast.textContent = '已复制到剪贴板';
-          document.body.appendChild(toast);
-          requestAnimationFrame(() => toast.classList.add('opacity-100'));
+          // Show checkmark on button
+          const originalHTML = btn.innerHTML;
+          btn.innerHTML = `<svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>`;
+          btn.classList.add('text-green-400');
           setTimeout(() => {
-            toast.classList.remove('opacity-100');
-            setTimeout(() => toast.remove(), 300);
+            btn.innerHTML = originalHTML;
+            btn.classList.remove('text-green-400');
           }, 2000);
         } catch (err) {
           console.error('复制失败:', err);

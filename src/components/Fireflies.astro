@@ -106,9 +106,16 @@
     }
   }
 
-  createFireflies();
-  updateFirefliesVisibility();
-
+  // Theme observer - set up immediately for visibility control
   const observer = new MutationObserver(updateFirefliesVisibility);
   observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
+  // Defer firefly creation to avoid blocking page load
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(() => {
+      createFireflies();
+    }, { timeout: 2000 });
+  } else {
+    setTimeout(createFireflies, 500);
+  }
 </script>

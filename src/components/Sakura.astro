@@ -63,9 +63,16 @@
     }
   }
 
-  createSakura();
-  updateSakuraVisibility();
-
+  // Theme observer - set up immediately for visibility control
   const observer = new MutationObserver(updateSakuraVisibility);
   observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
+  // Defer petal creation to avoid blocking page load
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(() => {
+      createSakura();
+    }, { timeout: 2000 });
+  } else {
+    setTimeout(createSakura, 500);
+  }
 </script>
