@@ -1,0 +1,100 @@
+---
+// Water Effect - Interactive water ripples following mouse movement
+---
+
+<div id="water-canvas" class="fixed inset-0 w-full h-full pointer-events-none z-[5]"></div>
+
+<script>
+  function initWaterEffect() {
+    const canvas = document.getElementById('water-canvas') as HTMLCanvasElement;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    interface Ripple {
+      x: number;
+      y: number;
+      radius: number;
+      maxRadius: number;
+      opacity: number;
+      speed: number;
+    }
+
+    const ripples: Ripple[] = [];
+    const MAX_RIPPLES = 30;
+
+    canvas.addEventListener('mousemove', (e) => {
+      if (ripples.length >= MAX_RIPPLES) {
+        ripples.shift();
+      }
+      ripples.push({
+        x: e.clientX,
+        y: e.clientY,
+        radius: 0,
+        maxRadius: 80 + Math.random() * 60,
+        opacity: 0.4 + Math.random() * 0.3,
+        speed: 2 + Math.random() * 2,
+      });
+    });
+
+    canvas.addEventListener('touchmove', (e) => {
+      const touch = e.touches[0];
+      if (ripples.length >= MAX_RIPPLES) {
+        ripples.shift();
+      }
+      ripples.push({
+        x: touch.clientX,
+        y: touch.clientY,
+        radius: 0,
+        maxRadius: 80 + Math.random() * 60,
+        opacity: 0.4 + Math.random() * 0.3,
+        speed: 2 + Math.random() * 2,
+      });
+    });
+
+    function animate() {
+      ctx!.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = ripples.length - 1; i >= 0; i--) {
+        const r = ripples[i];
+        r.radius += r.speed;
+
+        if (r.radius > r.maxRadius) {
+          r.opacity -= 0.015;
+        }
+
+        if (r.opacity <= 0) {
+          ripples.splice(i, 1);
+          continue;
+        }
+
+        ctx!.beginPath();
+        ctx!.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
+        ctx!.strokeStyle = `rgba(100, 200, 255, ${r.opacity})`;
+        ctx!.lineWidth = 2;
+        ctx!.stroke();
+
+        ctx!.beginPath();
+        ctx!.arc(r.x, r.y, r.radius * 0.6, 0, Math.PI * 2);
+        ctx!.strokeStyle = `rgba(150, 220, 255, ${r.opacity * 0.5})`;
+        ctx!.lineWidth = 1;
+        ctx!.stroke();
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  }
+
+  initWaterEffect();
+  document.addEventListener('astro:after-swap', initWaterEffect);
+</script>
