@@ -2,6 +2,7 @@
 import Fireflies from '../components/Fireflies.astro';
 import Sakura from '../components/Sakura.astro';
 import ThemeToggle from '../components/ThemeToggle.astro';
+import FontSizeToggle from '../components/FontSizeToggle.astro';
 import BackToTop from '../components/BackToTop.astro';
 import ReadingProgress from '../components/ReadingProgress.astro';
 import VisitorStats from '../components/VisitorStats.astro';
@@ -189,6 +190,9 @@ const currentPath = Astro.url.pathname;
               </div>
 
               <ThemeToggle />
+              <div class="relative">
+                <FontSizeToggle />
+              </div>
             </nav>
 
             <!-- Mobile Menu Button -->
