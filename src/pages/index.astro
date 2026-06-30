@@ -40,9 +40,10 @@ const allTags = [...new Set(allPosts.flatMap(post => post.data.tags || []))];
   <div class="xl:flex xl:gap-8">
     <main class="flex-1">
       <!-- Hero Section -->
-      <section class="mb-16 p-8 rounded-3xl backdrop-blur-xl bg-gradient-to-br from-primary via-white/70 to-primary dark:from-primary dark:via-slate-800/70 dark:to-primary border border-primary dark:border-primary">
-        <div class="flex flex-col md:flex-row items-center gap-8">
-          <div class="w-28 h-28 rounded-full bg-gradient-to-br from-primary to-primary flex items-center justify-center text-5xl font-serif text-white shadow-xl shadow-primary flex-shrink-0">
+      <section class="mb-16 p-8 rounded-3xl backdrop-blur-xl bg-gradient-to-br from-teal-400 via-white/50 to-cyan-400 dark:from-teal-600 dark:via-slate-800/50 dark:to-cyan-600 border border-teal-300/50 dark:border-teal-600/50 relative overflow-hidden">
+        <div class="absolute top-2 right-4 text-6xl opacity-10">🌊</div>
+        <div class="flex flex-col md:flex-row items-center gap-8 relative z-10">
+          <div class="w-28 h-28 rounded-full bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center text-5xl font-serif text-white shadow-xl shadow-teal-500/50 flex-shrink-0">
             M
           </div>
 
@@ -50,12 +51,12 @@ const allTags = [...new Set(allPosts.flatMap(post => post.data.tags || []))];
             <h1 class="text-3xl md:text-4xl font-serif font-black text-slate-900 dark:text-white mb-3 tracking-tight">
               你好，欢迎来访
             </h1>
-            <p class="text-lg text-slate-500 dark:text-slate-400 mb-4 max-w-xl">
+            <p class="text-lg text-slate-600 dark:text-slate-300 mb-4 max-w-xl">
               在这里记录生活的点滴，分享关于音乐、读书、电商运营和宝可梦的思考
             </p>
             <div class="flex flex-wrap gap-2 justify-center md:justify-start">
               {allTags.slice(0, 8).map((tag) => (
-                <span class="px-3 py-1 text-xs rounded-full bg-primary text-primary dark:bg-primary">
+                <span class="px-3 py-1 text-xs rounded-full bg-teal-500/20 text-teal-700 dark:bg-teal-400/30 dark:text-teal-300">
                   #{tag}
                 </span>
               ))}
@@ -71,7 +72,7 @@ const allTags = [...new Set(allPosts.flatMap(post => post.data.tags || []))];
           {categoryCounts.map((cat) => (
             <a
               href={`${BASE}/category/${cat.slug}`}
-              class="group relative p-6 rounded-2xl backdrop-blur-xl bg-white/70 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50 shadow-sm hover:shadow-lg hover:border-primary dark:hover:border-primary transition-all duration-300"
+              class="group relative p-6 rounded-2xl backdrop-blur-xl bg-gradient-to-br from-teal-50/60 via-white/40 to-cyan-50/60 dark:from-teal-900/40 dark:via-slate-800/40 dark:to-cyan-900/40 border border-teal-200/50 dark:border-teal-700/50 shadow-sm hover:shadow-lg hover:border-teal-400 dark:hover:border-teal-500 transition-all duration-300"
             >
               <span class="text-3xl mb-3 block">{cat.icon}</span>
               <div class="font-medium text-slate-800 dark:text-slate-100 text-sm group-hover:text-primary transition-colors">{cat.name}</div>
@@ -106,7 +107,9 @@ const allTags = [...new Set(allPosts.flatMap(post => post.data.tags || []))];
               <article class="group">
                 <a
                   href={`${BASE}/post/${post.id}`}
-                  class="block p-6 rounded-2xl backdrop-blur-xl bg-white/70 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50 hover:bg-white dark:hover:bg-slate-800 hover:border-primary dark:hover:border-primary hover:shadow-lg transition-all duration-300"
+                  class="block p-6 rounded-2xl backdrop-blur-xl bg-gradient-to-br from-white/40 via-white/30 to-sand-100/40 dark:from-slate-800/40 dark:via-slate-800/30 dark:to-teal-900/40 border border-teal-200/50 dark:border-teal-700/50 hover:from-white/60 hover:via-white/50 hover:to-sand-100/60 dark:hover:from-slate-800/60 dark:hover:via-slate-800/50 dark:hover:to-teal-900/60 hover:border-teal-400 dark:hover:border-teal-500 hover:shadow-lg shadow-teal-500/10 transition-all duration-300 relative overflow-hidden"
+                >
+                  <div class="absolute top-0 right-0 w-16 h-16 opacity-10 text-teal-600">🐚</div>
                 >
                   <div class="flex items-center gap-3 mb-3">
                     <span class="text-xs text-slate-400">{post.data.published.toLocaleDateString('zh-CN')}</span>
@@ -150,7 +153,9 @@ const allTags = [...new Set(allPosts.flatMap(post => post.data.tags || []))];
               <article class="group">
                 <a
                   href={`${BASE}/post/${post.id}`}
-                  class="block p-6 rounded-2xl backdrop-blur-xl bg-white/70 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50 hover:bg-white dark:hover:bg-slate-800 hover:border-primary dark:hover:border-primary hover:shadow-lg transition-all duration-300 h-full"
+                  class="block p-6 rounded-2xl backdrop-blur-xl bg-gradient-to-br from-white/40 via-white/30 to-sand-100/40 dark:from-slate-800/40 dark:via-slate-800/30 dark:to-teal-900/40 border border-teal-200/50 dark:border-teal-700/50 hover:from-white/60 hover:via-white/50 hover:to-sand-100/60 dark:hover:from-slate-800/60 dark:hover:via-slate-800/50 dark:hover:to-teal-900/60 hover:border-teal-400 dark:hover:border-teal-500 hover:shadow-lg shadow-teal-500/10 transition-all duration-300 h-full relative overflow-hidden"
+                >
+                  <div class="absolute top-0 right-0 w-16 h-16 opacity-10 text-teal-600">🐚</div>
                 >
                   <div class="flex items-center gap-3 mb-3">
                     <span class="px-2 py-0.5 text-xs bg-primary text-primary dark:bg-primary rounded-full">
