@@ -20,12 +20,12 @@ const categories = [
   { name: '宝可梦', slug: 'pokemon', icon: '⚡' },
 ];
 
-const categoryInfo: Record<string, { name: string }> = {
-  daily: { name: '日常生活' },
-  music: { name: '音乐分析' },
-  books: { name: '读书鉴赏' },
-  ecommerce: { name: '电商运营' },
-  pokemon: { name: '宝可梦' },
+const categoryInfo: Record<string, { name: string; emoji: string; gradient: string; border: string; shadow: string }> = {
+  daily: { name: '日常生活', emoji: '🏠', gradient: 'from-amber-50/50 via-orange-50/40 to-yellow-50/50', border: 'border-amber-200/60', shadow: 'shadow-amber-500' },
+  music: { name: '音乐分析', emoji: '🎵', gradient: 'from-pink-50/50 via-purple-50/40 to-fuchsia-50/50', border: 'border-pink-200/60', shadow: 'shadow-pink-500' },
+  books: { name: '读书鉴赏', emoji: '📚', gradient: 'from-emerald-50/50 via-green-50/40 to-teal-50/50', border: 'border-emerald-200/60', shadow: 'shadow-emerald-500' },
+  ecommerce: { name: '电商运营', emoji: '🛒', gradient: 'from-blue-50/50 via-indigo-50/40 to-violet-50/50', border: 'border-blue-200/60', shadow: 'shadow-blue-500' },
+  pokemon: { name: '宝可梦', emoji: '⚡', gradient: 'from-yellow-50/50 via-orange-50/40 to-red-50/50', border: 'border-yellow-200/60', shadow: 'shadow-yellow-500' },
 };
 
 const categoryCounts = categories.map(cat => ({
@@ -107,20 +107,15 @@ const allTags = [...new Set(allPosts.flatMap(post => post.data.tags || []))];
         <!-- List Layout -->
         <div id="posts-list" class="space-y-4">
           {posts.length > 0 ? (
-            posts.map((post) => (
+            posts.map((post) => {
+              const cat = categoryInfo[post.data.category] || categoryInfo.daily;
+              return (
               <article class="group">
                 <a
                   href={`${BASE}/post/${post.id}`}
-                  class="group block p-6 rounded-2xl backdrop-blur-2xl bg-gradient-to-br from-blue-100/50 via-cyan-50/40 to-teal-50/50 dark:from-slate-800/50 dark:via-blue-900/30 dark:to-teal-900/50 border border-cyan-200/60 dark:border-cyan-700/50 shadow-lg shadow-cyan-500/10 hover:shadow-xl hover:shadow-cyan-500/20 hover:border-cyan-400 dark:hover:border-cyan-500 transition-all duration-500 relative overflow-hidden"
+                  class={`group block p-6 rounded-2xl backdrop-blur-2xl bg-gradient-to-br ${cat.gradient} dark:from-slate-800/50 dark:via-blue-900/30 dark:to-teal-900/50 border ${cat.border} dark:border-cyan-700/50 shadow-lg ${cat.shadow}/10 hover:shadow-xl hover:${cat.shadow}/20 transition-all duration-500 relative overflow-hidden`}
                 >
-                  <!-- Wave decoration top -->
-                  <div class="absolute -top-1 left-0 right-0 h-3 overflow-hidden">
-                    <div class="absolute inset-x-0 bottom-0 h-6 bg-gradient-to-r from-transparent via-cyan-200/40 to-transparent animate-wave-slow"></div>
-                  </div>
-                  <!-- Shell decoration -->
-                  <div class="absolute top-2 right-2 text-2xl opacity-30 group-hover:opacity-50 transition-opacity">🐚</div>
-                  <!-- Starfish decoration -->
-                  <div class="absolute bottom-2 right-8 text-lg opacity-20 group-hover:opacity-40 transition-opacity">⭐</div>
+                  <div class="absolute -top-2 -right-2 text-4xl opacity-20 group-hover:opacity-40 transition-opacity">{cat.emoji}</div>
                   <div class="flex items-center gap-3 mb-3">
                     <span class="text-xs text-slate-400">{post.data.published.toLocaleDateString('zh-CN')}</span>
                     <span class="flex items-center gap-1 text-xs text-slate-400">
@@ -129,8 +124,8 @@ const allTags = [...new Set(allPosts.flatMap(post => post.data.tags || []))];
                       </svg>
                       {post.readingTime} 分钟
                     </span>
-                    <span class="px-2 py-0.5 text-xs bg-primary text-primary dark:bg-primary rounded-full">
-                      {categoryInfo[post.data.category]?.name || '未知'}
+                    <span class={`px-2 py-0.5 text-xs rounded-full ${cat.border.replace('border-', 'bg-')}/40`}>
+                      {cat.name}
                     </span>
                   </div>
                   <h3 class="text-lg font-serif font-semibold text-slate-900 dark:text-white group-hover:text-primary transition-colors mb-2">
@@ -140,7 +135,7 @@ const allTags = [...new Set(allPosts.flatMap(post => post.data.tags || []))];
                   {post.data.tags && post.data.tags.length > 0 && (
                     <div class="flex gap-2 mt-3">
                       {post.data.tags.slice(0, 3).map((tag) => (
-                        <span class="px-2 py-0.5 text-xs bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 rounded">
+                        <span class="px-2 py-0.5 text-xs bg-slate-100/80 dark:bg-slate-700/80 text-slate-600 dark:text-slate-300 rounded">
                           #{tag}
                         </span>
                       ))}
@@ -148,7 +143,8 @@ const allTags = [...new Set(allPosts.flatMap(post => post.data.tags || []))];
                   )}
                 </a>
               </article>
-            ))
+              );
+            })
           ) : (
             <div class="text-center py-16">
               <p class="text-slate-400 dark:text-slate-500">暂无文章</p>
@@ -159,23 +155,18 @@ const allTags = [...new Set(allPosts.flatMap(post => post.data.tags || []))];
         <!-- Grid Layout -->
         <div id="posts-grid" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4">
           {posts.length > 0 ? (
-            posts.map((post) => (
+            posts.map((post) => {
+              const cat = categoryInfo[post.data.category] || categoryInfo.daily;
+              return (
               <article class="group">
                 <a
                   href={`${BASE}/post/${post.id}`}
-                  class="group block p-6 rounded-2xl backdrop-blur-2xl bg-gradient-to-br from-blue-100/50 via-cyan-50/40 to-teal-50/50 dark:from-slate-800/50 dark:via-blue-900/30 dark:to-teal-900/50 border border-cyan-200/60 dark:border-cyan-700/50 shadow-lg shadow-cyan-500/10 hover:shadow-xl hover:shadow-cyan-500/20 hover:border-cyan-400 dark:hover:border-cyan-500 transition-all duration-500 h-full relative overflow-hidden"
+                  class={`group block p-6 rounded-2xl backdrop-blur-2xl bg-gradient-to-br ${cat.gradient} dark:from-slate-800/50 dark:via-blue-900/30 dark:to-teal-900/50 border ${cat.border} dark:border-cyan-700/50 shadow-lg ${cat.shadow}/10 hover:shadow-xl hover:${cat.shadow}/20 transition-all duration-500 h-full relative overflow-hidden`}
                 >
-                  <!-- Wave decoration top -->
-                  <div class="absolute -top-1 left-0 right-0 h-3 overflow-hidden">
-                    <div class="absolute inset-x-0 bottom-0 h-6 bg-gradient-to-r from-transparent via-cyan-200/40 to-transparent animate-wave-slow"></div>
-                  </div>
-                  <!-- Shell decoration -->
-                  <div class="absolute top-2 right-2 text-2xl opacity-30 group-hover:opacity-50 transition-opacity">🐚</div>
-                  <!-- Starfish decoration -->
-                  <div class="absolute bottom-2 right-8 text-lg opacity-20 group-hover:opacity-40 transition-opacity">⭐</div>
+                  <div class="absolute -top-2 -right-2 text-4xl opacity-20 group-hover:opacity-40 transition-opacity">{cat.emoji}</div>
                   <div class="flex items-center gap-3 mb-3">
-                    <span class="px-2 py-0.5 text-xs bg-primary text-primary dark:bg-primary rounded-full">
-                      {categoryInfo[post.data.category]?.name || '未知'}
+                    <span class={`px-2 py-0.5 text-xs rounded-full ${cat.border.replace('border-', 'bg-')}/40`}>
+                      {cat.name}
                     </span>
                     <span class="text-xs text-slate-400">{post.data.published.toLocaleDateString('zh-CN')}</span>
                     <span class="flex items-center gap-1 text-xs text-slate-400">
@@ -191,7 +182,8 @@ const allTags = [...new Set(allPosts.flatMap(post => post.data.tags || []))];
                   <p class="text-sm text-slate-500 dark:text-slate-400 line-clamp-3">{post.body.slice(0, 100)}...</p>
                 </a>
               </article>
-            ))
+              );
+            })
           ) : (
             <div class="col-span-2 text-center py-16">
               <p class="text-slate-400 dark:text-slate-500">暂无文章</p>
