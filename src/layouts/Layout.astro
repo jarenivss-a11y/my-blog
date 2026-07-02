@@ -145,10 +145,10 @@ const currentPath = Astro.url.pathname;
       <div class="mx-auto px-4 transition-all duration-300">
         <div id="nav-container" class="relative overflow-hidden transition-all duration-300 rounded-none">
           <div class="flex h-16 items-center justify-between px-4 md:px-6">
-            <a href={BASE} class="text-xl font-black text-slate-800 dark:text-white tracking-tighter hover:text-primary transition-colors">
+            <a href={BASE} class="text-xl font-black text-[#5080b0] dark:text-white tracking-tighter hover:text-[#72a8d8] transition-colors">
               我的博客
-              <span class="text-primary mx-1">の</span>
-              <span class="text-slate-400 dark:text-slate-500 font-normal text-sm">宝藏之地</span>
+              <span class="text-[#72a8d8] mx-1">の</span>
+              <span class="text-[#8ac4e8] dark:text-[#8ac4e8] font-normal text-sm">宝藏之地</span>
             </a>
 
             <!-- Desktop Navigation -->
@@ -156,15 +156,15 @@ const currentPath = Astro.url.pathname;
               {navLinks.map((link) => (
                 link.name === '归档' ? (
                   <div class="relative group">
-                    <button class="flex items-center gap-1 py-1 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary transition-colors">
+                    <button class="flex items-center gap-1 py-1 text-sm font-medium text-[#5080b0] dark:text-[#8ac4e8] hover:text-[#72a8d8] dark:hover:text-[#72a8d8] transition-colors">
                       {link.name}
                       <svg class="w-3 h-3 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                       </svg>
                     </button>
-                    <div class="absolute top-full left-0 mt-2 w-48 py-2 rounded-2xl backdrop-blur-xl bg-white/90 dark:bg-slate-800/90 border border-white/50 dark:border-slate-700/50 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                    <div class="absolute top-full left-0 mt-2 w-48 py-2 rounded-2xl backdrop-blur-xl bg-[rgba(30,45,65,0.98)] border border-[rgba(80,128,176,0.3)] shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                       {categories.map(cat => (
-                        <a href={`${BASE}/category/${cat.slug}`} class="flex items-center gap-2 px-4 py-2 text-sm text-slate-600 dark:text-slate-300 hover:bg-primary/10 hover:text-primary transition-colors">
+                        <a href={`${BASE}/category/${cat.slug}`} class="flex items-center gap-2 px-4 py-2 text-sm text-[#8ac4e8] hover:bg-[rgba(80,128,176,0.15)] hover:text-[#72a8d8] transition-colors">
                           <span>{cat.icon}</span>
                           <span>{cat.name}</span>
                         </a>
@@ -177,7 +177,7 @@ const currentPath = Astro.url.pathname;
                   class={`relative py-1 text-sm font-medium transition-colors ${
                     currentPath === `${BASE}${link.href}` || currentPath === `${BASE}${link.href}/`
                       ? 'text-primary dark:text-primary'
-                      : 'text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary'
+                      : 'text-[#5080b0] dark:text-[#8ac4e8] hover:text-[#72a8d8] dark:hover:text-[#72a8d8]'
                   }`}
                 >
                   {link.name}
@@ -194,9 +194,9 @@ const currentPath = Astro.url.pathname;
                   type="text"
                   id="search-input"
                   placeholder="搜索..."
-                  class="h-9 w-40 rounded-full border-0 bg-slate-100 dark:bg-slate-800 pl-9 pr-4 text-sm placeholder:text-slate-400 focus:w-56 focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+                  class="h-9 w-40 rounded-full border-0 bg-[rgba(155,180,218,0.1)] dark:bg-[rgba(30,45,65,0.8)] pl-9 pr-4 text-sm placeholder:text-[#8ac4e8] focus:w-56 focus:outline-none focus:ring-2 focus:ring-[#72a8d8] transition-all"
                 />
-                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8ac4e8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                 </svg>
               </div>
@@ -204,7 +204,7 @@ const currentPath = Astro.url.pathname;
             </nav>
 
             <!-- Mobile Menu Button -->
-            <button id="mobile-menu-btn" class="md:hidden p-2 text-slate-600 dark:text-slate-300 hover:text-primary">
+            <button id="mobile-menu-btn" class="md:hidden p-2 text-[#5080b0] dark:text-[#8ac4e8] hover:text-[#72a8d8]">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
               </svg>
@@ -220,20 +220,20 @@ const currentPath = Astro.url.pathname;
                   class={`py-2 text-sm font-medium transition-colors ${
                     currentPath === `${BASE}${link.href}` || currentPath === `${BASE}${link.href}/`
                       ? 'text-primary'
-                      : 'text-slate-600 dark:text-slate-300'
+                      : 'text-[#5080b0] dark:text-[#8ac4e8]'
                   }`}
                 >
                   {link.name}
                 </a>
               ))}
               <div class="pt-2 pb-1">
-                <span class="text-xs text-slate-400 uppercase tracking-wider">分类</span>
+                <span class="text-xs text-[#8ac4e8] uppercase tracking-wider">分类</span>
               </div>
               <div class="grid grid-cols-2 gap-2">
               {categories.map(cat => (
                 <a
                   href={`${BASE}/category/${cat.slug}`}
-                  class="py-2 px-3 text-sm font-medium rounded-lg bg-slate-100 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300 hover:bg-primary/10 hover:text-primary transition-colors flex items-center gap-2"
+                  class="py-2 px-3 text-sm font-medium rounded-lg bg-[rgba(155,180,218,0.1)] text-[#5080b0] hover:bg-[rgba(80,128,176,0.15)] hover:text-[#72a8d8] transition-colors flex items-center gap-2"
                 >
                   <span>{cat.icon}</span>
                   <span>{cat.name}</span>
@@ -256,24 +256,24 @@ const currentPath = Astro.url.pathname;
     </div>
 
     <!-- Footer -->
-    <footer class="py-8 border-t border-slate-200/50 dark:border-slate-800/50 text-center">
+    <footer class="py-8 border-t border-[rgba(80,128,176,0.2)] text-center">
       <div class="flex items-center justify-center gap-4 mb-4">
-        <a href="/my-blog/feed" class="text-sm text-slate-400 hover:text-primary transition-colors" title="订阅预览">
+        <a href="/my-blog/feed" class="text-sm text-[#8ac4e8] hover:text-[#72a8d8] transition-colors" title="订阅预览">
           <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
             <path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19.01 7.38 20 6.18 20C4.98 20 4 19.01 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1z"/>
           </svg>
         </a>
-        <a href="/my-blog/rss.xml" class="text-sm text-slate-400 hover:text-primary transition-colors" title="RSS 源">
+        <a href="/my-blog/rss.xml" class="text-sm text-[#8ac4e8] hover:text-[#72a8d8] transition-colors" title="RSS 源">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19.01 7.38 20 6.18 20C4.98 20 4 19.01 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1z"/>
           </svg>
         </a>
-        <a href="/my-blog/sitemap-preview" class="text-sm text-slate-400 hover:text-primary transition-colors" title="网站地图">
+        <a href="/my-blog/sitemap-preview" class="text-sm text-[#8ac4e8] hover:text-[#72a8d8] transition-colors" title="网站地图">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
           </svg>
         </a>
-        <a href="/my-blog/sitemap-index.xml" class="text-sm text-slate-400 hover:text-primary transition-colors" title="Sitemap XML">
+        <a href="/my-blog/sitemap-index.xml" class="text-sm text-[#8ac4e8] hover:text-[#72a8d8] transition-colors" title="Sitemap XML">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/>
           </svg>
@@ -281,7 +281,7 @@ const currentPath = Astro.url.pathname;
       </div>
       <VisitorStats />
       <RunningTime />
-      <p class="text-sm text-slate-400 dark:text-slate-500 mt-2">© 2026 我的博客 · 用心记录每一天</p>
+      <p class="text-sm text-[#8ac4e8] mt-2">© 2026 我的博客 · 用心记录每一天</p>
     </footer>
 
     <!-- Back to Top Button -->
