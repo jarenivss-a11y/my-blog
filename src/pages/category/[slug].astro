@@ -31,15 +31,15 @@ const posts = allPosts.filter(post => post.data.category === slug).sort((a, b) =
 
 <Layout title={`${info.name} | 我的博客`}>
   <!-- Header -->
-  <header class="mb-12 p-8 rounded-3xl backdrop-blur-xl bg-gradient-to-br from-white/80 to-slate-100/80 dark:from-slate-800/80 dark:to-slate-900/80 border border-white/50 dark:border-slate-700/50">
+  <header class="mb-12 p-8 rounded-3xl backdrop-blur-xl bg-[rgba(155,180,218,0.1)] border border-[rgba(80,128,176,0.3)]">
     <div class="flex items-center gap-4 mb-4">
       <span class="text-5xl">{info.icon}</span>
       <div>
-        <h1 class="text-3xl font-serif font-black text-slate-900 dark:text-white">{info.name}</h1>
-        <p class="text-slate-500 dark:text-slate-400 mt-1">{info.description}</p>
+        <h1 class="text-3xl font-serif font-black text-[#5080b0]">{info.name}</h1>
+        <p class="text-[#8ac4e8] mt-1">{info.description}</p>
       </div>
     </div>
-    <p class="text-sm text-slate-400 dark:text-slate-500">{posts.length} 篇文章</p>
+    <p class="text-sm text-[#8ac4e8]">{posts.length} 篇文章</p>
   </header>
 
   <!-- Posts -->
@@ -49,21 +49,21 @@ const posts = allPosts.filter(post => post.data.category === slug).sort((a, b) =
         <article class="group">
           <a
             href={`${BASE}/post/${post.id}`}
-            class="block p-6 rounded-2xl backdrop-blur-xl bg-white/70 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50 hover:bg-white dark:hover:bg-slate-800 hover:border-primary dark:hover:border-primary hover:shadow-lg transition-all duration-300"
+            class="block p-6 rounded-2xl backdrop-blur-xl bg-[rgba(155,180,218,0.08)] border border-[rgba(80,128,176,0.2)] hover:bg-[rgba(80,128,176,0.15)] hover:border-[#72a8d8] hover:shadow-lg transition-all duration-300"
           >
             <div class="flex items-baseline justify-between gap-4 mb-3">
-              <h2 class="text-lg font-serif font-semibold text-slate-900 dark:text-white group-hover:text-primary transition-colors">
+              <h2 class="text-lg font-serif font-semibold text-[#5080b0] group-hover:text-[#72a8d8] transition-colors">
                 {post.data.title}
               </h2>
-              <span class="text-sm text-slate-400 dark:text-slate-500 flex-shrink-0">
+              <span class="text-sm text-[#8ac4e8] flex-shrink-0">
                 {post.data.published.toLocaleDateString('zh-CN')}
               </span>
             </div>
-            <p class="text-sm text-slate-500 dark:text-slate-400 line-clamp-2">{post.body.slice(0, 150)}...</p>
+            <p class="text-sm text-[#8ac4e8] line-clamp-2">{post.body.slice(0, 150)}...</p>
             {post.data.tags && (
               <div class="flex gap-2 mt-4">
                 {post.data.tags.map((tag) => (
-                  <span class="px-2 py-0.5 text-xs bg-primary text-primary dark:bg-primary rounded-full">
+                  <span class="px-2 py-0.5 text-xs bg-[rgba(80,128,176,0.2)] text-[#72a8d8] rounded-full">
                     {tag}
                   </span>
                 ))}
@@ -73,9 +73,9 @@ const posts = allPosts.filter(post => post.data.category === slug).sort((a, b) =
         </article>
       ))
     ) : (
-      <div class="py-20 text-center rounded-3xl backdrop-blur-xl bg-white/50 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50">
+      <div class="py-20 text-center rounded-3xl backdrop-blur-xl bg-[rgba(155,180,218,0.08)] border border-[rgba(80,128,176,0.2)]">
         <p class="text-4xl mb-4">{info.icon}</p>
-        <p class="text-slate-400 dark:text-slate-500">暂无文章</p>
+        <p class="text-[#8ac4e8]">暂无文章</p>
       </div>
     )}
   </div>
