@@ -72,32 +72,37 @@ const category = categoryInfo[post.data.category] || { name: '未知', icon: '�
       ]} />
 
       <!-- Header -->
-      <header class="mb-12 p-8 rounded-3xl backdrop-blur-xl bg-white/70 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50">
+      <header class="mb-12 p-10 rounded-3xl backdrop-blur-xl bg-[rgba(155,180,218,0.06)] border border-[rgba(165,188,230,0.15)] shadow-[0_8px_32px_rgba(0,0,0,0.15)] relative overflow-hidden">
+        <!-- Decorative elements -->
+        <div class="absolute inset-0 bg-gradient-to-br from-[rgba(80,128,176,0.08)] via-transparent to-[rgba(114,168,216,0.05)] pointer-events-none"></div>
+        <div class="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-[rgba(80,128,176,0.08)] blur-2xl"></div>
+        <div class="absolute -bottom-10 -left-10 w-32 h-32 rounded-full bg-[rgba(114,168,216,0.06)] blur-2xl"></div>
+
         <a
           href={`${BASE}/category/${post.data.category}`}
-          class="inline-flex items-center gap-2 text-sm text-primary hover:text-primary transition-colors mb-6"
+          class="inline-flex items-center gap-2 text-sm text-[#72a8d8] hover:text-[#8ac4e8] transition-colors mb-6 relative z-10 group"
         >
-          <span>{category.icon}</span>
-          <span>{category.name}</span>
+          <span class="group-hover:scale-110 transition-transform">{category.icon}</span>
+          <span class="group-hover:translate-x-1 transition-transform">{category.name}</span>
         </a>
-        <h1 class="text-3xl font-serif font-black text-slate-900 dark:text-white mb-6 leading-tight">
+        <h1 class="text-3xl font-serif font-black text-[#e2e9f5] mb-6 leading-tight relative z-10">
           {post.data.title}
         </h1>
-        <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-400 dark:text-slate-500">
-          <span class="flex items-center gap-1">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-[#8a9cc4] relative z-10">
+          <span class="flex items-center gap-1.5">
+            <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
             </svg>
             {post.data.published.toLocaleDateString('zh-CN')}
           </span>
-          <span class="flex items-center gap-1">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <span class="flex items-center gap-1.5">
+            <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
             {readingTime} 分钟阅读
           </span>
-          <span class="flex items-center gap-1">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <span class="flex items-center gap-1.5">
+            <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
             </svg>
             {wordCount.toLocaleString()} 字
@@ -105,7 +110,7 @@ const category = categoryInfo[post.data.category] || { name: '未知', icon: '�
           {post.data.tags && post.data.tags.length > 0 && (
             <div class="flex flex-wrap gap-2 ml-auto">
               {post.data.tags.map((tag) => (
-                <a href={`${BASE}/tags/${encodeURIComponent(tag)}`} class="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs hover:bg-primary hover:text-white transition-colors">
+                <a href={`${BASE}/tags/${encodeURIComponent(tag)}`} class="px-3 py-1 rounded-full bg-[rgba(80,128,176,0.15)] border border-[rgba(80,128,176,0.2)] text-[#72a8d8] text-xs hover:bg-[rgba(80,128,176,0.25)] hover:border-[rgba(80,128,176,0.35)] hover:shadow-[0_0_12px_rgba(80,128,176,0.3)] transition-all duration-300">
                   #{tag}
                 </a>
               ))}
@@ -127,7 +132,7 @@ const category = categoryInfo[post.data.category] || { name: '未知', icon: '�
       )}
 
       <!-- Content -->
-      <div class="p-8 rounded-3xl backdrop-blur-xl bg-white/70 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50 prose prose-lg max-w-none prose-slate dark:prose-invert prose-headings:font-serif prose-headings:text-slate-900 dark:prose-headings:text-white prose-p:text-slate-600 dark:prose-p:text-slate-300 prose-li:text-slate-600 dark:prose-li:text-slate-300 prose-a:text-primary prose-strong:text-slate-900 dark:prose-strong:text-white">
+      <div class="p-10 rounded-3xl backdrop-blur-xl bg-[rgba(155,180,218,0.06)] border border-[rgba(165,188,230,0.15)] shadow-[0_8px_32px_rgba(0,0,0,0.12)] prose prose-lg max-w-none prose-slate dark:prose-invert prose-headings:font-serif prose-headings:text-[#e2e9f5] prose-p:text-[#b2c0d8] prose-li:text-[#b2c0d8] prose-a:text-[#72a8d8] prose-strong:text-[#e2e9f5] prose-code:text-[#72a8d8] prose-blockquote:border-l-[#5080b0] prose-blockquote:text-[#8a9cc4]">
         <Content />
       </div>
 
@@ -137,10 +142,10 @@ const category = categoryInfo[post.data.category] || { name: '未知', icon: '�
           {prevPost ? (
             <a
               href={`${BASE}/post/${prevPost.id}`}
-              class="group p-6 rounded-2xl backdrop-blur-xl bg-white/50 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50 hover:bg-white/70 dark:hover:bg-slate-800/70 hover:border-primary transition-all"
+              class="group p-6 rounded-2xl backdrop-blur-xl bg-[rgba(155,180,218,0.05)] border border-[rgba(165,188,230,0.12)] hover:bg-[rgba(155,180,218,0.1)] hover:border-[rgba(80,128,176,0.3)] hover:shadow-[0_8px_32px_rgba(80,128,176,0.15)] transition-all duration-300"
             >
-              <span class="text-xs text-slate-400 mb-1 block">← 上一篇</span>
-              <span class="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-primary transition-colors line-clamp-2">
+              <span class="text-xs text-[#8a9cc4] mb-1 block group-hover:text-[#72a8d8] transition-colors">← 上一篇</span>
+              <span class="text-sm font-medium text-[#b2c0d8] group-hover:text-[#8ac4e8] transition-colors line-clamp-2">
                 {prevPost.data.title}
               </span>
             </a>
@@ -150,10 +155,10 @@ const category = categoryInfo[post.data.category] || { name: '未知', icon: '�
           {nextPost ? (
             <a
               href={`${BASE}/post/${nextPost.id}`}
-              class="group p-6 rounded-2xl backdrop-blur-xl bg-white/50 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50 hover:bg-white/70 dark:hover:bg-slate-800/70 hover:border-primary transition-all text-right"
+              class="group p-6 rounded-2xl backdrop-blur-xl bg-[rgba(155,180,218,0.05)] border border-[rgba(165,188,230,0.12)] hover:bg-[rgba(155,180,218,0.1)] hover:border-[rgba(80,128,176,0.3)] hover:shadow-[0_8px_32px_rgba(80,128,176,0.15)] transition-all duration-300 text-right"
             >
-              <span class="text-xs text-slate-400 mb-1 block">下一篇 →</span>
-              <span class="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-primary transition-colors line-clamp-2">
+              <span class="text-xs text-[#8a9cc4] mb-1 block group-hover:text-[#72a8d8] transition-colors">下一篇 →</span>
+              <span class="text-sm font-medium text-[#b2c0d8] group-hover:text-[#8ac4e8] transition-colors line-clamp-2">
                 {nextPost.data.title}
               </span>
             </a>
@@ -164,11 +169,11 @@ const category = categoryInfo[post.data.category] || { name: '未知', icon: '�
       )}
 
       <!-- Footer -->
-      <footer class="mt-8 p-6 rounded-2xl backdrop-blur-xl bg-white/50 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50">
+      <footer class="mt-8 p-6 rounded-2xl backdrop-blur-xl bg-[rgba(155,180,218,0.05)] border border-[rgba(165,188,230,0.12)]">
         <div class="flex items-center justify-between flex-wrap gap-4">
           <a
             href={`${BASE}/category/${post.data.category}`}
-            class="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-primary transition-colors"
+            class="inline-flex items-center gap-2 text-sm text-[#8a9cc4] hover:text-[#72a8d8] transition-colors"
           >
             ← 返回{category.name}
           </a>
@@ -176,7 +181,7 @@ const category = categoryInfo[post.data.category] || { name: '未知', icon: '�
           <div class="flex items-center gap-3">
             <a
               href="#"
-              class="edit-on-github hidden text-sm text-slate-400 hover:text-primary transition-colors"
+              class="edit-on-github hidden text-sm text-[#8a9cc4] hover:text-[#72a8d8] transition-colors"
               data-post-id={`${post.id}.md`}
               title="在 GitHub 上编辑"
             >
@@ -187,7 +192,7 @@ const category = categoryInfo[post.data.category] || { name: '未知', icon: '�
             </a>
             <button
               id="add-to-reading-list"
-              class="flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-700 hover:bg-primary hover:text-white text-slate-600 dark:text-slate-300 transition-colors text-sm"
+              class="flex items-center gap-2 px-4 py-2 rounded-full bg-[rgba(80,128,176,0.15)] border border-[rgba(80,128,176,0.2)] hover:bg-[rgba(80,128,176,0.25)] hover:border-[rgba(80,128,176,0.35)] text-[#72a8d8] hover:text-[#8ac4e8] transition-all duration-300 text-sm"
             >
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
@@ -259,36 +264,36 @@ const category = categoryInfo[post.data.category] || { name: '未知', icon: '�
     font-size: var(--article-font-size, 18px);
   }
   .prose h2 {
-    @apply text-xl font-bold text-slate-900 dark:text-white mt-12 mb-4;
+    @apply text-xl font-bold text-[#e2e9f5] mt-12 mb-4;
   }
   .prose h3 {
-    @apply text-lg font-bold text-slate-900 dark:text-white mt-8 mb-3;
+    @apply text-lg font-bold text-[#e2e9f5] mt-8 mb-3;
   }
   .prose p {
-    @apply text-slate-600 dark:text-slate-300 leading-relaxed mb-6;
+    @apply text-[#b2c0d8] leading-relaxed mb-6;
   }
   .prose ul, .prose ol {
-    @apply text-slate-600 dark:text-slate-300 mb-6 pl-6;
+    @apply text-[#b2c0d8] mb-6 pl-6;
   }
   .prose li {
     @apply mb-2;
   }
   .prose strong {
-    @apply font-semibold text-slate-900 dark:text-white;
+    @apply font-semibold text-[#e2e9f5];
   }
   .prose a {
-    @apply text-primary underline decoration-primary hover:decoration-primary transition-colors;
+    @apply text-[#72a8d8] underline decoration-[#5080b0] hover:decoration-[#72a8d8] transition-colors;
   }
   .prose blockquote {
-    @apply border-l-4 border-primary pl-4 italic text-slate-500 dark:text-slate-400 my-8;
+    @apply border-l-4 border-[#5080b0] pl-4 italic text-[#8a9cc4] my-8;
   }
   .prose code {
-    @apply bg-primary px-1.5 py-0.5 rounded text-sm text-primary;
+    @apply bg-[rgba(80,128,176,0.15)] px-1.5 py-0.5 rounded text-sm text-[#72a8d8];
   }
   .prose pre {
-    @apply bg-slate-900 dark:bg-slate-950 text-slate-100 p-4 rounded-xl overflow-x-auto my-8;
+    @apply bg-[rgba(30,40,60,0.8)] text-[#b2c0d8] p-4 rounded-xl overflow-x-auto my-8 border border-[rgba(80,128,176,0.15)];
   }
   .prose pre code {
-    @apply bg-transparent p-0 text-slate-100;
+    @apply bg-transparent p-0 text-[#b2c0d8];
   }
 </style>

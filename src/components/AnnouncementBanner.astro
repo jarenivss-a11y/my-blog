@@ -8,7 +8,7 @@ interface Props {
 }
 
 const {
-  message = "🎉 博客新版上线！新增主题颜色切换和键盘快捷键功能",
+  message = "🌊 博客新版上线！海浪背景与潮汐音效已启用",
   link = { text: "了解更多", href: "/my-blog/about" }
 } = Astro.props;
 
@@ -17,7 +17,7 @@ const isVisible = true; // Set to false to hide the banner
 
 {isVisible && (
   <div id="announcement-banner" class="fixed top-0 left-0 right-0 z-[60] transform transition-transform duration-300">
-    <div class="bg-gradient-to-r from-primary via-purple-500 to-pink-500 text-white py-2 px-4">
+    <div class="bg-gradient-to-r from-[#5080b0] via-[#72a8d8] to-[#8ac4e8] text-white py-2 px-4">
       <div class="max-w-6xl mx-auto flex items-center justify-center gap-4 text-sm">
         <span class="text-center">{message}</span>
         <a

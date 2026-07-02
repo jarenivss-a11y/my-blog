@@ -24,20 +24,20 @@ for (let i = 1; i <= daysInMonth; i++) {
 const monthNames = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
 ---
 
-<div class="p-4 rounded-2xl backdrop-blur-xl bg-white/70 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50">
+<div class="p-5 rounded-2xl backdrop-blur-xl bg-[rgba(155,180,218,0.05)] border border-[rgba(165,188,230,0.12)] shadow-[0_8px_32px_rgba(0,0,0,0.1)]">
   <div class="flex items-center justify-between mb-4">
-    <h4 class="text-xs font-medium text-slate-400 uppercase tracking-widest">{year}年 {monthNames[month]}</h4>
-    <span class="text-xs text-slate-400">{publishedPosts.length} 篇文章</span>
+    <h4 class="text-xs font-medium text-[#8a9cc4] uppercase tracking-widest">{year}年 {monthNames[month]}</h4>
+    <span class="text-xs text-[#8a9cc4]">{publishedPosts.length} 篇文章</span>
   </div>
 
   <div class="grid grid-cols-7 gap-1 text-center mb-2">
-    <span class="text-xs text-slate-400">日</span>
-    <span class="text-xs text-slate-400">一</span>
-    <span class="text-xs text-slate-400">二</span>
-    <span class="text-xs text-slate-400">三</span>
-    <span class="text-xs text-slate-400">四</span>
-    <span class="text-xs text-slate-400">五</span>
-    <span class="text-xs text-slate-400">六</span>
+    <span class="text-xs text-[#7a8cb4]">日</span>
+    <span class="text-xs text-[#7a8cb4]">一</span>
+    <span class="text-xs text-[#7a8cb4]">二</span>
+    <span class="text-xs text-[#7a8cb4]">三</span>
+    <span class="text-xs text-[#7a8cb4]">四</span>
+    <span class="text-xs text-[#7a8cb4]">五</span>
+    <span class="text-xs text-[#7a8cb4]">六</span>
   </div>
 
   <div class="grid grid-cols-7 gap-1">
@@ -49,12 +49,12 @@ const monthNames = ['一月', '二月', '三月', '四月', '五月', '六月', 
       const hasPost = postDates.includes(dateStr);
       const isToday = dateStr === now.toISOString().split('T')[0];
       return (
-        <div class={`aspect-square flex items-center justify-center rounded-full text-xs ${
+        <div class={`group aspect-square flex items-center justify-center rounded-full text-xs transition-all duration-300 ${
           hasPost
-            ? 'bg-primary text-primary font-medium'
+            ? 'bg-[rgba(80,128,176,0.25)] text-[#72a8d8] font-medium hover:bg-[rgba(80,128,176,0.4)]'
             : isToday
-              ? 'ring-1 ring-primary text-primary'
-              : 'text-slate-400 dark:text-slate-500'
+              ? 'ring-1 ring-[rgba(80,128,176,0.5)] text-[#72a8d8] hover:ring-2 hover:ring-[rgba(80,128,176,0.7)]'
+              : 'text-[#7a8cb4] hover:text-[#8a9cc4]'
         }`}>
           {day}
         </div>

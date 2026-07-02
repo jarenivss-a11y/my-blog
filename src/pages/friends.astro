@@ -16,31 +16,33 @@ const friends = [
 
 <Layout title="友链 | 我的博客">
   <!-- Header -->
-  <header class="mb-12 p-8 rounded-3xl backdrop-blur-xl bg-gradient-to-br from-white/80 to-slate-100/80 dark:from-slate-800/80 dark:to-slate-900/80 border border-white/50 dark:border-slate-700/50">
-    <h1 class="text-3xl font-serif font-black text-slate-900 dark:text-white mb-2">友链</h1>
-    <p class="text-slate-500 dark:text-slate-400">交换链接，携手前行</p>
+  <header class="mb-12 p-10 rounded-3xl backdrop-blur-xl bg-[rgba(155,180,218,0.06)] border border-[rgba(165,188,230,0.15)] shadow-[0_8px_32px_rgba(0,0,0,0.15)] relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-[rgba(80,128,176,0.08)] via-transparent to-[rgba(114,168,216,0.05)] pointer-events-none"></div>
+    <div class="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-[rgba(80,128,176,0.1)] blur-2xl"></div>
+    <h1 class="text-3xl font-serif font-black text-[#e2e9f5] mb-2 relative z-10">友链</h1>
+    <p class="text-[#8a9cc4] relative z-10">交换链接，携手前行</p>
   </header>
 
   <!-- Friends Grid -->
   <section class="mb-12">
-    <h2 class="text-xs font-medium text-slate-400 uppercase tracking-widest mb-6">我的朋友们</h2>
+    <h2 class="text-xs font-medium text-[#8a9cc4] uppercase tracking-widest mb-6">我的朋友们</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       {friends.map((friend) => (
         <a
           href={friend.url}
           target="_blank"
           rel="noopener noreferrer"
-          class="group p-6 rounded-2xl backdrop-blur-xl bg-white/70 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50 hover:bg-white dark:hover:bg-slate-800 hover:border-primary dark:hover:border-primary hover:shadow-lg transition-all duration-300"
+          class="group p-6 rounded-2xl backdrop-blur-xl bg-[rgba(155,180,218,0.05)] border border-[rgba(165,188,230,0.12)] hover:bg-[rgba(155,180,218,0.1)] hover:border-[rgba(80,128,176,0.3)] hover:shadow-[0_8px_32px_rgba(80,128,176,0.2)] transition-all duration-300"
         >
           <div class="flex items-start gap-4">
-            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary flex items-center justify-center text-xl font-serif text-white flex-shrink-0">
+            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-[#5080b0] to-[#72a8d8] flex items-center justify-center text-xl font-serif text-white flex-shrink-0 shadow-[0_4px_12px_rgba(80,128,176,0.3)]">
               {friend.avatar}
             </div>
             <div>
-              <h3 class="font-medium text-slate-900 dark:text-white group-hover:text-primary transition-colors mb-1">
+              <h3 class="font-medium text-[#e2e9f5] group-hover:text-[#72a8d8] transition-colors mb-1">
                 {friend.name}
               </h3>
-              <p class="text-sm text-slate-500 dark:text-slate-400 line-clamp-2">
+              <p class="text-sm text-[#8a9cc4] line-clamp-2">
                 {friend.description}
               </p>
             </div>
@@ -51,22 +53,22 @@ const friends = [
   </section>
 
   <!-- Apply Section -->
-  <section class="p-8 rounded-3xl backdrop-blur-xl bg-white/50 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50">
-    <h2 class="text-lg font-serif font-bold text-slate-900 dark:text-white mb-4">申请友链</h2>
-    <p class="text-slate-500 dark:text-slate-400 mb-6">
+  <section class="p-8 rounded-3xl backdrop-blur-xl bg-[rgba(155,180,218,0.05)] border border-[rgba(165,188,230,0.12)]">
+    <h2 class="text-lg font-serif font-bold text-[#e2e9f5] mb-4">申请友链</h2>
+    <p class="text-[#8a9cc4] mb-6">
       如果你想和我交换友链，欢迎通过以下方式联系我：
     </p>
     <div class="space-y-3 text-sm">
       <div class="flex items-center gap-3">
-        <span class="text-slate-400">博客名称：</span>
-        <span class="text-slate-700 dark:text-slate-200">我的博客</span>
+        <span class="text-[#7a8cb4]">博客名称：</span>
+        <span class="text-[#b2c0d8]">我的博客</span>
       </div>
       <div class="flex items-center gap-3">
-        <span class="text-slate-400">博客地址：</span>
-        <span class="text-slate-700 dark:text-slate-200">https://jarenivss-a11y.github.io/my-blog/</span>
+        <span class="text-[#7a8cb4]">博客地址：</span>
+        <span class="text-[#72a8d8]">https://jarenivss-a11y.github.io/my-blog/</span>
       </div>
     </div>
-    <p class="text-xs text-slate-400 mt-6">
+    <p class="text-xs text-[#7a8cb4] mt-6">
       * 请确保你的博客内容健康、至少有一篇原创文章，且网站可以正常访问
     </p>
   </section>

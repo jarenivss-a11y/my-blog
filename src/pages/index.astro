@@ -41,44 +41,56 @@ const allTags = [...new Set(allPosts.flatMap(post => post.data.tags || []))];
     <main class="flex-1">
       <!-- Hero Section - Enhanced Glass Morphism -->
       <section class="mb-16 p-10 rounded-3xl backdrop-blur-2xl bg-[rgba(155,180,218,0.06)] border border-[rgba(165,188,230,0.15)] shadow-[0_8px_40px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.05)] relative overflow-hidden">
-        <!-- Animated background gradient -->
-        <div class="absolute inset-0 bg-gradient-to-br from-[rgba(80,128,176,0.15)] via-transparent to-[rgba(114,168,216,0.1)] pointer-events-none animate-pulse-slow"></div>
+        <!-- Animated gradient border -->
+        <div class="absolute inset-0 rounded-3xl p-px bg-gradient-to-br from-[rgba(80,128,176,0.4)] via-[rgba(114,168,216,0.2)] to-[rgba(80,128,176,0.3)] opacity-60">
+          <div class="absolute inset-0 rounded-3xl bg-[rgba(20,30,50,0.8)] -z-10"></div>
+        </div>
 
-        <!-- Floating particles -->
+        <!-- Animated background gradient -->
+        <div class="absolute inset-0 bg-gradient-to-br from-[rgba(80,128,176,0.12)] via-transparent to-[rgba(114,168,216,0.08)] pointer-events-none animate-pulse-slow"></div>
+
+        <!-- Enhanced floating particles -->
         <div class="absolute inset-0 overflow-hidden pointer-events-none">
-          <div class="particle absolute w-1 h-1 rounded-full bg-[rgba(114,168,216,0.6)] animate-float-up" style="left: 10%; animation-delay: 0s;"></div>
-          <div class="particle absolute w-1.5 h-1.5 rounded-full bg-[rgba(80,128,176,0.4)] animate-float-up" style="left: 25%; animation-delay: 1s;"></div>
-          <div class="particle absolute w-1 h-1 rounded-full bg-[rgba(114,168,216,0.5)] animate-float-up" style="left: 45%; animation-delay: 2s;"></div>
-          <div class="particle absolute w-2 h-2 rounded-full bg-[rgba(80,128,176,0.3)] animate-float-up" style="left: 65%; animation-delay: 0.5s;"></div>
-          <div class="particle absolute w-1 h-1 rounded-full bg-[rgba(114,168,216,0.4)] animate-float-up" style="left: 80%; animation-delay: 1.5s;"></div>
-          <div class="particle absolute w-1.5 h-1.5 rounded-full bg-[rgba(80,128,176,0.5)] animate-float-up" style="left: 90%; animation-delay: 2.5s;"></div>
+          <div class="particle absolute w-1 h-1 rounded-full bg-[rgba(114,168,216,0.7)] animate-float-up" style="left: 10%; animation-delay: 0s;"></div>
+          <div class="particle absolute w-1.5 h-1.5 rounded-full bg-[rgba(80,128,176,0.5)] animate-float-up" style="left: 25%; animation-delay: 1s;"></div>
+          <div class="particle absolute w-1 h-1 rounded-full bg-[rgba(114,168,216,0.6)] animate-float-up" style="left: 45%; animation-delay: 2s;"></div>
+          <div class="particle absolute w-2 h-2 rounded-full bg-[rgba(80,128,176,0.4)] animate-float-up" style="left: 65%; animation-delay: 0.5s;"></div>
+          <div class="particle absolute w-1 h-1 rounded-full bg-[rgba(114,168,216,0.5)] animate-float-up" style="left: 80%; animation-delay: 1.5s;"></div>
+          <div class="particle absolute w-1.5 h-1.5 rounded-full bg-[rgba(80,128,176,0.6)] animate-float-up" style="left: 90%; animation-delay: 2.5s;"></div>
+          <div class="particle absolute w-0.5 h-0.5 rounded-full bg-white/40 animate-float-up" style="left: 35%; animation-delay: 0.8s;"></div>
+          <div class="particle absolute w-0.5 h-0.5 rounded-full bg-white/30 animate-float-up" style="left: 55%; animation-delay: 1.8s;"></div>
         </div>
 
         <!-- Decorative glow orbs -->
-        <div class="absolute -top-20 -right-20 w-40 h-40 rounded-full bg-[rgba(80,128,176,0.15)] blur-3xl animate-pulse"></div>
-        <div class="absolute -bottom-10 -left-10 w-32 h-32 rounded-full bg-[rgba(114,168,216,0.1)] blur-2xl animate-pulse" style="animation-delay: 1s;"></div>
+        <div class="absolute -top-20 -right-20 w-40 h-40 rounded-full bg-[rgba(80,128,176,0.18)] blur-3xl animate-pulse"></div>
+        <div class="absolute -bottom-10 -left-10 w-32 h-32 rounded-full bg-[rgba(114,168,216,0.12)] blur-2xl animate-pulse" style="animation-delay: 1s;"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full bg-[rgba(80,128,176,0.05)] blur-3xl"></div>
 
-        <div class="absolute top-4 right-8 text-8xl opacity-[0.04] select-none">✦</div>
+        <div class="absolute top-4 right-8 text-8xl opacity-[0.04] select-none animate-pulse-subtle">✦</div>
 
         <div class="flex flex-col md:flex-row items-center gap-10 relative z-10">
           <div class="relative">
+            <!-- Outer ring with gradient -->
+            <div class="absolute inset-0 rounded-full bg-gradient-to-br from-[rgba(80,128,176,0.6)] to-transparent blur-xl animate-pulse-subtle"></div>
             <div class="w-32 h-32 rounded-full bg-gradient-to-br from-[#5080b0] via-[#72a8d8] to-[#8895b4] flex items-center justify-center text-6xl font-['Cormorant_Garamond'] text-white shadow-[0_0_40px_rgba(80,128,176,0.5),0_0_80px_rgba(80,128,176,0.25)] flex-shrink-0 animate-glow-pulse">
               <span class="relative z-10">M</span>
               <div class="absolute inset-0 rounded-full bg-gradient-to-br from-[#5080b0] via-[#72a8d8] to-[#8895b4] animate-spin-slow"></div>
             </div>
             <div class="absolute -inset-2 rounded-full border border-[rgba(80,128,176,0.3)] animate-ping opacity-20"></div>
+            <!-- Second ring -->
+            <div class="absolute -inset-4 rounded-full border border-[rgba(80,128,176,0.15)] animate-ping opacity-10" style="animation-delay: 0.5s;"></div>
           </div>
 
           <div class="text-center md:text-left">
-            <h1 class="text-4xl md:text-5xl font-['Cormorant_Garamond'] font-semibold text-[#e2e9f5] mb-4 tracking-tight animate-fade-in-up">
-              你好，欢迎来访
+            <h1 class="text-4xl md:text-5xl font-['Cormorant_Garamond'] font-semibold mb-4 tracking-tight animate-fade-in-up">
+              <span class="bg-gradient-to-r from-[#e2e9f5] via-[#8ac4e8] to-[#b2c0d8] bg-clip-text text-transparent">你好，欢迎来访</span>
             </h1>
             <p class="text-lg text-[#b2c0d8] mb-5 max-w-xl leading-relaxed animate-fade-in-up" style="animation-delay: 0.1s;">
               在这里记录生活的点滴，分享关于音乐、读书、电商运营和宝可梦的思考
             </p>
             <div class="flex flex-wrap gap-3 justify-center md:justify-start animate-fade-in-up" style="animation-delay: 0.2s;">
               {allTags.slice(0, 8).map((tag) => (
-                <span class="px-4 py-1.5 text-sm rounded-full bg-[rgba(80,128,176,0.15)] border border-[rgba(80,128,176,0.2)] text-[#72a8d8] hover:bg-[rgba(80,128,176,0.25)] hover:border-[rgba(80,128,176,0.3)] transition-all duration-300 cursor-default">
+                <span class="group px-4 py-1.5 text-sm rounded-full bg-[rgba(80,128,176,0.12)] border border-[rgba(80,128,176,0.2)] text-[#72a8d8] hover:bg-[rgba(80,128,176,0.22)] hover:border-[rgba(80,128,176,0.35)] hover:shadow-[0_0_15px_rgba(80,128,176,0.3)] transition-all duration-300 cursor-default">
                   #{tag}
                 </span>
               ))}
@@ -121,7 +133,7 @@ const allTags = [...new Set(allPosts.flatMap(post => post.data.tags || []))];
       <section class="mb-16">
         <h2 class="text-xs font-medium text-[#8a9cc4] uppercase tracking-widest mb-6 flex items-center gap-3">
           <span class="h-px flex-1 bg-gradient-to-r from-transparent via-[rgba(80,128,176,0.3)] to-transparent"></span>
-          探索分类
+          <span class="px-4">探索分类</span>
           <span class="h-px flex-1 bg-gradient-to-r from-transparent via-[rgba(80,128,176,0.3)] to-transparent"></span>
         </h2>
         <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
@@ -133,10 +145,15 @@ const allTags = [...new Set(allPosts.flatMap(post => post.data.tags || []))];
             >
               <div class="absolute inset-0 bg-gradient-to-br from-[rgba(80,128,176,0.15)] via-transparent to-[rgba(114,168,216,0.1)] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
+              <!-- Shimmer effect -->
+              <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+                <div class="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+              </div>
+
               <!-- Glow effect on hover -->
               <div class="absolute -inset-px rounded-2xl bg-gradient-to-br from-[rgba(80,128,176,0.3)] to-[rgba(114,168,216,0.2)] opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10 blur-sm"></div>
 
-              <span class="text-4xl mb-4 block transform group-hover:scale-110 transition-transform duration-300">{cat.icon}</span>
+              <span class="text-4xl mb-4 block transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">{cat.icon}</span>
               <div class="font-medium text-[#e0e6f2] text-sm group-hover:text-[#72a8d8] transition-colors duration-300">{cat.name}</div>
               <div class="text-xs text-[#8a9cc4] mt-2 group-hover:text-[#a0b8d8] transition-colors">{cat.count} 篇</div>
 

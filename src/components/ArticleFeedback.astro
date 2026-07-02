@@ -2,45 +2,45 @@
 // ArticleFeedback - asks users if article was helpful
 ---
 
-<div id="article-feedback" class="mt-8 p-6 rounded-2xl backdrop-blur-xl bg-white/50 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50">
-  <h3 class="text-lg font-serif font-bold text-slate-900 dark:text-white mb-4">这篇文章对你有帮助吗？</h3>
+<div id="article-feedback" class="mt-8 p-6 rounded-2xl backdrop-blur-xl bg-[rgba(155,180,218,0.05)] border border-[rgba(165,188,230,0.12)]">
+  <h3 class="text-lg font-serif font-bold text-[#e2e9f5] mb-4">这篇文章对你有帮助吗？</h3>
 
   <div id="feedback-buttons" class="flex flex-wrap gap-3">
     <button
-      class="feedback-btn px-4 py-2 rounded-full border border-slate-200 dark:border-slate-600 hover:border-green-500 hover:bg-green-50 dark:hover:bg-green-900/20 transition-all flex items-center gap-2"
+      class="feedback-btn px-4 py-2 rounded-full border border-[rgba(80,128,176,0.2)] hover:border-[#72a8d8] hover:bg-[rgba(80,128,176,0.1)] transition-all flex items-center gap-2 text-[#b2c0d8]"
       data-feedback="helpful"
     >
       <span>👍</span>
-      <span class="text-slate-600 dark:text-slate-300">有帮助</span>
+      <span>有帮助</span>
     </button>
     <button
-      class="feedback-btn px-4 py-2 rounded-full border border-slate-200 dark:border-slate-600 hover:border-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all flex items-center gap-2"
+      class="feedback-btn px-4 py-2 rounded-full border border-[rgba(80,128,176,0.2)] hover:border-[#72a8d8] hover:bg-[rgba(80,128,176,0.1)] transition-all flex items-center gap-2 text-[#b2c0d8]"
       data-feedback="not-helpful"
     >
       <span>👎</span>
-      <span class="text-slate-600 dark:text-slate-300">不太有帮助</span>
+      <span>不太有帮助</span>
     </button>
     <button
-      class="feedback-btn px-4 py-2 rounded-full border border-slate-200 dark:border-slate-600 hover:border-primary hover:bg-primary/10 transition-all flex items-center gap-2"
+      class="feedback-btn px-4 py-2 rounded-full border border-[rgba(80,128,176,0.2)] hover:border-[#72a8d8] hover:bg-[rgba(80,128,176,0.1)] transition-all flex items-center gap-2 text-[#b2c0d8]"
       data-feedback="suggestions"
     >
       <span>💡</span>
-      <span class="text-slate-600 dark:text-slate-300">有改进建议</span>
+      <span>有改进建议</span>
     </button>
   </div>
 
   <div id="feedback-form" class="hidden mt-4">
     <textarea
       id="feedback-comment"
-      class="w-full p-4 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 placeholder:text-slate-400 resize-none"
+      class="w-full p-4 rounded-xl border border-[rgba(80,128,176,0.3)] bg-[rgba(80,128,176,0.1)] text-[#b2c0d8] placeholder:text-[#7a8cb4] resize-none focus:outline-none focus:ring-2 focus:ring-[#5080b0] focus:border-transparent"
       rows="3"
       placeholder="请分享你的想法..."
     ></textarea>
     <div class="flex justify-end gap-2 mt-3">
-      <button id="feedback-cancel" class="px-4 py-2 text-sm text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors">
+      <button id="feedback-cancel" class="px-4 py-2 text-sm text-[#8a9cc4] hover:text-[#b2c0d8] transition-colors">
         取消
       </button>
-      <button id="feedback-submit" class="px-4 py-2 text-sm bg-primary text-white rounded-full hover:bg-primary/90 transition-colors">
+      <button id="feedback-submit" class="px-4 py-2 text-sm bg-gradient-to-r from-[#5080b0] to-[#72a8d8] text-white rounded-full hover:shadow-[0_4px 20px_rgba(80,128,176,0.4)] transition-all">
         提交反馈
       </button>
     </div>
@@ -48,7 +48,7 @@
 
   <div id="feedback-thanks" class="hidden text-center py-4">
     <span class="text-2xl mb-2 block">🙏</span>
-    <p class="text-slate-600 dark:text-slate-300">感谢你的反馈！</p>
+    <p class="text-[#b2c0d8]">感谢你的反馈！</p>
   </div>
 </div>
 

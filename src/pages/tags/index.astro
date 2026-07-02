@@ -24,9 +24,11 @@ const sortedTags = Object.entries(tagCounts)
 
 <Layout title="标签 | 我的博客">
   <!-- Header -->
-  <header class="mb-12 p-8 rounded-3xl backdrop-blur-xl bg-gradient-to-br from-white/80 to-slate-100/80 dark:from-slate-800/80 dark:to-slate-900/80 border border-white/50 dark:border-slate-700/50">
-    <h1 class="text-3xl font-serif font-black text-slate-900 dark:text-white mb-2">标签</h1>
-    <p class="text-slate-500 dark:text-slate-400">共 {sortedTags.length} 个标签</p>
+  <header class="mb-12 p-10 rounded-3xl backdrop-blur-xl bg-[rgba(155,180,218,0.06)] border border-[rgba(165,188,230,0.15)] shadow-[0_8px_32px_rgba(0,0,0,0.15)] relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-[rgba(80,128,176,0.08)] via-transparent to-[rgba(114,168,216,0.05)] pointer-events-none"></div>
+    <div class="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-[rgba(80,128,176,0.1)] blur-2xl"></div>
+    <h1 class="text-3xl font-serif font-black text-[#e2e9f5] mb-2 relative z-10">标签</h1>
+    <p class="text-[#8a9cc4] relative z-10">共 {sortedTags.length} 个标签</p>
   </header>
 
   <!-- Tags Cloud -->
@@ -35,14 +37,14 @@ const sortedTags = Object.entries(tagCounts)
       sortedTags.map(({ tag, count }) => (
         <a
           href={`${BASE}/tags/${encodeURIComponent(tag)}`}
-          class="group px-6 py-3 rounded-2xl backdrop-blur-xl bg-white/70 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50 hover:bg-primary hover:text-white hover:border-primary transition-all duration-300"
+          class="group px-6 py-3 rounded-2xl backdrop-blur-xl bg-[rgba(155,180,218,0.05)] border border-[rgba(165,188,230,0.12)] hover:bg-[rgba(80,128,176,0.2)] hover:border-[rgba(80,128,176,0.3)] hover:shadow-[0_4px_20px_rgba(80,128,176,0.2)] transition-all duration-300"
         >
-          <span class="text-sm font-medium group-hover:text-white">#{tag}</span>
-          <span class="ml-2 text-xs text-slate-400 group-hover:text-primary">({count})</span>
+          <span class="text-sm font-medium text-[#72a8d8] group-hover:text-[#e2e9f5]">#{tag}</span>
+          <span class="ml-2 text-xs text-[#7a8cb4] group-hover:text-[#8a9cc4]">({count})</span>
         </a>
       ))
     ) : (
-      <p class="text-slate-400 dark:text-slate-500">暂无标签</p>
+      <p class="text-[#8a9cc4]">暂无标签</p>
     )}
   </div>
 </Layout>

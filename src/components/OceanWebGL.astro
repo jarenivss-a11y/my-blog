@@ -369,17 +369,60 @@
 
       renderer.render(scene, camera);
 
-      // Bloom pass (simple glow effect)
+      // Enhanced bloom pass with dynamic colors
       bloomCtx.clearRect(0, 0, bloomCanvas.width, bloomCanvas.height);
-      const gradient = bloomCtx.createRadialGradient(
-        bloomCanvas.width * 0.5, bloomCanvas.height * 0.4, 0,
-        bloomCanvas.width * 0.5, bloomCanvas.height * 0.4, bloomCanvas.width * 0.6
+
+      // Create multiple bloom layers for depth
+      const time = elapsedTime * 0.5;
+
+      // Primary bloom - sun reflection
+      const primaryGradient = bloomCtx.createRadialGradient(
+        bloomCanvas.width * (0.5 + Math.sin(time * 0.3) * 0.1),
+        bloomCanvas.height * (0.35 + Math.cos(time * 0.2) * 0.05),
+        0,
+        bloomCanvas.width * 0.5,
+        bloomCanvas.height * 0.4,
+        bloomCanvas.width * 0.7
       );
-      gradient.addColorStop(0, 'rgba(100, 180, 220, 0.08)');
-      gradient.addColorStop(0.5, 'rgba(50, 120, 180, 0.03)');
-      gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-      bloomCtx.fillStyle = gradient;
+      primaryGradient.addColorStop(0, 'rgba(150, 200, 230, 0.12)');
+      primaryGradient.addColorStop(0.3, 'rgba(100, 160, 200, 0.06)');
+      primaryGradient.addColorStop(0.6, 'rgba(50, 100, 150, 0.02)');
+      primaryGradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      bloomCtx.fillStyle = primaryGradient;
       bloomCtx.fillRect(0, 0, bloomCanvas.width, bloomCanvas.height);
+
+      // Secondary bloom - wave crests
+      const secondaryGradient = bloomCtx.createRadialGradient(
+        bloomCanvas.width * 0.5,
+        bloomCanvas.height * 0.6,
+        0,
+        bloomCanvas.width * 0.5,
+        bloomCanvas.height * 0.6,
+        bloomCanvas.width * 0.4
+      );
+      secondaryGradient.addColorStop(0, 'rgba(80, 140, 180, 0.08)');
+      secondaryGradient.addColorStop(0.5, 'rgba(40, 80, 120, 0.03)');
+      secondaryGradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      bloomCtx.globalCompositeOperation = 'screen';
+      bloomCtx.fillStyle = secondaryGradient;
+      bloomCtx.fillRect(0, 0, bloomCanvas.width, bloomCanvas.height);
+
+      // Sparkle overlay
+      const sparkleGradient = bloomCtx.createRadialGradient(
+        bloomCanvas.width * (0.4 + Math.sin(time) * 0.15),
+        bloomCanvas.height * 0.3,
+        0,
+        bloomCanvas.width * 0.5,
+        bloomCanvas.height * 0.4,
+        bloomCanvas.width * 0.5
+      );
+      sparkleGradient.addColorStop(0, 'rgba(255, 255, 255, 0.05)');
+      sparkleGradient.addColorStop(0.2, 'rgba(200, 230, 255, 0.02)');
+      sparkleGradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      bloomCtx.fillStyle = sparkleGradient;
+      bloomCtx.fillRect(0, 0, bloomCanvas.width, bloomCanvas.height);
+
+      bloomCtx.globalCompositeOperation = 'source-over';
     }
 
     function handleResize() {

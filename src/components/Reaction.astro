@@ -6,38 +6,38 @@ interface Props {
 const { postId } = Astro.props;
 ---
 
-<div class="reaction-container mt-8 p-6 rounded-2xl backdrop-blur-xl bg-white/50 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50">
-  <h3 class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-4 text-center">觉得这篇文章如何？</h3>
+<div class="reaction-container mt-8 p-6 rounded-2xl backdrop-blur-xl bg-[rgba(155,180,218,0.05)] border border-[rgba(165,188,230,0.12)]">
+  <h3 class="text-sm font-medium text-[#8a9cc4] mb-4 text-center">觉得这篇文章如何？</h3>
   <div class="reaction-buttons flex justify-center gap-4">
     <button class="reaction-btn" data-reaction="like" data-post={postId}>
       <span class="reaction-icon text-2xl">👍</span>
-      <span class="reaction-count text-sm text-slate-500 ml-1" id="like-count">0</span>
+      <span class="reaction-count text-sm text-[#8a9cc4] ml-1" id="like-count">0</span>
     </button>
     <button class="reaction-btn" data-reaction="love" data-post={postId}>
       <span class="reaction-icon text-2xl">❤️</span>
-      <span class="reaction-count text-sm text-slate-500 ml-1" id="love-count">0</span>
+      <span class="reaction-count text-sm text-[#8a9cc4] ml-1" id="love-count">0</span>
     </button>
     <button class="reaction-btn" data-reaction="useful" data-post={postId}>
       <span class="reaction-icon text-2xl">💡</span>
-      <span class="reaction-count text-sm text-slate-500 ml-1" id="useful-count">0</span>
+      <span class="reaction-count text-sm text-[#8a9cc4] ml-1" id="useful-count">0</span>
     </button>
     <button class="reaction-btn" data-reaction="awesome" data-post={postId}>
       <span class="reaction-icon text-2xl">🚀</span>
-      <span class="reaction-count text-sm text-slate-500 ml-1" id="awesome-count">0</span>
+      <span class="reaction-count text-sm text-[#8a9cc4] ml-1" id="awesome-count">0</span>
     </button>
   </div>
 </div>
 
 <style>
   .reaction-btn {
-    @apply flex items-center px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-700/50 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all;
+    @apply flex items-center px-4 py-2 rounded-full bg-[rgba(80,128,176,0.1)] border border-[rgba(80,128,176,0.15)] hover:bg-[rgba(80,128,176,0.15)] hover:border-[rgba(80,128,176,0.25)] transition-all;
   }
   .reaction-btn:hover {
     transform: scale(1.1);
   }
   .reaction-btn.active {
-    background-color: var(--color-primary-light);
-    box-shadow: 0 0 0 2px var(--color-primary);
+    background-color: rgba(80, 128, 176, 0.2);
+    box-shadow: 0 0 0 2px #5080b0;
   }
   .reaction-icon {
     @apply transition-transform;

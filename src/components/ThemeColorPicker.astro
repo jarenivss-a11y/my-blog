@@ -5,33 +5,33 @@
 <div id="theme-color-picker" class="fixed bottom-24 right-4 z-50">
   <button
     id="color-picker-toggle"
-    class="p-3 rounded-full backdrop-blur-xl bg-white/80 dark:bg-slate-800/80 border border-white/50 dark:border-slate-700/50 shadow-lg hover:shadow-xl transition-all"
+    class="p-3 rounded-full backdrop-blur-xl bg-[rgba(155,180,218,0.1)] border border-[rgba(80,128,176,0.3)] shadow-lg hover:shadow-[0_8px 32px_rgba(80,128,176,0.3)] transition-all"
     aria-label="切换主题色"
   >
-    <svg class="w-5 h-5 text-slate-600 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg class="w-5 h-5 text-[#72a8d8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
     </svg>
   </button>
 
-  <div id="color-picker-panel" class="hidden absolute bottom-14 right-0 p-4 rounded-2xl backdrop-blur-xl bg-white/90 dark:bg-slate-800/90 border border-white/50 dark:border-slate-700/50 shadow-xl min-w-[200px]">
-    <h4 class="text-xs font-medium text-slate-400 uppercase tracking-widest mb-3">主题色</h4>
+  <div id="color-picker-panel" class="hidden absolute bottom-14 right-0 p-4 rounded-2xl backdrop-blur-xl bg-[rgba(30,45,65,0.95)] border border-[rgba(80,128,176,0.3)] shadow-xl min-w-[200px]">
+    <h4 class="text-xs font-medium text-[#8a9cc4] uppercase tracking-widest mb-3">主题色</h4>
     <div class="grid grid-cols-6 gap-2 mb-4">
-      <button class="color-option w-8 h-8 rounded-full bg-indigo-500 hover:ring-2 ring-offset-2 ring-indigo-400 transition-all" data-color="#6366f1" data-primary="indigo"></button>
-      <button class="color-option w-8 h-8 rounded-full bg-pink-500 hover:ring-2 ring-offset-2 ring-pink-400 transition-all" data-color="#ec4899" data-primary="pink"></button>
-      <button class="color-option w-8 h-8 rounded-full bg-purple-500 hover:ring-2 ring-offset-2 ring-purple-400 transition-all" data-color="#a855f7" data-primary="purple"></button>
-      <button class="color-option w-8 h-8 rounded-full bg-blue-500 hover:ring-2 ring-offset-2 ring-blue-400 transition-all" data-color="#3b82f6" data-primary="blue"></button>
-      <button class="color-option w-8 h-8 rounded-full bg-cyan-500 hover:ring-2 ring-offset-2 ring-cyan-400 transition-all" data-color="#06b6d4" data-primary="cyan"></button>
-      <button class="color-option w-8 h-8 rounded-full bg-teal-500 hover:ring-2 ring-offset-2 ring-teal-400 transition-all" data-color="#14b8a6" data-primary="teal"></button>
-      <button class="color-option w-8 h-8 rounded-full bg-green-500 hover:ring-2 ring-offset-2 ring-green-400 transition-all" data-color="#22c55e" data-primary="green"></button>
-      <button class="color-option w-8 h-8 rounded-full bg-emerald-500 hover:ring-2 ring-offset-2 ring-emerald-400 transition-all" data-color="#10b981" data-primary="emerald"></button>
-      <button class="color-option w-8 h-8 rounded-full bg-amber-500 hover:ring-2 ring-offset-2 ring-amber-400 transition-all" data-color="#f59e0b" data-primary="amber"></button>
-      <button class="color-option w-8 h-8 rounded-full bg-orange-500 hover:ring-2 ring-offset-2 ring-orange-400 transition-all" data-color="#f97316" data-primary="orange"></button>
-      <button class="color-option w-8 h-8 rounded-full bg-red-500 hover:ring-2 ring-offset-2 ring-red-400 transition-all" data-color="#ef4444" data-primary="red"></button>
-      <button class="color-option w-8 h-8 rounded-full bg-rose-500 hover:ring-2 ring-offset-2 ring-rose-400 transition-all" data-color="#f43f5e" data-primary="rose"></button>
+      <button class="color-option w-8 h-8 rounded-full bg-[#6366f1] hover:ring-2 ring-offset-2 ring-[#6366f1] transition-all" data-color="#6366f1" data-primary="indigo"></button>
+      <button class="color-option w-8 h-8 rounded-full bg-[#5080b0] hover:ring-2 ring-offset-2 ring-[#5080b0] transition-all" data-color="#5080b0" data-primary="ocean"></button>
+      <button class="color-option w-8 h-8 rounded-full bg-[#72a8d8] hover:ring-2 ring-offset-2 ring-[#72a8d8] transition-all" data-color="#72a8d8" data-primary="sky"></button>
+      <button class="color-option w-8 h-8 rounded-full bg-[#06b6d4] hover:ring-2 ring-offset-2 ring-[#06b6d4] transition-all" data-color="#06b6d4" data-primary="cyan"></button>
+      <button class="color-option w-8 h-8 rounded-full bg-[#14b8a6] hover:ring-2 ring-offset-2 ring-[#14b8a6] transition-all" data-color="#14b8a6" data-primary="teal"></button>
+      <button class="color-option w-8 h-8 rounded-full bg-[#22c55e] hover:ring-2 ring-offset-2 ring-[#22c55e] transition-all" data-color="#22c55e" data-primary="green"></button>
+      <button class="color-option w-8 h-8 rounded-full bg-[#10b981] hover:ring-2 ring-offset-2 ring-[#10b981] transition-all" data-color="#10b981" data-primary="emerald"></button>
+      <button class="color-option w-8 h-8 rounded-full bg-[#f59e0b] hover:ring-2 ring-offset-2 ring-[#f59e0b] transition-all" data-color="#f59e0b" data-primary="amber"></button>
+      <button class="color-option w-8 h-8 rounded-full bg-[#f97316] hover:ring-2 ring-offset-2 ring-[#f97316] transition-all" data-color="#f97316" data-primary="orange"></button>
+      <button class="color-option w-8 h-8 rounded-full bg-[#ef4444] hover:ring-2 ring-offset-2 ring-[#ef4444] transition-all" data-color="#ef4444" data-primary="red"></button>
+      <button class="color-option w-8 h-8 rounded-full bg-[#ec4899] hover:ring-2 ring-offset-2 ring-[#ec4899] transition-all" data-color="#ec4899" data-primary="pink"></button>
+      <button class="color-option w-8 h-8 rounded-full bg-[#a855f7] hover:ring-2 ring-offset-2 ring-[#a855f7] transition-all" data-color="#a855f7" data-primary="purple"></button>
     </div>
     <div class="flex items-center gap-2">
-      <input type="color" id="custom-color" value="#6366f1" class="w-8 h-8 rounded cursor-pointer border-0 bg-transparent" />
-      <span class="text-sm text-slate-500 dark:text-slate-400">自定义颜色</span>
+      <input type="color" id="custom-color" value="#5080b0" class="w-8 h-8 rounded cursor-pointer border-0 bg-transparent" />
+      <span class="text-sm text-[#8a9cc4]">自定义颜色</span>
     </div>
   </div>
 </div>

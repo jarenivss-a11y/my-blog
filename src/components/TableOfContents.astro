@@ -13,20 +13,20 @@ const filteredHeadings = headings.filter(h => h.depth === 2 || h.depth === 3);
     <!-- Mobile Toggle Button -->
     <button
       id="toc-toggle"
-      class="lg:hidden fixed right-4 bottom-24 z-40 p-3 rounded-full backdrop-blur-xl bg-white/80 dark:bg-slate-800/80 border border-white/50 dark:border-slate-700/50 shadow-lg hover:shadow-xl transition-all"
+      class="lg:hidden fixed right-4 bottom-24 z-40 p-3 rounded-full backdrop-blur-xl bg-[rgba(155,180,218,0.1)] border border-[rgba(80,128,176,0.3)] shadow-lg hover:shadow-[0_8px 32px_rgba(80,128,176,0.3)] transition-all"
       aria-label="切换目录"
     >
-      <svg class="w-5 h-5 text-slate-600 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg class="w-5 h-5 text-[#72a8d8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/>
       </svg>
     </button>
 
     <!-- TOC Panel -->
     <nav id="toc" class="hidden lg:block fixed right-8 top-32 w-64 z-30">
-      <div class="p-4 rounded-2xl backdrop-blur-xl bg-white/70 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50">
+      <div class="p-4 rounded-2xl backdrop-blur-xl bg-[rgba(155,180,218,0.05)] border border-[rgba(165,188,230,0.12)]">
         <div class="flex items-center justify-between mb-4">
-          <h4 class="text-xs font-medium text-slate-400 uppercase tracking-widest">目录</h4>
-          <button id="toc-close" class="lg:hidden text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+          <h4 class="text-xs font-medium text-[#8a9cc4] uppercase tracking-widest">目录</h4>
+          <button id="toc-close" class="lg:hidden text-[#8a9cc4] hover:text-[#72a8d8]">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
@@ -37,7 +37,7 @@ const filteredHeadings = headings.filter(h => h.depth === 2 || h.depth === 3);
             <li class={heading.depth === 3 ? 'pl-3' : ''}>
               <a
                 href={`#${heading.slug}`}
-                class="group flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-primary transition-colors line-clamp-2 toc-link"
+                class="group flex items-center gap-2 text-sm text-[#8a9cc4] hover:text-[#72a8d8] transition-colors line-clamp-2 toc-link"
                 data-slug={heading.slug}
               >
                 <span class="flex-1">{heading.text}</span>
@@ -108,11 +108,11 @@ const filteredHeadings = headings.filter(h => h.depth === 2 || h.depth === 3);
       tocLinks.forEach(link => {
         const slug = link.getAttribute('data-slug');
         if (slug === currentId) {
-          link.classList.add('text-primary', 'font-medium');
-          link.classList.remove('text-slate-500');
+          link.classList.add('text-[#72a8d8]', 'font-medium');
+          link.classList.remove('text-[#8a9cc4]');
         } else {
-          link.classList.remove('text-primary', 'font-medium');
-          link.classList.add('text-slate-500');
+          link.classList.remove('text-[#72a8d8]', 'font-medium');
+          link.classList.add('text-[#8a9cc4]');
         }
       });
     };

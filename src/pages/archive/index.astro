@@ -32,9 +32,11 @@ const monthNames = ['一月', '二月', '三月', '四月', '五月', '六月', 
 
 <Layout title="归档 | 我的博客">
   <!-- Header -->
-  <header class="mb-12 p-8 rounded-3xl backdrop-blur-xl bg-gradient-to-br from-white/80 to-slate-100/80 dark:from-slate-800/80 dark:to-slate-900/80 border border-white/50 dark:border-slate-700/50">
-    <h1 class="text-3xl font-serif font-black text-slate-900 dark:text-white mb-2">文章归档</h1>
-    <p class="text-slate-500 dark:text-slate-400">共 {posts.length} 篇文章</p>
+  <header class="mb-12 p-10 rounded-3xl backdrop-blur-xl bg-[rgba(155,180,218,0.06)] border border-[rgba(165,188,230,0.15)] shadow-[0_8px_32px_rgba(0,0,0,0.15)] relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-[rgba(80,128,176,0.08)] via-transparent to-[rgba(114,168,216,0.05)] pointer-events-none"></div>
+    <div class="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-[rgba(80,128,176,0.1)] blur-2xl"></div>
+    <h1 class="text-3xl font-serif font-black text-[#e2e9f5] mb-2 relative z-10">文章归档</h1>
+    <p class="text-[#8a9cc4] relative z-10">共 {posts.length} 篇文章</p>
   </header>
 
   <!-- Archive List -->
@@ -43,31 +45,31 @@ const monthNames = ['一月', '二月', '三月', '四月', '五月', '六月', 
       .sort(([a], [b]) => Number(b) - Number(a))
       .map(([year, months]) => (
         <section>
-          <h2 class="text-2xl font-serif font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-4">
+          <h2 class="text-2xl font-serif font-bold text-[#e2e9f5] mb-6 flex items-center gap-4">
             <span>{year}</span>
-            <span class="text-sm font-normal text-slate-400">{Object.values(months).flat().length} 篇</span>
+            <span class="text-sm font-normal text-[#8a9cc4]">{Object.values(months).flat().length} 篇</span>
           </h2>
-          <div class="space-y-8 pl-4 border-l-2 border-primary">
+          <div class="space-y-8 pl-4 border-l-2 border-[rgba(80,128,176,0.4)]">
             {Object.entries(months)
               .sort(([a], [b]) => Number(b) - Number(a))
               .map(([month, monthPosts]) => (
                 <div>
-                  <h3 class="text-lg font-medium text-slate-700 dark:text-slate-200 mb-4">
+                  <h3 class="text-lg font-medium text-[#b2c0d8] mb-4">
                     {monthNames[parseInt(month) - 1]}
                   </h3>
                   <div class="space-y-3">
                     {monthPosts.map((post) => (
                       <a
                         href={`${BASE}/post/${post.id}`}
-                        class="group flex items-center gap-4 p-4 rounded-xl backdrop-blur-xl bg-white/50 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50 hover:bg-white/70 dark:hover:bg-slate-800/70 hover:border-primary transition-all"
+                        class="group flex items-center gap-4 p-4 rounded-xl backdrop-blur-xl bg-[rgba(155,180,218,0.04)] border border-[rgba(165,188,230,0.12)] hover:bg-[rgba(155,180,218,0.08)] hover:border-[rgba(80,128,176,0.3)] hover:shadow-[0_4px_20px_rgba(80,128,176,0.15)] transition-all duration-300"
                       >
-                        <span class="text-sm text-slate-400 w-16 flex-shrink-0">
+                        <span class="text-sm text-[#7a8cb4] w-16 flex-shrink-0">
                           {post.data.published.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' })}
                         </span>
-                        <span class="flex-1 text-slate-800 dark:text-slate-100 group-hover:text-primary transition-colors line-clamp-1">
+                        <span class="flex-1 text-[#b2c0d8] group-hover:text-[#8ac4e8] transition-colors line-clamp-1">
                           {post.data.title}
                         </span>
-                        <span class="text-xs px-2 py-0.5 rounded-full bg-primary text-primary flex-shrink-0">
+                        <span class="text-xs px-2 py-0.5 rounded-full bg-[rgba(80,128,176,0.15)] border border-[rgba(80,128,176,0.2)] text-[#72a8d8] flex-shrink-0">
                           {categoryInfo[post.data.category]?.name || '未知'}
                         </span>
                       </a>

@@ -34,7 +34,7 @@
       const currentSrc = link.href;
 
       const overlay = document.createElement('div');
-      overlay.className = 'lightbox-overlay fixed inset-0 bg-black/95 z-[9999] flex items-center justify-center';
+      overlay.className = 'lightbox-overlay fixed inset-0 bg-black/95 z-[9999] flex items-center justify-center backdrop-blur-sm';
       overlay.innerHTML = `
         <button class="lightbox-close absolute top-4 right-4 p-2 text-white/80 hover:text-white transition-colors">
           <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -51,7 +51,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
           </svg>
         </button>
-        <img src="${currentSrc}" alt="${img.alt || ''}" class="max-w-[90vw] max-h-[85vh] object-contain" />
+        <img src="${currentSrc}" alt="${img.alt || ''}" class="max-w-[90vw] max-h-[85vh] object-contain rounded-lg shadow-2xl" />
         ${img.alt ? `<div class="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/80 text-sm max-w-[80%] text-center">${img.alt}</div>` : ''}
       `;
 

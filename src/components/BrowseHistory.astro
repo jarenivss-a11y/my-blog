@@ -7,10 +7,13 @@ interface Props {
 const { maxItems = 5 } = Astro.props;
 ---
 
-<div id="browse-history" class="p-4 rounded-2xl backdrop-blur-xl bg-white/50 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50">
-  <h4 class="text-xs font-medium text-slate-400 uppercase tracking-widest mb-3">最近浏览</h4>
+<div id="browse-history" class="p-5 rounded-2xl backdrop-blur-xl bg-[rgba(155,180,218,0.05)] border border-[rgba(165,188,230,0.12)] shadow-[0_8px_32px_rgba(0,0,0,0.1)]">
+  <h4 class="text-xs font-medium text-[#8a9cc4] uppercase tracking-widest mb-4 flex items-center gap-2">
+    <span class="w-8 h-px bg-gradient-to-r from-transparent to-[rgba(80,128,176,0.4)]"></span>
+    最近浏览
+  </h4>
   <div id="history-list" class="space-y-2">
-    <p class="text-sm text-slate-400 italic">暂无浏览记录</p>
+    <p class="text-sm text-[#7a8cb4] italic">暂无浏览记录</p>
   </div>
 </div>
 
@@ -39,13 +42,13 @@ const { maxItems = 5 } = Astro.props;
 
     const history = getHistory();
     if (history.length === 0) {
-      list.innerHTML = '<p class="text-sm text-slate-400 italic">暂无浏览记录</p>';
+      list.innerHTML = '<p class="text-sm text-[#7a8cb4] italic">暂无浏览记录</p>';
       return;
     }
 
     list.innerHTML = history.map(item => `
-      <a href="${item.url}" class="block text-sm text-slate-600 dark:text-slate-300 hover:text-primary transition-colors line-clamp-2 py-1">
-        <span class="text-primary/60 mr-2">·</span>${item.title}
+      <a href="${item.url}" class="group block text-sm text-[#b2c0d8] hover:text-[#8ac4e8] transition-all duration-300 line-clamp-2 py-2 px-3 rounded-lg hover:bg-[rgba(80,128,176,0.1)] -mx-3">
+        <span class="text-[#5080b0] mr-2 opacity-60 group-hover:opacity-100 transition-opacity">·</span>${item.title}
       </a>
     `).join('');
   }

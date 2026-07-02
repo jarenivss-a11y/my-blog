@@ -4,24 +4,24 @@
 
 <button
   id="font-size-toggle"
-  class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+  class="p-2 rounded-lg hover:bg-[rgba(80,128,176,0.1)] transition-colors"
   aria-label="切换字体大小"
   title="字体大小"
 >
-  <svg class="w-5 h-5 text-slate-600 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <svg class="w-5 h-5 text-[#72a8d8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16"/>
   </svg>
 </button>
 
-<div id="font-size-menu" class="hidden absolute right-0 top-full mt-2 p-2 rounded-xl backdrop-blur-xl bg-white/90 dark:bg-slate-800/90 border border-white/50 dark:border-slate-700/50 shadow-xl z-50 min-w-[120px]">
-  <div class="text-xs text-slate-400 px-2 py-1 mb-1">字体大小</div>
-  <button data-size="small" class="font-size-btn w-full text-left px-3 py-2 rounded-lg text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+<div id="font-size-menu" class="hidden absolute right-0 top-full mt-2 p-2 rounded-xl backdrop-blur-xl bg-[rgba(30,45,65,0.98)] border border-[rgba(80,128,176,0.3)] shadow-xl z-50 min-w-[120px]">
+  <div class="text-xs text-[#8a9cc4] px-2 py-1 mb-1">字体大小</div>
+  <button data-size="small" class="font-size-btn w-full text-left px-3 py-2 rounded-lg text-sm text-[#b2c0d8] hover:bg-[rgba(80,128,176,0.1)] transition-colors">
     小
   </button>
-  <button data-size="medium" class="font-size-btn w-full text-left px-3 py-2 rounded-lg text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+  <button data-size="medium" class="font-size-btn w-full text-left px-3 py-2 rounded-lg text-sm text-[#b2c0d8] hover:bg-[rgba(80,128,176,0.1)] transition-colors">
     中
   </button>
-  <button data-size="large" class="font-size-btn w-full text-left px-3 py-2 rounded-lg text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+  <button data-size="large" class="font-size-btn w-full text-left px-3 py-2 rounded-lg text-sm text-[#b2c0d8] hover:bg-[rgba(80,128,176,0.1)] transition-colors">
     大
   </button>
 </div>
@@ -70,9 +70,9 @@
       menu.querySelectorAll('.font-size-btn').forEach(btn => {
         const btnSize = (btn as HTMLElement).dataset.size;
         if (btnSize === size) {
-          btn.classList.add('bg-primary/10', 'text-primary');
+          btn.classList.add('bg-[rgba(80,128,176,0.2)]', 'text-[#72a8d8]');
         } else {
-          btn.classList.remove('bg-primary/10', 'text-primary');
+          btn.classList.remove('bg-[rgba(80,128,176,0.2)]', 'text-[#72a8d8]');
         }
       });
     }

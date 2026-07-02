@@ -6,25 +6,34 @@ import BrowseHistory from './BrowseHistory.astro';
 const BASE = '/my-blog';
 
 const quickLinks = [
-  { name: '🏠 首页', href: '/' },
-  { name: '📝 归档', href: '/archive' },
-  { name: '🏷️ 标签', href: '/tags' },
-  { name: '🤝 友链', href: '/friends' },
-  { name: '📖 关于', href: '/about' },
+  { name: '首页', href: '/', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2l7-7 7 7' },
+  { name: '归档', href: '/archive', icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11a2 2 0 110-4 2 2 0 010 4m14 0V5a2 2 0 00-2-2' },
+  { name: '标签', href: '/tags', icon: 'M7 7h.01M7 3h5c.64 0 1.15.26 1.54.71L12.56 7.6a2 2 0 011.41 1.84L12 14m7 7l.01.01M17 3h.01M17 7h.01M15 21v-7a2 2 0 00-2-2H7a2 2 0 00-2 2v7' },
+  { name: '友链', href: '/friends', icon: 'M17 20h5v-2a3 3 0 00-5.618-2.117M7 20h5m-5 0v-5a2 2 0 012-2h1.276a2 2 0 011.949 1.712L12 10l-3.276 4.712A2 2 0 017.276 16H8m5 0v-5a2 2 0 012-2' },
+  { name: '关于', href: '/about', icon: 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 9 9 9 0 0118 9z' },
 ];
 ---
 
 <aside class="hidden xl:block space-y-6">
   <!-- Quick Links -->
-  <div class="p-4 rounded-2xl backdrop-blur-xl bg-white/70 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50">
-    <h4 class="text-xs font-medium text-slate-400 uppercase tracking-widest mb-4">快捷导航</h4>
+  <div class="p-5 rounded-2xl backdrop-blur-xl bg-[rgba(155,180,218,0.05)] border border-[rgba(165,188,230,0.12)] shadow-[0_8px_32px_rgba(0,0,0,0.1)]">
+    <h4 class="text-xs font-medium text-[#8a9cc4] uppercase tracking-widest mb-5 flex items-center gap-2">
+      <span class="w-8 h-px bg-gradient-to-r from-transparent to-[rgba(80,128,176,0.4)]"></span>
+      快捷导航
+    </h4>
     <nav class="space-y-1">
       {quickLinks.map(link => (
         <a
           href={`${BASE}${link.href}`}
-          class="block py-2 px-3 rounded-lg text-sm text-slate-600 dark:text-slate-300 hover:bg-primary hover:text-primary transition-colors"
+          class="group flex items-center gap-3 py-2.5 px-4 rounded-xl text-sm text-[#b2c0d8] hover:text-[#8ac4e8] hover:bg-[rgba(80,128,176,0.1)] transition-all duration-300"
         >
-          {link.name}
+          <svg class="w-5 h-5 opacity-60 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d={link.icon}/>
+          </svg>
+          <span>{link.name}</span>
+          <svg class="w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
         </a>
       ))}
     </nav>

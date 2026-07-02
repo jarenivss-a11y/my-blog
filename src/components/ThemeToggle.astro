@@ -3,14 +3,14 @@
 ---
 
 <div id="theme-toggle-wrapper" class="relative">
-  <button id="theme-toggle" class="relative w-14 h-7 rounded-full bg-slate-200 dark:bg-slate-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary overflow-hidden">
+  <button id="theme-toggle" class="relative w-14 h-7 rounded-full bg-[rgba(80,128,176,0.2)] transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-[#5080b0] overflow-hidden">
     <span id="toggle-indicator" class="absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow-md transform transition-all duration-300 dark:translate-x-7">
       <!-- Sun icon -->
       <svg id="sun-icon" class="absolute inset-0 w-6 h-6 p-1 text-amber-500 transition-all duration-300 dark:opacity-0 dark:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
       </svg>
       <!-- Moon icon -->
-      <svg id="moon-icon" class="absolute inset-0 w-6 h-6 p-1 text-slate-600 transition-all duration-300 opacity-0 -rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg id="moon-icon" class="absolute inset-0 w-6 h-6 p-1 text-[#5080b0] transition-all duration-300 opacity-0 -rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
       </svg>
     </span>
@@ -18,14 +18,14 @@
   </button>
 
   <!-- Theme dropdown -->
-  <div id="theme-dropdown" class="hidden absolute top-full right-0 mt-2 p-2 w-40 rounded-xl backdrop-blur-xl bg-white/90 dark:bg-slate-800/90 border border-white/50 dark:border-slate-700/50 shadow-xl z-50">
-    <button class="theme-option w-full px-3 py-2 text-left text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors flex items-center gap-2" data-theme="light">
+  <div id="theme-dropdown" class="hidden absolute top-full right-0 mt-2 p-2 w-40 rounded-xl backdrop-blur-xl bg-[rgba(30,45,65,0.98)] border border-[rgba(80,128,176,0.3)] shadow-xl z-50">
+    <button class="theme-option w-full px-3 py-2 text-left text-sm rounded-lg hover:bg-[rgba(80,128,176,0.1)] transition-colors flex items-center gap-2 text-[#b2c0d8]" data-theme="light">
       <span>☀️</span> 浅色
     </button>
-    <button class="theme-option w-full px-3 py-2 text-left text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors flex items-center gap-2" data-theme="dark">
+    <button class="theme-option w-full px-3 py-2 text-left text-sm rounded-lg hover:bg-[rgba(80,128,176,0.1)] transition-colors flex items-center gap-2 text-[#b2c0d8]" data-theme="dark">
       <span>🌙</span> 深色
     </button>
-    <button class="theme-option w-full px-3 py-2 text-left text-sm rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors flex items-center gap-2" data-theme="system">
+    <button class="theme-option w-full px-3 py-2 text-left text-sm rounded-lg hover:bg-[rgba(80,128,176,0.1)] transition-colors flex items-center gap-2 text-[#b2c0d8]" data-theme="system">
       <span>💻</span> 跟随系统
     </button>
   </div>
@@ -47,8 +47,8 @@
     transform: rotate(0deg);
   }
   .theme-option.active {
-    background-color: var(--color-primary-light);
-    color: var(--color-primary);
+    background-color: rgba(80, 128, 176, 0.2);
+    color: #72a8d8;
   }
 </style>
 

@@ -51,7 +51,7 @@
 
   function showWelcomeBack(message: string) {
     const toast = document.createElement('div');
-    toast.className = 'welcome-toast fixed top-20 left-1/2 -translate-x-1/2 z-[200] px-6 py-3 rounded-2xl backdrop-blur-xl bg-primary/90 text-white shadow-lg animate-fade-in-down';
+    toast.className = 'welcome-toast fixed top-20 left-1/2 -translate-x-1/2 z-[200] px-6 py-3 rounded-2xl backdrop-blur-xl bg-[rgba(80,128,176,0.9)] text-white shadow-lg animate-fade-in-down';
     toast.style.cssText = 'animation: fadeInDown 0.5s ease-out forwards;';
     toast.innerHTML = `
       <div class="flex items-center gap-3">
@@ -69,7 +69,7 @@
 
   function showToast(message: string, duration: number) {
     const toast = document.createElement('div');
-    toast.className = 'welcome-toast fixed top-20 left-1/2 -translate-x-1/2 z-[200] px-6 py-3 rounded-2xl backdrop-blur-xl bg-slate-800/90 text-white shadow-lg';
+    toast.className = 'welcome-toast fixed top-20 left-1/2 -translate-x-1/2 z-[200] px-6 py-3 rounded-2xl backdrop-blur-xl bg-[rgba(30,45,65,0.95)] text-white shadow-lg';
     toast.innerHTML = `
       <div class="flex items-center gap-3">
         <span>${message}</span>

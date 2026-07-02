@@ -5,26 +5,26 @@
 <div id="floating-share" class="fixed left-4 bottom-24 z-40 hidden md:block">
   <button
     id="share-btn"
-    class="p-3 rounded-full backdrop-blur-xl bg-white/80 dark:bg-slate-800/80 border border-white/50 dark:border-slate-700/50 shadow-lg hover:shadow-xl transition-all hover:scale-105 hover:bg-primary hover:text-white"
+    class="p-3 rounded-full backdrop-blur-xl bg-[rgba(155,180,218,0.1)] border border-[rgba(80,128,176,0.3)] shadow-lg hover:shadow-[0_8px 32px_rgba(80,128,176,0.3)] transition-all hover:scale-105 hover:bg-[rgba(80,128,176,0.2)]"
     aria-label="分享文章"
   >
-    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg class="w-5 h-5 text-[#72a8d8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
     </svg>
   </button>
 
   <!-- Share dropdown -->
-  <div id="share-dropdown" class="hidden absolute bottom-full left-0 mb-2 w-48 py-2 rounded-xl backdrop-blur-xl bg-white/90 dark:bg-slate-800/90 border border-white/50 dark:border-slate-700/50 shadow-xl">
-    <button class="share-option w-full px-4 py-2 text-left text-sm hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2" data-platform="twitter">
+  <div id="share-dropdown" class="hidden absolute bottom-full left-0 mb-2 w-48 py-2 rounded-xl backdrop-blur-xl bg-[rgba(30,45,65,0.98)] border border-[rgba(80,128,176,0.3)] shadow-xl">
+    <button class="share-option w-full px-4 py-2 text-left text-sm hover:bg-[rgba(80,128,176,0.1)] flex items-center gap-2 text-[#b2c0d8]" data-platform="twitter">
       <span>X (Twitter)</span>
     </button>
-    <button class="share-option w-full px-4 py-2 text-left text-sm hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2" data-platform="facebook">
+    <button class="share-option w-full px-4 py-2 text-left text-sm hover:bg-[rgba(80,128,176,0.1)] flex items-center gap-2 text-[#b2c0d8]" data-platform="facebook">
       <span>Facebook</span>
     </button>
-    <button class="share-option w-full px-4 py-2 text-left text-sm hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2" data-platform="weibo">
+    <button class="share-option w-full px-4 py-2 text-left text-sm hover:bg-[rgba(80,128,176,0.1)] flex items-center gap-2 text-[#b2c0d8]" data-platform="weibo">
       <span>微博</span>
     </button>
-    <button class="share-option w-full px-4 py-2 text-left text-sm hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2" data-platform="copy">
+    <button class="share-option w-full px-4 py-2 text-left text-sm hover:bg-[rgba(80,128,176,0.1)] flex items-center gap-2 text-[#b2c0d8]" data-platform="copy">
       <span>复制链接</span>
     </button>
   </div>

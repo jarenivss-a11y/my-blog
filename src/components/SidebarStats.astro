@@ -19,35 +19,39 @@ const startDate = new Date('2024-01-01');
 const daysSinceStart = Math.floor((now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
 ---
 
-<div class="p-4 rounded-2xl backdrop-blur-xl bg-white/70 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50">
-  <h4 class="text-xs font-medium text-slate-400 uppercase tracking-widest mb-4">博客统计</h4>
-  <div class="space-y-3">
-    <div class="flex items-center justify-between">
-      <span class="text-sm text-slate-500 dark:text-slate-400">文章总数</span>
-      <span class="text-sm font-medium text-primary">{publishedPosts.length}</span>
+<div class="p-5 rounded-2xl backdrop-blur-xl bg-[rgba(155,180,218,0.05)] border border-[rgba(165,188,230,0.12)] shadow-[0_8px_32px_rgba(0,0,0,0.1)]">
+  <h4 class="text-xs font-medium text-[#8a9cc4] uppercase tracking-widest mb-5 flex items-center gap-2">
+    <span class="w-8 h-px bg-gradient-to-r from-transparent to-[rgba(80,128,176,0.4)]"></span>
+    博客统计
+  </h4>
+
+  <div class="grid grid-cols-2 gap-3">
+    <div class="p-3 rounded-xl bg-[rgba(80,128,176,0.08)] border border-[rgba(80,128,176,0.1)] text-center">
+      <div class="text-2xl font-semibold text-[#72a8d8]">{publishedPosts.length}</div>
+      <div class="text-xs text-[#8a9cc4] mt-1">文章</div>
     </div>
-    <div class="flex items-center justify-between">
-      <span class="text-sm text-slate-500 dark:text-slate-400">标签总数</span>
-      <span class="text-sm font-medium text-primary">{tagCount}</span>
+    <div class="p-3 rounded-xl bg-[rgba(80,128,176,0.08)] border border-[rgba(80,128,176,0.1)] text-center">
+      <div class="text-2xl font-semibold text-[#72a8d8]">{tagCount}</div>
+      <div class="text-xs text-[#8a9cc4] mt-1">标签</div>
     </div>
-    <div class="flex items-center justify-between">
-      <span class="text-sm text-slate-500 dark:text-slate-400">总字数</span>
-      <span class="text-sm font-medium text-primary">{totalWords.toLocaleString()}</span>
+    <div class="p-3 rounded-xl bg-[rgba(80,128,176,0.08)] border border-[rgba(80,128,176,0.1)] text-center">
+      <div class="text-2xl font-semibold text-[#72a8d8]">{Math.round(totalWords / 1000)}k</div>
+      <div class="text-xs text-[#8a9cc4] mt-1">字数</div>
     </div>
-    <div class="flex items-center justify-between">
-      <span class="text-sm text-slate-500 dark:text-slate-400">运行天数</span>
-      <span class="text-sm font-medium text-primary">{daysSinceStart}</span>
+    <div class="p-3 rounded-xl bg-[rgba(80,128,176,0.08)] border border-[rgba(80,128,176,0.1)] text-center">
+      <div class="text-2xl font-semibold text-[#72a8d8]">{daysSinceStart}</div>
+      <div class="text-xs text-[#8a9cc4] mt-1">天数</div>
     </div>
   </div>
 
   {categoryCount.length > 0 && (
-    <div class="mt-4 pt-4 border-t border-slate-200/50 dark:border-slate-700/50">
-      <div class="text-xs text-slate-400 mb-2">分类分布</div>
+    <div class="mt-4 pt-4 border-t border-[rgba(165,188,230,0.1)]">
+      <div class="text-xs text-[#8a9cc4] mb-3">分类分布</div>
       <div class="space-y-2">
         {categoryCount.map(cat => (
-          <div class="flex items-center justify-between text-xs">
-            <span class="text-slate-500 dark:text-slate-400">{cat.name}</span>
-            <span class="text-slate-600 dark:text-slate-300">{cat.count}</span>
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-[#b2c0d8]">{cat.name}</span>
+            <span class="px-2 py-0.5 rounded-full bg-[rgba(80,128,176,0.15)] text-[#72a8d8] text-xs">{cat.count}</span>
           </div>
         ))}
       </div>
