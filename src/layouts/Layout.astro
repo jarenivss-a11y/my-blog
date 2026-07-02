@@ -472,13 +472,13 @@ const currentPath = Astro.url.pathname;
 
               if (scrollY > 100) {
                 // Scrolled: add glass effect
-                navContainer.classList.add('rounded-2xl', 'border', 'border-white/50', 'dark:border-white/10', 'bg-white/80', 'dark:bg-slate-900/80', 'backdrop-blur-xl', 'shadow-lg', 'shadow-black/5');
+                navContainer.classList.add('rounded-2xl', 'border', 'border-white/50', 'dark:border-white/10', 'bg-white/80', 'dark:bg-[rgba(30,45,65,0.8)]', 'backdrop-blur-xl', 'shadow-lg', 'shadow-black/5');
                 navbar.classList.add('top-4');
                 navbar.classList.remove('top-0');
                 navContainer.classList.remove('rounded-none');
               } else {
                 // At top: transparent
-                navContainer.classList.remove('rounded-2xl', 'border', 'border-white/50', 'dark:border-white/10', 'bg-white/80', 'dark:bg-slate-900/80', 'backdrop-blur-xl', 'shadow-lg', 'shadow-black/5');
+                navContainer.classList.remove('rounded-2xl', 'border', 'border-white/50', 'dark:border-white/10', 'bg-white/80', 'dark:bg-[rgba(30,45,65,0.8)]', 'backdrop-blur-xl', 'shadow-lg', 'shadow-black/5');
                 navbar.classList.remove('top-4');
                 navbar.classList.add('top-0');
                 navContainer.classList.add('rounded-none');
