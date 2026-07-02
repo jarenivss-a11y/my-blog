@@ -48,24 +48,24 @@ const categoryInfo: Record<string, { name: string; icon: string }> = {
 };
 ---
 
-<section class="mt-8 p-6 rounded-2xl backdrop-blur-xl bg-white/50 dark:bg-slate-800/50 border border-white/50 dark:border-slate-700/50">
-  <h2 class="text-lg font-serif font-bold text-slate-900 dark:text-white mb-4">相关文章</h2>
+<section class="mt-8 p-6 rounded-2xl backdrop-blur-xl bg-[rgba(155,180,218,0.1)] border border-[rgba(80,128,176,0.3)]">
+  <h2 class="text-lg font-serif font-bold text-[#5080b0] mb-4">相关文章</h2>
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
     {relatedPosts.map((post) => {
       const cat = categoryInfo[post.data.category] || { name: '未知', icon: '📁' };
       return (
         <a
           href={`/my-blog/post/${post.id}`}
-          class="group p-4 rounded-xl bg-white/50 dark:bg-slate-700/50 hover:bg-primary hover:border-primary border border-transparent transition-all"
+          class="group p-4 rounded-xl bg-[rgba(155,180,218,0.08)] hover:bg-[rgba(80,128,176,0.2)] border border-[rgba(80,128,176,0.2)] hover:border-[#72a8d8] transition-all"
         >
           <div class="flex items-center gap-2 mb-2">
             <span class="text-xs">{cat.icon}</span>
-            <span class="text-xs text-slate-400">{cat.name}</span>
+            <span class="text-xs text-[#8ac4e8]">{cat.name}</span>
           </div>
-          <h3 class="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-white transition-colors line-clamp-2 mb-2">
+          <h3 class="text-sm font-medium text-[#5080b0] group-hover:text-[#72a8d8] transition-colors line-clamp-2 mb-2">
             {post.data.title}
           </h3>
-          <span class="text-xs text-slate-400 group-hover:text-white/70">
+          <span class="text-xs text-[#8ac4e8] group-hover:text-[#72a8d8]/70">
             {post.data.published.toLocaleDateString('zh-CN')}
           </span>
         </a>
