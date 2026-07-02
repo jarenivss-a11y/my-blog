@@ -105,12 +105,12 @@ const currentPath = Astro.url.pathname;
     <link rel="manifest" href="/my-blog/manifest.webmanifest" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Great+Vibes&family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600&family=Raleway:wght@200;300&family=Spectral:ital,wght@1,300&display=swap" rel="stylesheet">
     <link rel="alternate" type="application/rss+xml" title="我的博客 RSS" href="/my-blog/rss.xml" />
     <SEO title={title} description={description} url={Astro.url.pathname} />
     <script is:inline define:vars={{ postUrls }}>window.__POST_URLS__ = postUrls;</script>
   </head>
-  <body class="bg-transparent text-slate-800 dark:text-slate-100 min-h-screen font-sans antialiased">
+  <body class="bg-[#181e32] text-[#e0e6f2] min-h-screen font-sans antialiased">
     <!-- Skip to content -->
     <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary focus:text-white focus:rounded-lg focus:outline-none focus:ring-2 focus:ring-white">
       跳转到主要内容
@@ -284,13 +284,13 @@ const currentPath = Astro.url.pathname;
         font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
       }
       h1, h2, h3 {
-        font-family: 'Noto Serif SC', serif;
+        font-family: 'Noto Serif SC', 'Cormorant Garamond', serif;
       }
       a {
         text-decoration: none;
       }
       ::selection {
-        background: rgba(99, 102, 241, 0.2);
+        background: rgba(80, 128, 176, 0.3);
         color: inherit;
       }
       ::-webkit-scrollbar {
@@ -301,35 +301,49 @@ const currentPath = Astro.url.pathname;
         background: transparent;
       }
       ::-webkit-scrollbar-thumb {
-        background: rgba(99, 102, 241, 0.3);
+        background: rgba(114, 144, 180, 0.4);
         border-radius: 10px;
       }
       ::-webkit-scrollbar-thumb:hover {
-        background: rgba(99, 102, 241, 0.6);
+        background: rgba(114, 144, 180, 0.7);
       }
 
-      /* Theme Color Variables */
+      /* Theme Color Variables - InternalBeyond Style */
       :root {
-        --color-primary: #6366f1;
-        --color-primary-light: rgba(99, 102, 241, 0.12);
-        --color-primary-dark: rgba(99, 102, 241, 0.25);
+        --color-primary: #5080b0;
+        --color-primary-light: rgba(80, 128, 176, 0.15);
+        --color-primary-dark: rgba(80, 128, 176, 0.3);
+        --bg-deep: #181e32;
+        --bg-mid: #263050;
+        --mist: #8895b4;
+        --silver: #b2c0d8;
+        --light: #cdd6ea;
+        --pale: #e2e9f5;
+        --text-primary: #e0e6f2;
+        --text-secondary: #adb8d0;
+        --text-muted: #7e90b2;
+        --glass-bg: rgba(155, 180, 218, 0.08);
+        --glass-border: rgba(165, 188, 230, 0.15);
+        --glass-shadow: rgba(0, 0, 0, 0.2);
+        --accent: #5080b0;
+        --accent-light: #72a8d8;
       }
 
       /* Also set on html element for dynamic updates */
       html {
-        --color-primary: #6366f1;
-        --color-primary-light: rgba(99, 102, 241, 0.12);
-        --color-primary-dark: rgba(99, 102, 241, 0.25);
+        --color-primary: #5080b0;
+        --color-primary-light: rgba(80, 128, 176, 0.15);
+        --color-primary-dark: rgba(80, 128, 176, 0.3);
         --article-font-size: 18px;
       }
 
       /* Focus Styles for Accessibility */
       :focus-visible {
-        outline: 2px solid rgba(99, 102, 241, 0.6);
+        outline: 2px solid rgba(80, 128, 176, 0.6);
         outline-offset: 2px;
       }
       a:focus-visible, button:focus-visible {
-        outline: 2px solid var(--color-primary, #6366f1);
+        outline: 2px solid var(--color-primary, #5080b0);
         outline-offset: 2px;
         border-radius: 4px;
       }
