@@ -1,11 +1,15 @@
 ---
-// OceanAudio - Realistic ocean wave sounds with auto-play
+// OceanAudio - Realistic ocean sounds with tidal effects and mouse interaction
 ---
 
 <script>
   function initOceanAudio() {
     let audioContext = null;
     let isInitialized = false;
+    let masterGain = null;
+    let waveGain = null;
+    let foamGain = null;
+    let tideGain = null;
 
     function createOceanAudio() {
       if (isInitialized) return;
@@ -13,35 +17,80 @@
 
       audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
-      const masterGain = audioContext.createGain();
-      masterGain.gain.value = 0.35;
+      masterGain = audioContext.createGain();
+      masterGain.gain.value = 0.4;
       masterGain.connect(audioContext.destination);
 
-      // Deep Ocean Rumble
-      const rumbleBuffer = audioContext.createBuffer(1, audioContext.sampleRate * 6, audioContext.sampleRate);
+      // === Deep Ocean Rumble (bass foundation) ===
+      const rumbleBuffer = audioContext.createBuffer(1, audioContext.sampleRate * 8, audioContext.sampleRate);
       const rumbleData = rumbleBuffer.getChannelData(0);
-      let rumbleLastOut = 0;
+      let rumbleOut = 0;
       for (let i = 0; i < rumbleData.length; i++) {
         const white = Math.random() * 2 - 1;
-        rumbleData[i] = (rumbleLastOut + (0.02 * white)) / 1.02;
-        rumbleLastOut = rumbleData[i];
-        rumbleData[i] *= 3.5;
+        rumbleOut = (rumbleOut + (0.02 * white)) / 1.02;
+        rumbleData[i] = rumbleOut * 4.0;
       }
       const rumbleSource = audioContext.createBufferSource();
       rumbleSource.buffer = rumbleBuffer;
       rumbleSource.loop = true;
       const rumbleFilter = audioContext.createBiquadFilter();
       rumbleFilter.type = 'lowpass';
-      rumbleFilter.frequency.value = 80;
-      const rumbleGain = audioContext.createGain();
-      rumbleGain.gain.value = 0.5;
+      rumbleFilter.frequency.value = 60;
+      const rumbleGainNode = audioContext.createGain();
+      rumbleGainNode.gain.value = 0.4;
       rumbleSource.connect(rumbleFilter);
-      rumbleFilter.connect(rumbleGain);
-      rumbleGain.connect(masterGain);
+      rumbleFilter.connect(rumbleGainNode);
+      rumbleGainNode.connect(masterGain);
       rumbleSource.start();
 
-      // Main Ocean Wave Sound
-      const waveBuffer = audioContext.createBuffer(2, audioContext.sampleRate * 8, audioContext.sampleRate);
+      // === Tidal Swell (rhythmic wave cycles) ===
+      const swellBuffer = audioContext.createBuffer(2, audioContext.sampleRate * 12, audioContext.sampleRate);
+      for (let channel = 0; channel < 2; channel++) {
+        const data = swellBuffer.getChannelData(channel);
+        let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+        for (let i = 0; i < data.length; i++) {
+          const t = i / audioContext.sampleRate;
+          const envelope = (Math.sin(t * 0.15 * Math.PI * 2) * 0.5 + 0.5); // 12s cycle
+          const white = Math.random() * 2 - 1;
+          b0 = 0.99886 * b0 + white * 0.0555179;
+          b1 = 0.99332 * b1 + white * 0.0750759;
+          b2 = 0.96900 * b2 + white * 0.1538520;
+          b3 = 0.86650 * b3 + white * 0.3104856;
+          b4 = 0.55000 * b4 + white * 0.5329522;
+          b5 = -0.7616 * b5 - white * 0.0168980;
+          data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11 * envelope;
+          b6 = white * 0.115926;
+        }
+      }
+      const swellSource = audioContext.createBufferSource();
+      swellSource.buffer = swellBuffer;
+      swellSource.loop = true;
+      const swellFilter = audioContext.createBiquadFilter();
+      swellFilter.type = 'lowpass';
+      swellFilter.frequency.value = 800;
+      const swellFilter2 = audioContext.createBiquadFilter();
+      swellFilter2.type = 'highpass';
+      swellFilter2.frequency.value = 100;
+      tideGain = audioContext.createGain();
+      tideGain.gain.value = 0.35;
+      swellSource.connect(swellFilter);
+      swellFilter.connect(swellFilter2);
+      swellFilter2.connect(tideGain);
+      tideGain.connect(masterGain);
+      swellSource.start();
+
+      // Slow tidal LFO (30 second cycle)
+      const tideLfo = audioContext.createOscillator();
+      const tideLfoGain = audioContext.createGain();
+      tideLfo.type = 'sine';
+      tideLfo.frequency.value = 0.033;
+      tideLfoGain.gain.value = 0.2;
+      tideLfo.connect(tideLfoGain);
+      tideLfoGain.connect(tideGain.gain);
+      tideLfo.start();
+
+      // === Main Wave Sound ===
+      const waveBuffer = audioContext.createBuffer(2, audioContext.sampleRate * 10, audioContext.sampleRate);
       for (let channel = 0; channel < 2; channel++) {
         const data = waveBuffer.getChannelData(channel);
         let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
@@ -63,31 +112,32 @@
       waveSource.loop = true;
       const waveFilter = audioContext.createBiquadFilter();
       waveFilter.type = 'bandpass';
-      waveFilter.frequency.value = 400;
-      waveFilter.Q.value = 0.5;
-      const waveGain = audioContext.createGain();
-      waveGain.gain.value = 0.4;
+      waveFilter.frequency.value = 500;
+      waveFilter.Q.value = 0.3;
+      waveGain = audioContext.createGain();
+      waveGain.gain.value = 0.35;
       waveSource.connect(waveFilter);
       waveFilter.connect(waveGain);
       waveGain.connect(masterGain);
       waveSource.start();
 
-      // Wave envelope modulation
+      // Wave envelope LFO (wave crash cycle ~8 seconds)
       const waveLfo = audioContext.createOscillator();
       const waveLfoGain = audioContext.createGain();
       waveLfo.type = 'sine';
-      waveLfo.frequency.value = 0.12;
+      waveLfo.frequency.value = 0.125; // ~8 second cycle
       waveLfoGain.gain.value = 0.25;
       waveLfo.connect(waveLfoGain);
       waveLfoGain.connect(waveGain.gain);
       waveLfo.start();
 
-      // High Frequency Foam/Splash
-      const foamBuffer = audioContext.createBuffer(2, audioContext.sampleRate * 4, audioContext.sampleRate);
+      // === High Frequency Foam/Spray ===
+      const foamBuffer = audioContext.createBuffer(2, audioContext.sampleRate * 6, audioContext.sampleRate);
       for (let channel = 0; channel < 2; channel++) {
         const data = foamBuffer.getChannelData(channel);
         for (let i = 0; i < data.length; i++) {
-          data[i] = Math.random() * 2 - 1;
+          const white = Math.random() * 2 - 1;
+          data[i] = white * 0.5;
         }
       }
       const foamSource = audioContext.createBufferSource();
@@ -95,117 +145,178 @@
       foamSource.loop = true;
       const foamFilter = audioContext.createBiquadFilter();
       foamFilter.type = 'highpass';
-      foamFilter.frequency.value = 3000;
-      const foamGain = audioContext.createGain();
-      foamGain.gain.value = 0.06;
+      foamFilter.frequency.value = 4000;
+      const foamFilter2 = audioContext.createBiquadFilter();
+      foamFilter2.type = 'lowpass';
+      foamFilter2.frequency.value = 12000;
+      foamGain = audioContext.createGain();
+      foamGain.gain.value = 0.05;
       foamSource.connect(foamFilter);
-      foamFilter.connect(foamGain);
+      foamFilter.connect(foamFilter2);
+      foamFilter2.connect(foamGain);
       foamGain.connect(masterGain);
       foamSource.start();
 
-      // Foam modulation
+      // Foam modulation with wave rhythm
       const foamLfo = audioContext.createOscillator();
       const foamLfoGain = audioContext.createGain();
       foamLfo.type = 'sine';
-      foamLfo.frequency.value = 0.12;
+      foamLfo.frequency.value = 0.125; // sync with wave
       foamLfoGain.gain.value = 0.04;
       foamLfo.connect(foamLfoGain);
       foamLfoGain.connect(foamGain.gain);
       foamLfo.start();
 
-      // Tidal Swell
-      const tideBuffer = audioContext.createBuffer(1, audioContext.sampleRate * 10, audioContext.sampleRate);
-      const tideData = tideBuffer.getChannelData(0);
-      let tb0 = 0, tb1 = 0, tb2 = 0, tb3 = 0, tb4 = 0, tb5 = 0, tb6 = 0;
-      for (let i = 0; i < tideData.length; i++) {
+      // === Distant Thunder/Rumble (optional low rumble) ===
+      const thunderBuffer = audioContext.createBuffer(1, audioContext.sampleRate * 15, audioContext.sampleRate);
+      const thunderData = thunderBuffer.getChannelData(0);
+      let thOut = 0;
+      for (let i = 0; i < thunderData.length; i++) {
         const white = Math.random() * 2 - 1;
-        tb0 = 0.99886 * tb0 + white * 0.0555179;
-        tb1 = 0.99332 * tb1 + white * 0.0750759;
-        tb2 = 0.96900 * tb2 + white * 0.1538520;
-        tb3 = 0.86650 * tb3 + white * 0.3104856;
-        tb4 = 0.55000 * tb4 + white * 0.5329522;
-        tb5 = -0.7616 * tb5 - white * 0.0168980;
-        tideData[i] = tb0 + tb1 + tb2 + tb3 + tb4 + tb5 + tb6 + white * 0.5362;
-        tideData[i] *= 0.11;
-        tb6 = white * 0.115926;
+        thOut = (thOut + (0.005 * white)) / 1.005;
+        thunderData[i] = thOut * 6.0 * (Math.random() > 0.998 ? 3 : 1);
       }
-      const tideSource = audioContext.createBufferSource();
-      tideSource.buffer = tideBuffer;
-      tideSource.loop = true;
-      const tideFilter = audioContext.createBiquadFilter();
-      tideFilter.type = 'lowpass';
-      tideFilter.frequency.value = 600;
-      const tideGain = audioContext.createGain();
-      tideGain.gain.value = 0.3;
-      tideSource.connect(tideFilter);
-      tideFilter.connect(tideGain);
-      tideGain.connect(masterGain);
-      tideSource.start();
+      const thunderSource = audioContext.createBufferSource();
+      thunderSource.buffer = thunderBuffer;
+      thunderSource.loop = true;
+      const thunderFilter = audioContext.createBiquadFilter();
+      thunderFilter.type = 'lowpass';
+      thunderFilter.frequency.value = 40;
+      const thunderGain = audioContext.createGain();
+      thunderGain.gain.value = 0.15;
+      thunderSource.connect(thunderFilter);
+      thunderFilter.connect(thunderGain);
+      thunderGain.connect(masterGain);
+      thunderSource.start();
 
-      // 30-second tidal cycle
-      const tideLfo = audioContext.createOscillator();
-      const tideLfoGain = audioContext.createGain();
-      tideLfo.type = 'sine';
-      tideLfo.frequency.value = 0.033;
-      tideLfoGain.gain.value = 0.2;
-      tideLfo.connect(tideLfoGain);
-      tideLfoGain.connect(tideGain.gain);
-      tideLfo.start();
-
-      // Resume audio context
+      // Resume audio context on user interaction
       if (audioContext.state === 'suspended') {
         const resumeAudio = function() {
-          audioContext && audioContext.resume();
+          if (audioContext && audioContext.state === 'suspended') {
+            audioContext.resume();
+          }
           document.removeEventListener('click', resumeAudio);
           document.removeEventListener('mousemove', resumeAudio);
           document.removeEventListener('touchstart', resumeAudio);
+          document.removeEventListener('keydown', resumeAudio);
         };
         document.addEventListener('click', resumeAudio);
-        document.addEventListener('mousemove', resumeAudio);
-        document.addEventListener('touchstart', resumeAudio);
+        document.addEventListener('mousemove', resumeAudio, { once: true });
+        document.addEventListener('touchstart', resumeAudio, { once: true });
+        document.addEventListener('keydown', resumeAudio, { once: true });
       }
     }
 
+    // Initialize on page load
     createOceanAudio();
 
+    // === Mouse ripple sound effect ===
     let lastRipple = 0;
-    function playRippleSound() {
+    let lastMouseX = 0;
+    let lastMouseY = 0;
+
+    function playRippleSound(x, y, speed) {
       if (!audioContext || audioContext.state !== 'running') return;
 
       const now = Date.now();
-      if (now - lastRipple < 60) return;
+      if (now - lastRipple < 40) return;
       lastRipple = now;
 
+      // Calculate intensity based on mouse speed
+      const intensity = Math.min(1, speed * 0.5 + 0.2);
+
+      // Create water droplet/ripple sound
       const osc = audioContext.createOscillator();
+      const osc2 = audioContext.createOscillator();
       const gain = audioContext.createGain();
       const filter = audioContext.createBiquadFilter();
 
+      // Primary frequency based on position
+      const baseFreq = 300 + (x / window.innerWidth) * 400;
+
       osc.type = 'sine';
-      osc.frequency.value = 400 + Math.random() * 400;
+      osc.frequency.value = baseFreq + Math.random() * 200;
+
+      osc2.type = 'sine';
+      osc2.frequency.value = baseFreq * 0.5 + Math.random() * 100;
 
       filter.type = 'lowpass';
-      filter.frequency.value = 1000;
+      filter.frequency.value = 800 + intensity * 400;
+      filter.Q.value = 1;
 
-      gain.gain.value = 0.04;
-      gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3);
+      // Volume envelope
+      gain.gain.value = 0.03 * intensity;
+      gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.4);
 
       osc.connect(filter);
+      osc2.connect(filter);
       filter.connect(gain);
       gain.connect(audioContext.destination);
 
       osc.start();
-      osc.stop(audioContext.currentTime + 0.3);
+      osc2.start();
+      osc.stop(audioContext.currentTime + 0.4);
+      osc2.stop(audioContext.currentTime + 0.4);
+
+      // Foam splash for fast movements
+      if (speed > 0.3 && Math.random() > 0.5) {
+        playFoamSplash(intensity * 0.5);
+      }
     }
 
-    document.addEventListener('mousemove', function() {
-      if (Math.random() > 0.85) {
-        playRippleSound();
+    function playFoamSplash(intensity) {
+      if (!audioContext || audioContext.state !== 'running') return;
+
+      const bufferSize = audioContext.sampleRate * 0.2;
+      const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+      const data = buffer.getChannelData(0);
+
+      for (let i = 0; i < bufferSize; i++) {
+        const t = i / bufferSize;
+        data[i] = (Math.random() * 2 - 1) * Math.exp(-t * 8) * 0.3;
+      }
+
+      const source = audioContext.createBufferSource();
+      source.buffer = buffer;
+
+      const filter = audioContext.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.value = 6000 + Math.random() * 2000;
+      filter.Q.value = 0.5;
+
+      const gain = audioContext.createGain();
+      gain.gain.value = 0.08 * intensity;
+
+      source.connect(filter);
+      filter.connect(gain);
+      gain.connect(audioContext.destination);
+
+      source.start();
+    }
+
+    // Track mouse movement and speed
+    document.addEventListener('mousemove', (e) => {
+      const now = Date.now();
+      const dx = e.clientX - lastMouseX;
+      const dy = e.clientY - lastMouseY;
+      const speed = Math.sqrt(dx * dx + dy * dy) / Math.max(1, now - lastRipple);
+
+      lastMouseX = e.clientX;
+      lastMouseY = e.clientY;
+
+      // Play ripple sounds probabilistically based on speed
+      if (speed > 0.1 && Math.random() > 0.7) {
+        playRippleSound(e.clientX, e.clientY, speed);
       }
     });
 
+    // Reinitialize on page swap
     document.addEventListener('astro:after-swap', function() {
       isInitialized = false;
       createOceanAudio();
+      lastRipple = 0;
+      lastMouseX = 0;
+      lastMouseY = 0;
     });
   }
 
