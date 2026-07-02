@@ -28,11 +28,14 @@
 
     function updateToggleButton(isEnabled) {
       const btn = document.getElementById('battery-saver-btn');
+      const svg = btn?.querySelector('svg');
       if (btn) {
-        btn.classList.toggle('bg-green-500', isEnabled);
-        btn.classList.toggle('bg-slate-300', !isEnabled);
-        btn.classList.toggle('dark:bg-green-500', isEnabled);
-        btn.classList.toggle('dark:bg-slate-600', !isEnabled);
+        btn.classList.toggle('bg-[#5080b0]', isEnabled);
+        btn.classList.toggle('bg-[rgba(80,128,176,0.3)]', !isEnabled);
+      }
+      if (svg) {
+        svg.classList.toggle('text-white', isEnabled);
+        svg.classList.toggle('text-[#72a8d8]', !isEnabled);
       }
     }
 
@@ -59,19 +62,17 @@
     // Create toggle button
     const btn = document.createElement('button');
     btn.id = 'battery-saver-btn';
-    btn.className = 'fixed bottom-4 left-4 z-50 w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110';
+    btn.className = 'fixed bottom-4 left-4 z-50 w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110 backdrop-blur-xl bg-[rgba(155,180,218,0.1)] border border-[rgba(80,128,176,0.3)]';
     btn.title = '省电模式';
     btn.innerHTML = `
-      <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg class="w-5 h-5 text-[#72a8d8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
       </svg>
     `;
 
     const isEnabled = document.documentElement.classList.contains('battery-saver');
-    btn.classList.toggle('bg-green-500', isEnabled);
-    btn.classList.toggle('bg-slate-300', !isEnabled);
-    btn.classList.toggle('dark:bg-green-500', isEnabled);
-    btn.classList.toggle('dark:bg-slate-600', !isEnabled);
+    btn.classList.toggle('bg-[#5080b0]', isEnabled);
+    btn.classList.toggle('bg-[rgba(80,128,176,0.3)]', !isEnabled);
 
     btn.addEventListener('click', () => {
       if (document.documentElement.classList.contains('battery-saver')) {

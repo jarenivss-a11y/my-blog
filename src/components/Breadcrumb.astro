@@ -20,24 +20,24 @@ const breadcrumbItems = [
 ---
 
 <nav aria-label="面包屑导航" class="mb-6">
-  <ol class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400" itemscope itemtype="https://schema.org/BreadcrumbList">
+  <ol class="flex items-center gap-2 text-sm text-[#8a9cc4]" itemscope itemtype="https://schema.org/BreadcrumbList">
     <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
-      <a href="/my-blog/" class="hover:text-primary transition-colors" itemprop="item">
+      <a href="/my-blog/" class="hover:text-[#72a8d8] transition-colors" itemprop="item">
         <span itemprop="name">首页</span>
       </a>
       <meta itemprop="position" content="1" />
     </li>
     {items.map((item, index) => (
-      <li class="text-slate-300 dark:text-slate-600">/</li>
+      <li class="text-[rgba(80,128,176,0.4)]">/</li>
     ))}
     {items.map((item, index) => (
       <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
         {item.href ? (
-          <a href={item.href} class="hover:text-primary transition-colors" itemprop="item">
+          <a href={item.href} class="hover:text-[#72a8d8] transition-colors" itemprop="item">
             <span itemprop="name">{item.name}</span>
           </a>
         ) : (
-          <span class="text-slate-700 dark:text-slate-200" itemprop="item">
+          <span class="text-[#e2e9f5]" itemprop="item">
             <span itemprop="name">{item.name}</span>
           </span>
         )}
