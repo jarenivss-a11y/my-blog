@@ -4,11 +4,11 @@
 
 <button
   id="reading-mode-btn"
-  class="fixed top-20 right-4 z-50 p-2 rounded-lg backdrop-blur-xl bg-white/80 dark:bg-slate-800/80 border border-white/50 dark:border-slate-700/50 shadow-lg hover:shadow-xl transition-all hover:scale-105"
+  class="fixed top-20 right-4 z-50 p-2 rounded-lg backdrop-blur-xl bg-[rgba(155,180,218,0.1)] border border-[rgba(80,128,176,0.3)] shadow-lg hover:shadow-xl transition-all hover:scale-105"
   aria-label="阅读模式"
   title="阅读模式"
 >
-  <svg class="w-5 h-5 text-slate-600 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <svg class="w-5 h-5 text-[#72a8d8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
   </svg>
 </button>
@@ -32,10 +32,10 @@
       localStorage.setItem(STORAGE_KEY, isReadingMode.toString());
 
       // Update button appearance
-      btn.classList.toggle('bg-primary', isReadingMode);
+      btn.classList.toggle('bg-[#5080b0]', isReadingMode);
       btn.classList.toggle('text-white', isReadingMode);
-      btn.classList.toggle('bg-white/80', !isReadingMode);
-      btn.classList.toggle('text-slate-600', !isReadingMode);
+      btn.classList.toggle('bg-[rgba(155,180,218,0.1)]', !isReadingMode);
+      btn.classList.toggle('text-[#72a8d8]', !isReadingMode);
     });
   }
 
