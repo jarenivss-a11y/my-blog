@@ -19,39 +19,39 @@ const startDate = new Date('2024-01-01');
 const daysSinceStart = Math.floor((now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
 ---
 
-<div class="p-5 rounded-2xl backdrop-blur-xl bg-[rgba(155,180,218,0.05)] border border-[rgba(165,188,230,0.12)] shadow-[0_8px_32px_rgba(0,0,0,0.1)]">
-  <h4 class="text-xs font-medium text-[#8a9cc4] uppercase tracking-widest mb-5 flex items-center gap-2">
-    <span class="w-8 h-px bg-gradient-to-r from-transparent to-[rgba(80,128,176,0.4)]"></span>
+<div class="p-5 rounded-2xl border border-gray-100 bg-white shadow-sm">
+  <h4 class="text-xs font-medium text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+    <span class="w-6 h-px bg-cyan-400"></span>
     博客统计
   </h4>
 
   <div class="grid grid-cols-2 gap-3">
-    <div class="p-3 rounded-xl bg-[rgba(80,128,176,0.08)] border border-[rgba(80,128,176,0.1)] text-center">
-      <div class="text-2xl font-semibold text-[#72a8d8]">{publishedPosts.length}</div>
-      <div class="text-xs text-[#8a9cc4] mt-1">文章</div>
+    <div class="p-3 rounded-xl bg-cyan-50 border border-cyan-100 text-center">
+      <div class="text-2xl font-semibold text-cyan-600">{publishedPosts.length}</div>
+      <div class="text-xs text-gray-500 mt-1">文章</div>
     </div>
-    <div class="p-3 rounded-xl bg-[rgba(80,128,176,0.08)] border border-[rgba(80,128,176,0.1)] text-center">
-      <div class="text-2xl font-semibold text-[#72a8d8]">{tagCount}</div>
-      <div class="text-xs text-[#8a9cc4] mt-1">标签</div>
+    <div class="p-3 rounded-xl bg-cyan-50 border border-cyan-100 text-center">
+      <div class="text-2xl font-semibold text-cyan-600">{tagCount}</div>
+      <div class="text-xs text-gray-500 mt-1">标签</div>
     </div>
-    <div class="p-3 rounded-xl bg-[rgba(80,128,176,0.08)] border border-[rgba(80,128,176,0.1)] text-center">
-      <div class="text-2xl font-semibold text-[#72a8d8]">{Math.round(totalWords / 1000)}k</div>
-      <div class="text-xs text-[#8a9cc4] mt-1">字数</div>
+    <div class="p-3 rounded-xl bg-cyan-50 border border-cyan-100 text-center">
+      <div class="text-2xl font-semibold text-cyan-600">{Math.round(totalWords / 1000)}k</div>
+      <div class="text-xs text-gray-500 mt-1">字数</div>
     </div>
-    <div class="p-3 rounded-xl bg-[rgba(80,128,176,0.08)] border border-[rgba(80,128,176,0.1)] text-center">
-      <div class="text-2xl font-semibold text-[#72a8d8]">{daysSinceStart}</div>
-      <div class="text-xs text-[#8a9cc4] mt-1">天数</div>
+    <div class="p-3 rounded-xl bg-cyan-50 border border-cyan-100 text-center">
+      <div class="text-2xl font-semibold text-cyan-600">{daysSinceStart}</div>
+      <div class="text-xs text-gray-500 mt-1">天数</div>
     </div>
   </div>
 
   {categoryCount.length > 0 && (
-    <div class="mt-4 pt-4 border-t border-[rgba(165,188,230,0.1)]">
-      <div class="text-xs text-[#8a9cc4] mb-3">分类分布</div>
+    <div class="mt-4 pt-4 border-t border-gray-100">
+      <div class="text-xs text-gray-400 mb-3">分类分布</div>
       <div class="space-y-2">
         {categoryCount.map(cat => (
           <div class="flex items-center justify-between text-sm">
-            <span class="text-[#b2c0d8]">{cat.name}</span>
-            <span class="px-2 py-0.5 rounded-full bg-[rgba(80,128,176,0.15)] text-[#72a8d8] text-xs">{cat.count}</span>
+            <span class="text-gray-600">{cat.name}</span>
+            <span class="px-2 py-0.5 rounded-full bg-cyan-50 text-cyan-600 text-xs">{cat.count}</span>
           </div>
         ))}
       </div>

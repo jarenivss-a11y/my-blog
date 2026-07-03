@@ -31,33 +31,34 @@ const searchData = posts.map(post => ({
 ---
 
 <Layout title={query ? `搜索: ${query} | 我的博客` : '搜索 | 我的博客'}>
-  <header class="mb-12 p-10 rounded-3xl backdrop-blur-xl bg-[rgba(155,180,218,0.06)] border border-[rgba(165,188,230,0.15)] shadow-[0_8px_32px_rgba(0,0,0,0.15)] relative overflow-hidden">
-    <div class="absolute inset-0 bg-gradient-to-br from-[rgba(80,128,176,0.08)] via-transparent to-[rgba(114,168,216,0.05)] pointer-events-none"></div>
-    <div class="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-[rgba(80,128,176,0.1)] blur-2xl"></div>
-    <h1 class="text-3xl font-serif font-black text-[#e2e9f5] mb-2 relative z-10">搜索</h1>
-    <p class="text-[#8a9cc4] relative z-10" id="search-status">
+  <header class="mb-12 py-8 border-b border-gray-100">
+    <h1 class="text-3xl font-serif font-bold text-gray-800 mb-2">搜索</h1>
+    <p class="text-gray-500" id="search-status" role="status" aria-live="polite">
       输入关键词搜索文章
     </p>
   </header>
 
-  <form id="search-form" method="get" action="/my-blog/search" class="mb-8">
+  <form id="search-form" method="get" action="/my-blog/search" class="mb-8" role="search">
     <div class="relative max-w-xl">
+      <label for="search-input" class="sr-only">搜索文章</label>
       <input
         type="text"
         name="q"
         id="search-input"
         value={query}
         placeholder="搜索文章标题、内容或标签..."
-        class="w-full h-12 pl-12 pr-4 rounded-2xl border border-[rgba(80,128,176,0.2)] bg-[rgba(155,180,218,0.08)] backdrop-blur-xl text-[#e2e9f5] placeholder:text-[#8a9cc4] focus:outline-none focus:ring-2 focus:ring-[#5080b0] focus:border-[rgba(80,128,176,0.4)] transition-all"
+        class="w-full h-12 pl-12 pr-4 rounded-2xl border border-gray-200 bg-white text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-300 transition-all"
+        aria-describedby="search-hint"
       />
-      <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#8a9cc4]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
       </svg>
     </div>
+    <p id="search-hint" class="sr-only">输入关键词后按回车搜索，或等待实时搜索结果</p>
   </form>
 
-  <div id="search-results" class="space-y-4">
-    <p class="text-center py-16 text-[#8a9cc4]">
+  <div id="search-results" class="space-y-4" role="region" aria-label="搜索结果" aria-live="polite">
+    <p class="text-center py-16 text-gray-400">
       输入关键词开始搜索
     </p>
   </div>
@@ -69,6 +70,7 @@ const searchData = posts.map(post => ({
     const resultsContainer = document.getElementById('search-results');
     const statusEl = document.getElementById('search-status');
     const input = document.getElementById('search-input');
+    let selectedIndex = -1;
 
     function escapeHtml(text) {
       const div = document.createElement('div');
@@ -76,15 +78,43 @@ const searchData = posts.map(post => ({
       return div.innerHTML;
     }
 
+    // Fuzzy match score - higher is better match
+    function fuzzyScore(query, text) {
+      const q = query.toLowerCase();
+      const t = text.toLowerCase();
+      let score = 0;
+      let qIndex = 0;
+      let prevMatch = -1;
+
+      for (let i = 0; i < t.length && qIndex < q.length; i++) {
+        if (t[i] === q[qIndex]) {
+          score += 10;
+          // Bonus for consecutive matches
+          if (prevMatch === i - 1) score += 5;
+          // Bonus for match at word boundary
+          if (i === 0 || /[\s\p{P}]/u.test(t[i-1])) score += 8;
+          // Bonus for match after underscore or camelCase
+          if (i > 0 && /[A-Z]/.test(t[i])) score += 3;
+          prevMatch = i;
+          qIndex++;
+        } else if (t[i] === ' ' || t[i] === '-') {
+          score += 1;
+        }
+      }
+
+      // Return score only if all query chars matched
+      return qIndex === q.length ? score : 0;
+    }
+
     function highlight(text, query) {
       if (!query) return text;
       const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-      return text.replace(regex, '<mark class="bg-[rgba(80,128,176,0.4)] text-[#8ac4e8] px-1 rounded">$1</mark>');
+      return text.replace(regex, '<mark class="bg-cyan-100 text-cyan-700 px-1 rounded">$1</mark>');
     }
 
     function search(query) {
       if (!query.trim()) {
-        resultsContainer.innerHTML = '<p class="text-center py-16 text-[#8a9cc4]">输入关键词开始搜索</p>';
+        resultsContainer.innerHTML = '<p class="text-center py-16 text-gray-400">输入关键词开始搜索</p>';
         statusEl.textContent = '输入关键词搜索文章';
         return;
       }
@@ -92,31 +122,46 @@ const searchData = posts.map(post => ({
       const q = query.toLowerCase().trim();
       statusEl.textContent = `正在搜索 "${query}"...`;
 
-      const results = searchIndex.filter(post =>
-        post.title.toLowerCase().includes(q) ||
-        post.body.toLowerCase().includes(q) ||
-        post.tags.some(tag => tag.toLowerCase().includes(q)) ||
-        post.categoryName.toLowerCase().includes(q)
-      );
+      // Score and sort results
+      const scored = searchIndex.map(post => {
+        let score = 0;
+        // Title matches get highest weight
+        if (post.title.toLowerCase().includes(q)) {
+          score += fuzzyScore(q, post.title) * 10;
+        }
+        // Tag matches
+        post.tags.forEach(tag => {
+          if (tag.toLowerCase().includes(q)) score += fuzzyScore(q, tag) * 5;
+        });
+        // Category match
+        if (post.categoryName.toLowerCase().includes(q)) score += fuzzyScore(q, post.categoryName) * 3;
+        // Body match
+        if (post.body.toLowerCase().includes(q)) score += fuzzyScore(q, q) * 1;
+        return { post, score };
+      }).filter(item => item.score > 0).sort((a, b) => b.score - a.score);
+
+      const results = scored.map(item => item.post);
 
       statusEl.textContent = `找到 ${results.length} 条结果`;
 
       if (results.length === 0) {
         resultsContainer.innerHTML = `
           <div class="text-center py-16">
-            <p class="text-[#8a9cc4] mb-4">没有找到相关文章</p>
-            <p class="text-sm text-[#7a8cb4]">试试其他关键词？</p>
+            <p class="text-4xl mb-4">🔍</p>
+            <p class="text-gray-500 mb-4">没有找到相关文章</p>
+            <p class="text-sm text-gray-400">试试其他关键词？</p>
           </div>
         `;
         return;
       }
 
-      resultsContainer.innerHTML = results.map(post => {
+      resultsContainer.innerHTML = results.map((post, idx) => {
         const title = highlight(escapeHtml(post.title), query);
         const body = highlight(escapeHtml(post.body.slice(0, 200)), query);
         const date = new Date(post.published).toLocaleDateString('zh-CN');
-        const tags = post.tags.slice(0, 3).map(tag => '<span class="text-xs px-2 py-1 rounded-full bg-[rgba(80,128,176,0.15)] text-[#72a8d8]">#' + escapeHtml(tag) + '</span>').join('');
-        return '<article class="group"><a href="/my-blog/post/' + post.id + '" class="block p-6 rounded-2xl backdrop-blur-xl bg-[rgba(155,180,218,0.05)] border border-[rgba(165,188,230,0.12)] hover:bg-[rgba(155,180,218,0.1)] hover:border-[rgba(80,128,176,0.3)] hover:shadow-[0_8px_32px_rgba(80,128,176,0.2)] transition-all duration-300"><div class="flex items-center gap-3 mb-3"><span class="text-xs text-[#7a8cb4]">' + date + '</span><span class="px-2 py-0.5 text-xs bg-[rgba(80,128,176,0.2)] text-[#72a8d8] rounded-full">' + escapeHtml(post.categoryName) + '</span></div><h3 class="text-lg font-serif font-semibold text-[#e2e9f5] group-hover:text-[#8ac4e8] transition-colors mb-2">' + title + '</h3><p class="text-sm text-[#8a9cc4] line-clamp-2">' + body + '...</p>' + (post.tags.length > 0 ? '<div class="flex gap-2 mt-3">' + tags + '</div>' : '') + '</a></article>';
+        const tags = post.tags.slice(0, 3).map(tag => '<span class="text-xs px-2 py-1 rounded-full bg-cyan-50 text-cyan-600">#' + escapeHtml(tag) + '</span>').join('');
+        const relevanceScore = Math.round((scored[idx].score / scored[0].score) * 100);
+        return '<article class="group" role="article"><a href="/my-blog/post/' + post.id + '" class="block p-6 rounded-2xl border border-gray-100 bg-white hover:border-cyan-200 hover:shadow-lg transition-all duration-300' + (idx === selectedIndex ? ' aria-selected="true"' : '') + ' tabindex="0"><div class="flex items-center gap-3 mb-3"><span class="text-xs text-gray-400">' + date + '</span><span class="px-2 py-0.5 text-xs bg-cyan-50 text-cyan-600 rounded-full">' + escapeHtml(post.categoryName) + '</span><span class="text-xs text-cyan-500 opacity-60">' + relevanceScore + '% 相关</span></div><h3 class="text-lg font-serif font-semibold text-gray-800 group-hover:text-cyan-600 transition-colors mb-2">' + title + '</h3><p class="text-sm text-gray-500 line-clamp-2">' + body + '...</p>' + (post.tags.length > 0 ? '<div class="flex gap-2 mt-3">' + tags + '</div>' : '') + '</a></article>';
       }).join('');
     }
 
@@ -128,6 +173,7 @@ const searchData = posts.map(post => ({
     // Live search as user types (debounced)
     let timeout;
     input.addEventListener('input', () => {
+      selectedIndex = -1;
       clearTimeout(timeout);
       timeout = setTimeout(() => {
         const q = input.value.trim();
@@ -135,8 +181,40 @@ const searchData = posts.map(post => ({
           window.history.replaceState({}, '', `/my-blog/search?q=${encodeURIComponent(q)}`);
           search(q);
         }
-      }, 300);
+      }, 200);
     });
+
+    // Keyboard navigation
+    input.addEventListener('keydown', (e) => {
+      const articles = resultsContainer.querySelectorAll('article');
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        selectedIndex = Math.min(selectedIndex + 1, articles.length - 1);
+        updateSelection(articles);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        selectedIndex = Math.max(selectedIndex - 1, -1);
+        updateSelection(articles);
+      } else if (e.key === 'Enter' && selectedIndex >= 0) {
+        e.preventDefault();
+        const link = articles[selectedIndex].querySelector('a');
+        if (link) link.click();
+      }
+    });
+
+    function updateSelection(articles) {
+      articles.forEach((article, idx) => {
+        const link = article.querySelector('a');
+        if (idx === selectedIndex) {
+          article.setAttribute('aria-selected', 'true');
+          link.classList.add('ring-2', 'ring-cyan-400');
+          link.focus();
+        } else {
+          article.setAttribute('aria-selected', 'false');
+          link.classList.remove('ring-2', 'ring-cyan-400');
+        }
+      });
+    }
 
     // Form submit
     document.getElementById('search-form').addEventListener('submit', (e) => {

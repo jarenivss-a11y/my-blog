@@ -13,29 +13,41 @@ const { currentPostId, category, tags = [], limit = 4 } = Astro.props;
 const allPosts = await getCollection('blog');
 const currentPost = allPosts.find(p => p.id === currentPostId);
 
-// Get posts from same category first
-const categoryPosts = allPosts
-  .filter(p => p.data.category === category && p.id !== currentPostId && !p.data.draft)
-  .sort((a, b) => b.data.published.getTime() - a.data.published.getTime());
-
-// Get posts with matching tags (excluding already shown from same category)
-const tagPosts = allPosts
-  .filter(p => {
-    if (p.id === currentPostId || p.data.draft) return false;
-    if (p.data.category === category) return false; // Already shown
+// Score-based related posts algorithm
+const scoredPosts = allPosts
+  .filter(p => p.id !== currentPostId && !p.data.draft)
+  .map(p => {
+    let score = 0;
     const postTags = p.data.tags || [];
-    return tags.some(tag => postTags.includes(tag));
-  })
-  .sort((a, b) => {
-    // Sort by number of matching tags
-    const aMatches = (a.data.tags || []).filter(t => tags.includes(t)).length;
-    const bMatches = (b.data.tags || []).filter(t => tags.includes(t)).length;
-    return bMatches - aMatches;
-  });
 
-// Combine: category posts first, then tag-based posts
-const combinedPosts = [...categoryPosts, ...tagPosts];
-const relatedPosts = combinedPosts.slice(0, limit);
+    // Same category: high score
+    if (p.data.category === category) score += 30;
+
+    // Matching tags: per-tag score
+    const matchingTags = tags.filter(t => postTags.includes(t));
+    score += matchingTags.length * 15;
+
+    // Recency bonus: posts from last 6 months get higher score
+    const sixMonthsAgo = Date.now() - (180 * 24 * 60 * 60 * 1000);
+    if (p.data.published.getTime() > sixMonthsAgo) score += 10;
+
+    // Content length similarity (prefer similar length posts)
+    const currentLength = currentPost?.body.length || 0;
+    const lengthDiff = Math.abs(p.body.length - currentLength);
+    if (lengthDiff < 500) score += 5;
+
+    // Title word overlap
+    const currentWords = currentPost?.data.title.toLowerCase().split(/\s+/) || [];
+    const postWords = p.data.title.toLowerCase().split(/\s+/);
+    const wordOverlap = currentWords.filter(w => w.length > 2 && postWords.includes(w)).length;
+    score += wordOverlap * 3;
+
+    return { post: p, score };
+  })
+  .filter(item => item.score > 0)
+  .sort((a, b) => b.score - a.score);
+
+const relatedPosts = scoredPosts.slice(0, limit).map(item => item.post);
 
 if (relatedPosts.length === 0) return;
 
@@ -48,24 +60,29 @@ const categoryInfo: Record<string, { name: string; icon: string }> = {
 };
 ---
 
-<section class="mt-8 p-6 rounded-2xl backdrop-blur-xl bg-[rgba(155,180,218,0.1)] border border-[rgba(80,128,176,0.3)]">
-  <h2 class="text-lg font-serif font-bold text-[#5080b0] mb-4">相关文章</h2>
+<section class="mt-8 p-6 rounded-2xl border border-gray-100 bg-white shadow-sm" aria-labelledby="related-posts-heading">
+  <h2 id="related-posts-heading" class="text-lg font-serif font-bold text-gray-800 mb-4">相关文章</h2>
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-    {relatedPosts.map((post) => {
+    {relatedPosts.map((post, idx) => {
       const cat = categoryInfo[post.data.category] || { name: '未知', icon: '📁' };
+      const relevanceScore = scoredPosts[idx]?.score || 0;
       return (
         <a
           href={`/my-blog/post/${post.id}`}
-          class="group p-4 rounded-xl bg-[rgba(155,180,218,0.08)] hover:bg-[rgba(80,128,176,0.2)] border border-[rgba(80,128,176,0.2)] hover:border-[#72a8d8] transition-all"
+          class="group p-4 rounded-xl bg-gray-50 hover:bg-cyan-50 border border-gray-100 hover:border-cyan-200 transition-all"
+          aria-label={`阅读 "${post.data.title}"，相关度 ${Math.round((relevanceScore / scoredPosts[0].score) * 100)}%`}
         >
           <div class="flex items-center gap-2 mb-2">
-            <span class="text-xs">{cat.icon}</span>
-            <span class="text-xs text-[#8ac4e8]">{cat.name}</span>
+            <span class="text-xs" aria-hidden="true">{cat.icon}</span>
+            <span class="text-xs text-gray-500">{cat.name}</span>
+            <span class="ml-auto text-xs px-2 py-0.5 rounded-full bg-cyan-50 text-cyan-600">
+              {Math.round((relevanceScore / scoredPosts[0].score) * 100)}%
+            </span>
           </div>
-          <h3 class="text-sm font-medium text-[#5080b0] group-hover:text-[#72a8d8] transition-colors line-clamp-2 mb-2">
+          <h3 class="text-sm font-medium text-gray-700 group-hover:text-cyan-600 transition-colors line-clamp-2 mb-2">
             {post.data.title}
           </h3>
-          <span class="text-xs text-[#8ac4e8] group-hover:text-[#72a8d8]/70">
+          <span class="text-xs text-gray-400 group-hover:text-cyan-500/70">
             {post.data.published.toLocaleDateString('zh-CN')}
           </span>
         </a>

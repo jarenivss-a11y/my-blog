@@ -1,5 +1,5 @@
 ---
-// OceanWebGL - Enhanced Three.js WebGL ocean with bloom, SSS and caustics
+// OceanWebGL - Enhanced Three.js WebGL ocean with bloom, SSS, caustics and realistic wave interactions
 ---
 
 <div id="ocean-container" class="fixed inset-0 w-full h-full pointer-events-none z-0 overflow-hidden">
@@ -20,9 +20,10 @@
     camera.position.set(0, 18, 55);
     camera.lookAt(0, 0, 0);
 
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    // Performance optimizations
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true, powerPreference: 'high-performance' });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.2;
 
@@ -31,14 +32,15 @@
     bloomCanvas.width = window.innerWidth;
     bloomCanvas.height = window.innerHeight;
 
-    // Large ocean plane
-    const geometry = new THREE.PlaneGeometry(500, 500, 256, 256);
+    // Optimized geometry - fewer segments for better performance
+    const geometry = new THREE.PlaneGeometry(500, 500, 180, 180);
 
     const vertexShader = `
       uniform float uTime;
       uniform vec2 uMouse;
       uniform float uMouseInfluence;
       uniform float uScrollInfluence;
+      uniform float uMouseSpeed;
 
       varying vec2 vUv;
       varying float vElevation;
@@ -46,7 +48,7 @@
       varying vec3 vNormal;
       varying vec3 vViewPosition;
 
-      // Gerstner wave
+      // Gerstner wave - realistic ocean waves
       vec3 gerstnerWave(vec2 pos, float steepness, float wavelength, vec2 direction, float time, float phase) {
         float k = 2.0 * 3.14159 / wavelength;
         float c = sqrt(9.8 / k);
@@ -60,7 +62,20 @@
         );
       }
 
-      // Noise functions
+      // Chop wave for smaller perturbations
+      vec3 chopWave(vec2 pos, float amp, float wavelength, vec2 direction, float time) {
+        float k = 2.0 * 3.14159 / wavelength;
+        float c = sqrt(9.8 / k);
+        vec2 d = normalize(direction);
+        float f = k * (dot(d, pos) - c * time);
+        return vec3(
+          d.x * amp * cos(f) * 0.3,
+          amp * sin(f) * 0.5,
+          d.y * amp * cos(f) * 0.3
+        );
+      }
+
+      // Simplex noise
       vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
       vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
       vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
@@ -100,45 +115,57 @@
         vUv = uv;
         vec3 pos = position;
 
-        // Base waves
-        vec3 wave1 = gerstnerWave(pos.xz, 0.35, 100.0, vec2(1.0, 0.2), uTime * 0.4, 0.0);
-        vec3 wave2 = gerstnerWave(pos.xz, 0.28, 60.0, vec2(0.7, 0.5), uTime * 0.6, 1.0);
-        vec3 wave3 = gerstnerWave(pos.xz, 0.25, 40.0, vec2(-0.3, 0.7), uTime * 0.8, 2.0);
-        vec3 wave4 = gerstnerWave(pos.xz, 0.20, 30.0, vec2(0.5, -0.4), uTime * 1.0, 0.5);
-        vec3 wave5 = gerstnerWave(pos.xz, 0.15, 20.0, vec2(-0.5, 0.3), uTime * 1.2, 1.5);
-        vec3 wave6 = gerstnerWave(pos.xz, 0.10, 15.0, vec2(0.3, -0.6), uTime * 1.5, 2.5);
-        vec3 wave7 = gerstnerWave(pos.xz, 0.06, 8.0, vec2(-0.2, 0.8), uTime * 2.0, 3.0);
+        // Main ocean swells
+        vec3 wave1 = gerstnerWave(pos.xz, 0.35, 120.0, vec2(1.0, 0.2), uTime * 0.35, 0.0);
+        vec3 wave2 = gerstnerWave(pos.xz, 0.28, 80.0, vec2(0.7, 0.5), uTime * 0.5, 1.0);
+        vec3 wave3 = gerstnerWave(pos.xz, 0.22, 50.0, vec2(-0.3, 0.7), uTime * 0.7, 2.0);
+        vec3 wave4 = gerstnerWave(pos.xz, 0.18, 35.0, vec2(0.5, -0.4), uTime * 0.9, 0.5);
 
-        vec3 totalWave = wave1 + wave2 + wave3 + wave4 + wave5 + wave6 + wave7;
+        // Chop waves
+        vec3 chop1 = chopWave(pos.xz, 0.3, 15.0, vec2(0.6, 0.8), uTime * 2.5);
+        vec3 chop2 = chopWave(pos.xz, 0.2, 10.0, vec2(-0.4, 0.6), uTime * 3.0);
+        vec3 chop3 = chopWave(pos.xz, 0.15, 8.0, vec2(0.8, -0.2), uTime * 2.8);
+
+        vec3 totalWave = wave1 + wave2 + wave3 + wave4 + chop1 + chop2 + chop3;
 
         // FBM detail
-        float noise1 = fbm(vec2(pos.x * 0.04 + uTime * 0.1, pos.z * 0.04 + uTime * 0.08)) * 1.5;
-        float noise2 = fbm(vec2(pos.x * 0.08 - uTime * 0.15, pos.z * 0.06 + uTime * 0.12)) * 0.8;
-        float noise3 = snoise(vec2(pos.x * 0.3 + uTime * 0.4, pos.z * 0.3 - uTime * 0.3)) * 0.4;
+        float noise1 = fbm(vec2(pos.x * 0.04 + uTime * 0.08, pos.z * 0.04 + uTime * 0.06)) * 1.2;
+        float noise2 = fbm(vec2(pos.x * 0.1 - uTime * 0.12, pos.z * 0.08 + uTime * 0.1)) * 0.6;
+        float noise3 = snoise(vec2(pos.x * 0.4 + uTime * 0.5, pos.z * 0.4 - uTime * 0.4)) * 0.3;
 
-        // Mouse ripples
-        vec2 mouseWorld = uMouse * 100.0;
+        // Mouse interaction
+        vec2 mouseWorld = uMouse * 120.0;
         float mouseDist = distance(pos.xz, mouseWorld);
-        float mouseRipple = sin(mouseDist * 0.25 - uTime * 4.0) * exp(-mouseDist * 0.025) * uMouseInfluence * 4.0;
-        float mouseRipple2 = sin(mouseDist * 0.15 - uTime * 3.0) * exp(-mouseDist * 0.02) * uMouseInfluence * 2.0;
+        float mouseRipple = sin(mouseDist * 0.2 - uTime * 5.0) * exp(-mouseDist * 0.02) * uMouseInfluence * 5.0;
+        float mouseRipple2 = sin(mouseDist * 0.12 - uTime * 3.5) * exp(-mouseDist * 0.015) * uMouseInfluence * 3.0;
+        float mouseRipple3 = sin(mouseDist * 0.08 - uTime * 2.5) * exp(-mouseDist * 0.01) * uMouseInfluence * 2.0;
+
+        // Speed-based spray
+        float speedSpray = uMouseSpeed * 0.8;
+        float speedRipple = sin(mouseDist * 0.3 - uTime * 6.0) * exp(-mouseDist * 0.03) * speedSpray * 3.0;
 
         // Scroll influence
-        float scrollWave = sin(pos.x * 0.05 + uTime * 0.5) * uScrollInfluence * 2.0;
+        float scrollWave = sin(pos.x * 0.04 + uTime * 0.4) * uScrollInfluence * 2.5;
 
-        pos.x += totalWave.x;
-        pos.y += totalWave.y + noise1 + noise2 + noise3 + mouseRipple + mouseRipple2 + scrollWave;
-        pos.z += totalWave.z;
+        // Combine
+        pos.x += totalWave.x + chop1.x + chop2.x + chop3.x;
+        pos.y += totalWave.y + noise1 + noise2 + noise3 + mouseRipple + mouseRipple2 + mouseRipple3 + speedRipple + scrollWave;
+        pos.z += totalWave.z + chop1.z + chop2.z + chop3.z;
 
         vElevation = pos.y;
         vWorldPosition = (modelMatrix * vec4(pos, 1.0)).xyz;
 
         // Calculate normal
-        float eps = 0.2;
-        float hL = gerstnerWave((pos.xz + vec2(-eps, 0.0)), 0.2, 40.0, vec2(-0.3, 0.7), uTime * 0.8, 2.0).y;
-        float hR = gerstnerWave((pos.xz + vec2(eps, 0.0)), 0.2, 40.0, vec2(-0.3, 0.7), uTime * 0.8, 2.0).y;
-        float hD = gerstnerWave((pos.xz + vec2(0.0, -eps)), 0.2, 40.0, vec2(-0.3, 0.7), uTime * 0.8, 2.0).y;
-        float hU = gerstnerWave((pos.xz + vec2(0.0, eps)), 0.2, 40.0, vec2(-0.3, 0.7), uTime * 0.8, 2.0).y;
-        vNormal = normalize(vec3(hL - hR, 2.0 * eps, hD - hU));
+        float eps = 0.3;
+        vec3 hL = gerstnerWave((pos.xz + vec2(-eps, 0.0)), 0.22, 50.0, vec2(-0.3, 0.7), uTime * 0.7, 2.0)
+                 + chopWave((pos.xz + vec2(-eps, 0.0)), 0.2, 10.0, vec2(-0.4, 0.6), uTime * 3.0);
+        vec3 hR = gerstnerWave((pos.xz + vec2(eps, 0.0)), 0.22, 50.0, vec2(-0.3, 0.7), uTime * 0.7, 2.0)
+                 + chopWave((pos.xz + vec2(eps, 0.0)), 0.2, 10.0, vec2(-0.4, 0.6), uTime * 3.0);
+        vec3 hD = gerstnerWave((pos.xz + vec2(0.0, -eps)), 0.22, 50.0, vec2(-0.3, 0.7), uTime * 0.7, 2.0)
+                 + chopWave((pos.xz + vec2(0.0, -eps)), 0.2, 10.0, vec2(-0.4, 0.6), uTime * 3.0);
+        vec3 hU = gerstnerWave((pos.xz + vec2(0.0, eps)), 0.22, 50.0, vec2(-0.3, 0.7), uTime * 0.7, 2.0)
+                 + chopWave((pos.xz + vec2(0.0, eps)), 0.2, 10.0, vec2(-0.4, 0.6), uTime * 3.0);
+        vNormal = normalize(vec3(hL.y - hR.y, 2.0 * eps, hD.y - hU.y));
 
         vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
         vViewPosition = -mvPosition.xyz;
@@ -158,6 +185,7 @@
       uniform vec3 uSunColor;
       uniform vec3 uSkyColor;
       uniform float uScrollInfluence;
+      uniform float uMouseSpeed;
 
       varying vec2 vUv;
       varying float vElevation;
@@ -191,7 +219,6 @@
         return 130.0 * dot(m, g);
       }
 
-      // Caustic pattern
       float caustic(vec2 p, float time) {
         float c1 = snoise(p * 4.0 + time * 0.4);
         float c2 = snoise(p * 6.0 - time * 0.3);
@@ -199,80 +226,86 @@
         return pow(abs((c1 + c2 + c3) / 3.0), 2.0);
       }
 
+      float waveFoam(vec2 p, float time) {
+        float f1 = snoise(p * 30.0 + time * 0.5);
+        float f2 = snoise(p * 50.0 - time * 0.3);
+        float f3 = snoise(p * 80.0 + time * 0.7);
+        return (f1 * 0.5 + f2 * 0.3 + f3 * 0.2 + 0.5);
+      }
+
       void main() {
         // Depth gradient
-        float depth = smoothstep(-4.0, 5.0, vElevation);
-        vec3 color = mix(uDeepColor, uMidColor, smoothstep(0.0, 0.3, depth));
-        color = mix(color, uSurfaceColor, smoothstep(0.3, 0.7, depth));
+        float depth = smoothstep(-5.0, 6.0, vElevation);
+        vec3 color = mix(uDeepColor, uMidColor, smoothstep(0.0, 0.25, depth));
+        color = mix(color, uSurfaceColor, smoothstep(0.25, 0.65, depth));
 
-        // Subsurface scattering approximation
-        vec3 sssColor = vec3(0.1, 0.4, 0.5);
+        // Subsurface scattering
+        vec3 sssColor = vec3(0.15, 0.45, 0.55);
         float sss = max(0.0, dot(normalize(vViewPosition), -normalize(vec3(0.5, 0.8, 0.3))));
-        sss = pow(sss, 3.0) * 0.4;
-        color += sssColor * sss * (1.0 - depth * 0.5);
+        sss = pow(sss, 2.5) * 0.5;
+        color += sssColor * sss * (1.0 - depth * 0.6);
 
         // Normal and view direction
         vec3 normal = normalize(vNormal);
         vec3 viewDir = normalize(vViewPosition);
 
         // Fresnel
-        float fresnel = pow(1.0 - max(dot(viewDir, normal), 0.0), 5.0);
+        float fresnel = pow(1.0 - max(dot(viewDir, normal), 0.0), 4.5);
         fresnel = clamp(fresnel, 0.0, 1.0);
 
         // Sky reflection
         vec3 reflectDir = reflect(-viewDir, normal);
-        float skyReflection = smoothstep(-0.1, 0.9, reflectDir.y);
+        float skyReflection = smoothstep(-0.1, 0.85, reflectDir.y);
         vec3 skyReflected = mix(uDeepColor, uSkyColor, skyReflection);
+        color = mix(color, skyReflected, fresnel * 0.7);
 
-        // Mix with fresnel
-        color = mix(color, skyReflected, fresnel * 0.75);
-
-        // Caustic light underwater
-        float causticLight = caustic(vWorldPosition.xz * 0.02 + uTime * 0.1, uTime);
-        causticLight *= (1.0 - smoothstep(-2.0, 1.0, vElevation)) * 0.15;
-        color += vec3(0.2, 0.4, 0.5) * causticLight;
+        // Caustic light
+        float causticLight = caustic(vWorldPosition.xz * 0.015 + uTime * 0.08, uTime);
+        causticLight *= (1.0 - smoothstep(-2.0, 1.0, vElevation)) * 0.2;
+        color += vec3(0.25, 0.5, 0.6) * causticLight;
 
         // Foam layers
-        float foamNoise1 = snoise(vUv * 40.0 + uTime * 0.3) * 0.5 + 0.5;
-        float foamNoise2 = snoise(vUv * 80.0 - uTime * 0.2) * 0.5 + 0.5;
+        float foamNoise1 = waveFoam(vUv * 2.0 + uTime * 0.2, uTime);
+        float foamNoise2 = waveFoam(vUv * 4.0 - uTime * 0.15, uTime);
         float foamNoise3 = snoise(vUv * 160.0 + uTime * 0.5) * 0.5 + 0.5;
 
-        float foam = smoothstep(1.2, 2.5, vElevation);
-        foam += smoothstep(1.8, 3.2, vElevation + foamNoise1 * 2.5);
-        foam += smoothstep(2.2, 3.8, vElevation + foamNoise2 * 2.0);
-        foam += smoothstep(2.5, 4.0, vElevation + foamNoise3 * 1.5);
+        float foam = smoothstep(1.0, 2.8, vElevation);
+        foam += smoothstep(1.5, 3.5, vElevation + foamNoise1 * 3.0) * 0.7;
+        foam += smoothstep(2.0, 4.2, vElevation + foamNoise2 * 2.5) * 0.5;
+        foam += smoothstep(2.5, 4.5, vElevation + foamNoise3 * 2.0) * 0.4;
         foam = clamp(foam, 0.0, 1.0);
 
-        // Foam spray
-        float sprayNoise = snoise(vUv * 200.0 + uTime * 2.0);
-        sprayNoise = smoothstep(0.2, 0.9, sprayNoise) * foam * 0.5;
+        // Speed spray
+        float speedSpray = uMouseSpeed * 0.6;
+        float sprayNoise = snoise(vUv * 250.0 + uTime * 3.0);
+        sprayNoise = smoothstep(0.3, 0.85, sprayNoise) * foam * speedSpray;
         foam = clamp(foam + sprayNoise, 0.0, 1.0);
 
-        color = mix(color, uFoamColor, foam * 0.9);
+        color = mix(color, uFoamColor, foam * 0.85);
 
         // Sun specular
         vec3 sunDir = normalize(vec3(0.5, 0.8, 0.3));
         vec3 halfDir = normalize(sunDir + viewDir);
-        float sunSpec = pow(max(dot(normal, halfDir), 0.0), 512.0);
-        float sunSpecWide = pow(max(dot(normal, halfDir), 0.0), 32.0);
-        color += uSunColor * sunSpec * 2.0;
-        color += uSunColor * sunSpecWide * 0.3;
+        float sunSpec = pow(max(dot(normal, halfDir), 0.0), 600.0);
+        float sunSpecWide = pow(max(dot(normal, halfDir), 0.0), 28.0);
+        color += uSunColor * sunSpec * 2.5;
+        color += uSunColor * sunSpecWide * 0.35;
 
         // Sparkle
-        float sparkle = snoise(vUv * 300.0 + uTime * 4.0);
-        sparkle = smoothstep(0.75, 1.0, sparkle);
-        float sparkleMask = (1.0 - foam) * smoothstep(-0.5, 1.5, vElevation);
-        color += vec3(1.0, 1.0, 0.95) * sparkle * sparkleMask * 0.5;
+        float sparkle = snoise(vUv * 400.0 + uTime * 5.0);
+        sparkle = smoothstep(0.8, 1.0, sparkle);
+        float sparkleMask = (1.0 - foam) * smoothstep(-0.5, 1.8, vElevation);
+        color += vec3(1.0, 0.98, 0.9) * sparkle * sparkleMask * 0.6;
 
-        // Atmospheric fog
+        // Fog
         float viewDepth = length(vViewPosition);
-        float fog = smoothstep(40.0, 350.0, viewDepth);
-        vec3 fogColor = mix(uMidColor, uSkyColor, 0.4);
-        color = mix(color, fogColor, fog * 0.5);
+        float fog = smoothstep(40.0, 400.0, viewDepth);
+        vec3 fogColor = mix(uMidColor, uSkyColor, 0.35);
+        color = mix(color, fogColor, fog * 0.55);
 
-        // Scroll glow effect
-        float scrollGlow = uScrollInfluence * 0.1 * smoothstep(2.0, 4.0, vElevation);
-        color += vec3(0.3, 0.5, 0.7) * scrollGlow;
+        // Scroll glow
+        float scrollGlow = uScrollInfluence * 0.12 * smoothstep(2.0, 5.0, vElevation);
+        color += vec3(0.35, 0.55, 0.75) * scrollGlow;
 
         gl_FragColor = vec4(color, 0.95);
       }
@@ -285,6 +318,7 @@
         uTime: { value: 0 },
         uMouse: { value: new THREE.Vector2(0, 0) },
         uMouseInfluence: { value: 0 },
+        uMouseSpeed: { value: 0 },
         uScrollInfluence: { value: 0 },
         uDeepColor: { value: new THREE.Color(0x011320) },
         uMidColor: { value: new THREE.Color(0x0a3a5c) },
@@ -304,12 +338,12 @@
 
     // Lighting
     scene.add(new THREE.AmbientLight(0x5a7a9a, 0.4));
-    const sunLight = new THREE.DirectionalLight(0xfff5e0, 0.8);
+    const sunLight = new THREE.DirectionalLight(0xfff5e0, 0.85);
     sunLight.position.set(50, 80, 30);
     scene.add(sunLight);
 
     // Mouse tracking
-    let mouseX = 0, mouseY = 0, mouseInfluence = 0;
+    let mouseX = 0, mouseY = 0, mouseInfluence = 0, mouseSpeed = 0;
     let lastMouseX = 0, lastMouseY = 0, lastMouseTime = Date.now();
 
     document.addEventListener('mousemove', (e) => {
@@ -317,107 +351,101 @@
       const newMouseY = -(e.clientY / window.innerHeight) * 2 + 1;
 
       const now = Date.now();
+      const dt = Math.max(1, now - lastMouseTime);
       const dx = newMouseX - lastMouseX;
       const dy = newMouseY - lastMouseY;
-      const speed = Math.sqrt(dx * dx + dy * dy) / Math.max(1, now - lastMouseTime) * 1000;
+      const speed = Math.sqrt(dx * dx + dy * dy) / dt * 1000;
 
       mouseX = newMouseX;
       mouseY = newMouseY;
       lastMouseX = mouseX;
       lastMouseY = mouseY;
       lastMouseTime = now;
-      mouseInfluence = Math.min(1.5, speed * 3 + 0.4);
+      mouseInfluence = Math.min(1.8, speed * 4 + 0.5);
+      mouseSpeed = Math.min(1.0, speed * 2);
     });
 
-    // Click splash effect
+    // Click splash
     document.addEventListener('click', (e) => {
       const clickX = (e.clientX / window.innerWidth) * 2 - 1;
       const clickY = -(e.clientY / window.innerHeight) * 2 + 1;
       material.uniforms.uMouse.value.set(clickX * 1.5, clickY * 1.5);
-      mouseInfluence = 2.0;
-
-      // Trigger splash in audio
+      mouseInfluence = 2.5;
+      mouseSpeed = 1.5;
       window.dispatchEvent(new CustomEvent('ocean-splash', { detail: { x: e.clientX, y: e.clientY } }));
     });
 
     // Scroll tracking
     let scrollInfluence = 0;
     window.addEventListener('scroll', () => {
-      const scrollY = window.scrollY;
-      scrollInfluence = Math.min(1, scrollY / 500);
+      scrollInfluence = Math.min(1, window.scrollY / 500);
     });
 
-    // Animation
+    // Animation with visibility API for performance
     const clock = new THREE.Clock();
+    let isVisible = true;
+    document.addEventListener('visibilitychange', () => {
+      isVisible = document.visibilityState === 'visible';
+    });
 
     function animate() {
+      if (!isVisible) {
+        requestAnimationFrame(animate);
+        return;
+      }
       requestAnimationFrame(animate);
       const elapsedTime = clock.getElapsedTime();
 
       material.uniforms.uTime.value = elapsedTime;
       material.uniforms.uMouse.value.set(mouseX, mouseY);
       material.uniforms.uMouseInfluence.value = mouseInfluence;
+      material.uniforms.uMouseSpeed.value = mouseSpeed;
       material.uniforms.uScrollInfluence.value = scrollInfluence;
-      mouseInfluence *= 0.95;
+      mouseInfluence *= 0.94;
+      mouseSpeed *= 0.92;
       scrollInfluence *= 0.98;
 
-      // Camera movement
-      camera.position.x = Math.sin(elapsedTime * 0.025) * 10;
-      camera.position.z = 55 + Math.cos(elapsedTime * 0.018) * 6;
-      camera.position.y = 18 + Math.sin(elapsedTime * 0.02) * 2;
+      // Camera sway
+      camera.position.x = Math.sin(elapsedTime * 0.02) * 12;
+      camera.position.z = 55 + Math.cos(elapsedTime * 0.015) * 8;
+      camera.position.y = 18 + Math.sin(elapsedTime * 0.018) * 2.5;
       camera.lookAt(0, 0, 0);
 
       renderer.render(scene, camera);
 
-      // Enhanced bloom pass with dynamic colors
+      // Bloom
       bloomCtx.clearRect(0, 0, bloomCanvas.width, bloomCanvas.height);
+      const time = elapsedTime * 0.4;
 
-      // Create multiple bloom layers for depth
-      const time = elapsedTime * 0.5;
+      const sunX = bloomCanvas.width * (0.5 + Math.sin(time * 0.25) * 0.12);
+      const sunY = bloomCanvas.height * (0.3 + Math.cos(time * 0.18) * 0.08);
 
-      // Primary bloom - sun reflection
-      const primaryGradient = bloomCtx.createRadialGradient(
-        bloomCanvas.width * (0.5 + Math.sin(time * 0.3) * 0.1),
-        bloomCanvas.height * (0.35 + Math.cos(time * 0.2) * 0.05),
-        0,
-        bloomCanvas.width * 0.5,
-        bloomCanvas.height * 0.4,
-        bloomCanvas.width * 0.7
-      );
-      primaryGradient.addColorStop(0, 'rgba(150, 200, 230, 0.12)');
-      primaryGradient.addColorStop(0.3, 'rgba(100, 160, 200, 0.06)');
-      primaryGradient.addColorStop(0.6, 'rgba(50, 100, 150, 0.02)');
+      const primaryGradient = bloomCtx.createRadialGradient(sunX, sunY, 0, sunX, sunY, bloomCanvas.width * 0.65);
+      primaryGradient.addColorStop(0, 'rgba(180, 220, 245, 0.15)');
+      primaryGradient.addColorStop(0.2, 'rgba(130, 180, 220, 0.08)');
+      primaryGradient.addColorStop(0.5, 'rgba(80, 140, 190, 0.04)');
       primaryGradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
       bloomCtx.fillStyle = primaryGradient;
       bloomCtx.fillRect(0, 0, bloomCanvas.width, bloomCanvas.height);
 
-      // Secondary bloom - wave crests
       const secondaryGradient = bloomCtx.createRadialGradient(
-        bloomCanvas.width * 0.5,
-        bloomCanvas.height * 0.6,
-        0,
-        bloomCanvas.width * 0.5,
-        bloomCanvas.height * 0.6,
-        bloomCanvas.width * 0.4
+        bloomCanvas.width * 0.5, bloomCanvas.height * 0.65, 0,
+        bloomCanvas.width * 0.5, bloomCanvas.height * 0.65, bloomCanvas.width * 0.45
       );
-      secondaryGradient.addColorStop(0, 'rgba(80, 140, 180, 0.08)');
-      secondaryGradient.addColorStop(0.5, 'rgba(40, 80, 120, 0.03)');
+      secondaryGradient.addColorStop(0, 'rgba(100, 160, 200, 0.1)');
+      secondaryGradient.addColorStop(0.4, 'rgba(60, 120, 170, 0.05)');
       secondaryGradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
       bloomCtx.globalCompositeOperation = 'screen';
       bloomCtx.fillStyle = secondaryGradient;
       bloomCtx.fillRect(0, 0, bloomCanvas.width, bloomCanvas.height);
 
-      // Sparkle overlay
+      const sparkleX = bloomCanvas.width * (0.35 + Math.sin(time * 1.2) * 0.2);
       const sparkleGradient = bloomCtx.createRadialGradient(
-        bloomCanvas.width * (0.4 + Math.sin(time) * 0.15),
-        bloomCanvas.height * 0.3,
-        0,
-        bloomCanvas.width * 0.5,
-        bloomCanvas.height * 0.4,
-        bloomCanvas.width * 0.5
+        sparkleX, bloomCanvas.height * 0.25, 0,
+        sparkleX, bloomCanvas.height * 0.35, bloomCanvas.width * 0.4
       );
-      sparkleGradient.addColorStop(0, 'rgba(255, 255, 255, 0.05)');
-      sparkleGradient.addColorStop(0.2, 'rgba(200, 230, 255, 0.02)');
+      sparkleGradient.addColorStop(0, 'rgba(255, 255, 255, 0.08)');
+      sparkleGradient.addColorStop(0.15, 'rgba(220, 240, 255, 0.03)');
       sparkleGradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
       bloomCtx.fillStyle = sparkleGradient;
       bloomCtx.fillRect(0, 0, bloomCanvas.width, bloomCanvas.height);
@@ -461,6 +489,6 @@
   #bloom-canvas {
     pointer-events: none;
     mix-blend-mode: screen;
-    opacity: 0.6;
+    opacity: 0.65;
   }
 </style>

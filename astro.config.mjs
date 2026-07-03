@@ -17,8 +17,8 @@ export default defineConfig({
         name: '我的博客',
         short_name: '博客',
         description: 'Personal Blog',
-        theme_color: '#6366f1',
-        background_color: '#ffffff',
+        theme_color: '#5080b0',
+        background_color: '#181e32',
         display: 'standalone',
         icons: [
           {

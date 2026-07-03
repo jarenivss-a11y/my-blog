@@ -1,39 +1,59 @@
 ---
-// LazyImage - adds fade-in effect for lazy loaded images
+// LazyImage - Enhanced lazy loading with blur-up effect and responsive images
 ---
 
 <script>
   function initLazyImages() {
+    // Blur-up effect for images with data-src
+    const blurUpObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const img = entry.target as HTMLImageElement;
+          if (img.dataset.src) {
+            // Create blur placeholder
+            img.style.filter = 'blur(20px)';
+            img.style.transition = 'filter 0.3s ease';
+
+            const tempImg = new Image();
+            tempImg.onload = () => {
+              img.src = img.dataset.src;
+              img.classList.add('lazy-loaded');
+              // Remove blur after load
+              setTimeout(() => {
+                img.style.filter = 'none';
+              }, 50);
+            };
+            tempImg.src = img.dataset.src;
+          } else {
+            img.classList.add('lazy-loaded');
+          }
+          blurUpObserver.unobserve(img);
+        }
+      });
+    }, { rootMargin: '100px' });
+
+    // Observe all images with data-src
+    document.querySelectorAll('img[data-src]').forEach((img) => {
+      blurUpObserver.observe(img);
+    });
+
+    // Handle native lazy loading with fade-in
     if ('loading' in HTMLImageElement.prototype) {
-      // Native lazy loading supported
       document.querySelectorAll('img[loading="lazy"]').forEach((img) => {
         img.addEventListener('load', () => {
           img.classList.add('lazy-loaded');
         });
-        // If already loaded
         if ((img as HTMLImageElement).complete) {
           img.classList.add('lazy-loaded');
         }
       });
-    } else {
-      // Fallback for browsers without native lazy loading
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const img = entry.target as HTMLImageElement;
-            if (img.dataset.src) {
-              img.src = img.dataset.src;
-            }
-            img.classList.add('lazy-loaded');
-            observer.unobserve(img);
-          }
-        });
-      });
-
-      document.querySelectorAll('img[data-src]').forEach((img) => {
-        observer.observe(img);
-      });
     }
+
+    // Generate srcset for responsive images
+    document.querySelectorAll('img[data-srcset]').forEach((img) => {
+      const el = img as HTMLImageElement;
+      el.srcset = el.dataset.srcset || '';
+    });
   }
 
   initLazyImages();
@@ -54,5 +74,11 @@
       opacity: 1;
       transform: scale(1);
     }
+  }
+
+  /* Responsive images */
+  img {
+    max-width: 100%;
+    height: auto;
   }
 </style>
