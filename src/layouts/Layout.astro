@@ -1,6 +1,6 @@
 ---
-import OceanWebGL from '../components/OceanWebGL.astro';
-import OceanAudio from '../components/OceanAudio.astro';
+import RainBackground from '../components/RainBackground.astro';
+import RainSound from '../components/RainSound.astro';
 import BackToTop from '../components/BackToTop.astro';
 import ReadingProgress from '../components/ReadingProgress.astro';
 import VisitorStats from '../components/VisitorStats.astro';
@@ -110,9 +110,9 @@ const currentPath = Astro.url.pathname;
     <SEO title={title} description={description} url={Astro.url.pathname} />
     <script is:inline define:vars={{ postUrls }}>window.__POST_URLS__ = postUrls;</script>
   </head>
-  <body class="bg-[#08080c] text-[#fafafa] min-h-screen font-sans antialiased scroll-smooth relative overflow-x-hidden transition-colors duration-500">
-    <!-- Dark background for ocean effect -->
-    <div class="fixed inset-0 pointer-events-none -z-10 bg-[#08080c]"></div>
+  <body class="bg-transparent text-[#fafafa] min-h-screen font-sans antialiased scroll-smooth relative overflow-x-hidden transition-colors duration-500">
+    <!-- Dark semi-transparent background -->
+    <div class="fixed inset-0 pointer-events-none -z-10 bg-[rgba(8,8,12,0.75)]"></div>
 
     <!-- Skip to content -->
     <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-cyan-500 focus:text-white focus:rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400">
@@ -126,11 +126,11 @@ const currentPath = Astro.url.pathname;
     <ReadingProgress />
 
     <!-- Ocean Background -->
-    <OceanWebGL />
-    <OceanAudio />
+    <RainBackground />
+    <RainSound />
 
     <!-- Navigation - Ocean theme -->
-    <header id="navbar" class="sticky top-0 z-50 backdrop-blur-md bg-[rgba(8,8,12,0.85)] border-b border-[rgba(80,128,176,0.2)]">
+    <header id="navbar" class="sticky top-0 z-50 backdrop-blur-md bg-[rgba(8,8,12,0.6)] border-b border-[rgba(80,128,176,0.15)]">
       <div class="max-w-6xl mx-auto px-4">
         <div class="flex h-16 items-center justify-between">
           <!-- Logo -->
@@ -243,7 +243,7 @@ const currentPath = Astro.url.pathname;
     </div>
 
     <!-- Footer -->
-    <footer class="py-8 border-t border-[rgba(80,128,176,0.2)] text-center bg-[rgba(8,8,12,0.9)]">
+    <footer class="py-8 border-t border-[rgba(80,128,176,0.15)] text-center bg-[rgba(8,8,12,0.6)]">
       <div class="flex items-center justify-center gap-6 mb-4">
         <a href="/my-blog/feed" class="text-sm text-slate-400 hover:text-cyan-400 transition-colors" title="订阅预览">
           <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
