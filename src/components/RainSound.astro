@@ -1,0 +1,295 @@
+---
+// RainSound - Synthesized rain sound effects with ocean blue aesthetic
+---
+
+<script>
+  class RainSound {
+    private audioContext: AudioContext | null = null;
+    private masterGain: GainNode | null = null;
+    private isInitialized = false;
+    private isEnabled = true;
+    private nodes: { node: AudioNode; gain: GainNode }[] = [];
+
+    async init() {
+      if (this.isInitialized) return;
+
+      try {
+        this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        this.masterGain = this.audioContext.createGain();
+        this.masterGain.gain.value = 0.4;
+        this.masterGain.connect(this.audioContext.destination);
+
+        await this.createRainLayers();
+        this.isInitialized = true;
+      } catch (e) {
+        console.warn('RainSound init failed:', e);
+      }
+    }
+
+    private createNoiseBuffer(type: 'white' | 'pink' | 'brown'): AudioBuffer {
+      const ctx = this.audioContext!;
+      const bufferSize = ctx.sampleRate * 2;
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+
+      if (type === 'white') {
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = Math.random() * 2 - 1;
+        }
+      } else if (type === 'pink') {
+        let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+        for (let i = 0; i < bufferSize; i++) {
+          const white = Math.random() * 2 - 1;
+          b0 = 0.99886 * b0 + white * 0.0555179;
+          b1 = 0.99332 * b1 + white * 0.0750759;
+          b2 = 0.96900 * b2 + white * 0.1538520;
+          b3 = 0.86650 * b3 + white * 0.3104856;
+          b4 = 0.55000 * b4 + white * 0.5329522;
+          b5 = -0.7616 * b5 - white * 0.0168980;
+          data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
+          b6 = white * 0.115926;
+        }
+      } else {
+        let lastOut = 0;
+        for (let i = 0; i < bufferSize; i++) {
+          const white = Math.random() * 2 - 1;
+          data[i] = (lastOut + (0.02 * white)) / 1.02;
+          lastOut = data[i];
+          data[i] *= 3.5;
+        }
+      }
+
+      return buffer;
+    }
+
+    private async createRainLayers() {
+      const ctx = this.audioContext!;
+
+      // Rain base - filtered pink noise
+      const rainBuffer = this.createNoiseBuffer('pink');
+      const rainSource = ctx.createBufferSource();
+      rainSource.buffer = rainBuffer;
+      rainSource.loop = true;
+
+      const rainFilter = ctx.createBiquadFilter();
+      rainFilter.type = 'lowpass';
+      rainFilter.frequency.value = 4000;
+
+      const rainGain = ctx.createGain();
+      rainGain.gain.value = 0.6;
+
+      rainSource.connect(rainFilter);
+      rainFilter.connect(rainGain);
+      rainGain.connect(this.masterGain!);
+      rainSource.start();
+      this.nodes.push({ node: rainSource, gain: rainGain });
+
+      // Rain detail - higher frequency drips
+      const dripBuffer = this.createNoiseBuffer('white');
+      const dripSource = ctx.createBufferSource();
+      dripSource.buffer = dripBuffer;
+      dripSource.loop = true;
+
+      const dripFilter = ctx.createBiquadFilter();
+      dripFilter.type = 'bandpass';
+      dripFilter.frequency.value = 6000;
+      dripFilter.Q.value = 0.5;
+
+      const dripGain = ctx.createGain();
+      dripGain.gain.value = 0.15;
+
+      dripSource.connect(dripFilter);
+      dripFilter.connect(dripGain);
+      dripGain.connect(this.masterGain!);
+      dripSource.start();
+      this.nodes.push({ node: dripSource, gain: dripGain });
+
+      // Thunder rumble - very low frequency
+      const thunderBuffer = this.createNoiseBuffer('brown');
+      const thunderSource = ctx.createBufferSource();
+      thunderSource.buffer = thunderBuffer;
+      thunderSource.loop = true;
+
+      const thunderFilter = ctx.createBiquadFilter();
+      thunderFilter.type = 'lowpass';
+      thunderFilter.frequency.value = 80;
+
+      const thunderGain = ctx.createGain();
+      thunderGain.gain.value = 0.08;
+
+      thunderSource.connect(thunderFilter);
+      thunderFilter.connect(thunderGain);
+      thunderGain.connect(this.masterGain!);
+      thunderSource.start();
+      this.nodes.push({ node: thunderSource, gain: thunderGain });
+
+      // Wind whoosh - occasional swooshes
+      this.createWindLayer();
+    }
+
+    private createWindLayer() {
+      const ctx = this.audioContext!;
+
+      const windBuffer = this.createNoiseBuffer('pink');
+      const windSource = ctx.createBufferSource();
+      windSource.buffer = windBuffer;
+      windSource.loop = true;
+
+      const windFilter = ctx.createBiquadFilter();
+      windFilter.type = 'lowpass';
+      windFilter.frequency.value = 400;
+
+      const windGain = ctx.createGain();
+      windGain.gain.value = 0.1;
+
+      // LFO for wind movement
+      const lfo = ctx.createOscillator();
+      lfo.type = 'sine';
+      lfo.frequency.value = 0.1;
+
+      const lfoGain = ctx.createGain();
+      lfoGain.gain.value = 100;
+
+      lfo.connect(lfoGain);
+      lfoGain.connect(windFilter.frequency);
+      lfo.start();
+
+      windSource.connect(windFilter);
+      windFilter.connect(windGain);
+      windGain.connect(this.masterGain!);
+      windSource.start();
+      this.nodes.push({ node: windSource, gain: windGain });
+    }
+
+    // Play a drip sound at position (for mouse interaction)
+    playDrip(x: number, y: number) {
+      if (!this.isInitialized || !this.audioContext || !this.isEnabled) return;
+
+      const ctx = this.audioContext;
+      const now = ctx.currentTime;
+
+      const osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(800 + Math.random() * 400, now);
+      osc.frequency.exponentialRampToValueAtTime(200, now + 0.1);
+
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.value = 2000;
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.masterGain!);
+
+      osc.start(now);
+      osc.stop(now + 0.15);
+    }
+
+    // Splash sound for click interaction
+    playSplash() {
+      if (!this.isInitialized || !this.audioContext || !this.isEnabled) return;
+
+      const ctx = this.audioContext;
+      const now = ctx.currentTime;
+
+      // Multiple drips for splash effect
+      for (let i = 0; i < 5; i++) {
+        const osc = ctx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(1200 + Math.random() * 600, now + i * 0.02);
+        osc.frequency.exponentialRampToValueAtTime(300, now + i * 0.02 + 0.12);
+
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.05, now + i * 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.02 + 0.2);
+
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.value = 3000;
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.masterGain!);
+
+        osc.start(now + i * 0.02);
+        osc.stop(now + i * 0.02 + 0.25);
+      }
+    }
+
+    setVolume(vol: number) {
+      if (this.masterGain) {
+        this.masterGain.gain.value = Math.max(0, Math.min(1, vol)) * 0.4;
+      }
+    }
+
+    enable() {
+      this.isEnabled = true;
+      if (this.masterGain) {
+        this.masterGain.gain.value = 0.4;
+      }
+    }
+
+    disable() {
+      this.isEnabled = false;
+      if (this.masterGain) {
+        this.masterGain.gain.value = 0;
+      }
+    }
+
+    toggle() {
+      if (this.isEnabled) {
+        this.disable();
+      } else {
+        this.enable();
+      }
+      return this.isEnabled;
+    }
+
+    destroy() {
+      this.nodes.forEach(({ node }) => {
+        try { node.disconnect(); } catch {}
+      });
+      if (this.audioContext) {
+        this.audioContext.close();
+      }
+      this.isInitialized = false;
+    }
+  }
+
+  const rainSound = new RainSound();
+
+  // Initialize on first user interaction
+  function initAudio() {
+    rainSound.init();
+    document.removeEventListener('click', initAudio);
+    document.removeEventListener('keydown', initAudio);
+  }
+  document.addEventListener('click', initAudio, { once: true });
+  document.addEventListener('keydown', initAudio, { once: true });
+
+  // Mouse ripple sounds
+  document.addEventListener('rain-drop', (e: any) => {
+    if (Math.random() > 0.7) {
+      rainSound.playDrip(e.detail.x, 0);
+    }
+  });
+
+  // Click splash sounds
+  document.addEventListener('click', (e) => {
+    if ((e.target as HTMLElement).closest('#rain-canvas')) {
+      rainSound.playSplash();
+    }
+  }, true);
+
+  // Expose API globally
+  (window as any).rainSound = {
+    toggle: () => rainSound.toggle(),
+    setVolume: (v: number) => rainSound.setVolume(v),
+    enable: () => rainSound.enable(),
+    disable: () => rainSound.disable(),
+  };
+</script>
