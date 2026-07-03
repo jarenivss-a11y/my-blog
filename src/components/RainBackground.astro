@@ -1,5 +1,5 @@
 ---
-// RainBackground - Professional rain effect with realistic ripples and mouse interaction
+// RainBackground - Rain effect with mouse sparkle trails
 ---
 
 <div id="rain-container" class="fixed inset-0 w-full h-full z-0 overflow-hidden">
@@ -34,66 +34,84 @@
     }
   }
 
-  class Ripple {
+  class Sparkle {
     x: number;
     y: number;
-    radius: number;
-    maxRadius: number;
-    opacity: number;
-    speed: number;
-    rings: number[];
+    vx: number;
+    vy: number;
+    life: number;
+    maxLife: number;
+    size: number;
+    hue: number;
 
-    constructor(x: number, y: number) {
+    constructor(x: number, y: number, mouseVx: number, mouseVy: number) {
       this.x = x;
       this.y = y;
-      this.radius = 0;
-      this.maxRadius = Math.random() * 60 + 40;
-      this.opacity = 0.6;
-      this.speed = Math.random() * 1.5 + 1;
-      this.rings = [0, 0.3, 0.6];
+      const speed = Math.sqrt(mouseVx * mouseVx + mouseVy * mouseVy);
+      const angle = Math.atan2(mouseVy, mouseVx) + (Math.random() - 0.5) * Math.PI * 0.5;
+      const sparkSpeed = Math.min(speed * 0.3 + Math.random() * 2, 8);
+      this.vx = Math.cos(angle) * sparkSpeed;
+      this.vy = Math.sin(angle) * sparkSpeed;
+      this.maxLife = Math.random() * 30 + 20;
+      this.life = this.maxLife;
+      this.size = Math.random() * 3 + 2;
+      this.hue = Math.random() * 30 + 175; // cyan range 175-205
     }
 
     update() {
-      this.radius += this.speed;
-      this.opacity *= 0.97;
-      return this.opacity > 0.01 && this.radius < this.maxRadius;
+      this.x += this.vx;
+      this.y += this.vy;
+      this.vx *= 0.96;
+      this.vy *= 0.96;
+      this.vy += 0.05; // slight gravity
+      this.life--;
+      return this.life > 0;
+    }
+
+    draw(ctx: CanvasRenderingContext2D) {
+      const alpha = this.life / this.maxLife;
+      const glow = Math.sin(alpha * Math.PI) * 0.8;
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size * alpha, 0, Math.PI * 2);
+      ctx.fillStyle = `hsla(${this.hue}, 90%, 65%, ${alpha * 0.8})`;
+      ctx.fill();
+
+      // Glow effect
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size * 2 * alpha, 0, Math.PI * 2);
+      ctx.fillStyle = `hsla(${this.hue}, 100%, 80%, ${glow * 0.3})`;
+      ctx.fill();
+      ctx.restore();
     }
   }
 
-  class Splash {
+  class Star {
     x: number;
     y: number;
-    particles: { x: number; y: number; vx: number; vy: number; life: number; size: number }[];
-    opacity: number;
+    size: number;
+    twinkle: number;
+    twinkleSpeed: number;
 
-    constructor(x: number, y: number) {
-      this.x = x;
-      this.y = y;
-      this.opacity = 1;
-      this.particles = [];
-      for (let i = 0; i < 8; i++) {
-        const angle = (Math.PI * 2 * i) / 8 + Math.random() * 0.3;
-        const speed = Math.random() * 3 + 2;
-        this.particles.push({
-          x: x,
-          y: y,
-          vx: Math.cos(angle) * speed,
-          vy: -Math.random() * 4 - 2,
-          life: 1,
-          size: Math.random() * 2 + 1
-        });
-      }
+    constructor(width: number, height: number) {
+      this.x = Math.random() * width;
+      this.y = Math.random() * height;
+      this.size = Math.random() * 1.5 + 0.5;
+      this.twinkle = Math.random() * Math.PI * 2;
+      this.twinkleSpeed = Math.random() * 0.05 + 0.02;
     }
 
     update() {
-      this.particles.forEach(p => {
-        p.x += p.vx;
-        p.y += p.vy;
-        p.vy += 0.2;
-        p.life -= 0.03;
-      });
-      this.particles = this.particles.filter(p => p.life > 0);
-      return this.particles.length > 0;
+      this.twinkle += this.twinkleSpeed;
+    }
+
+    draw(ctx: CanvasRenderingContext2D) {
+      const alpha = (Math.sin(this.twinkle) * 0.3 + 0.7) * 0.4;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(200, 230, 255, ${alpha})`;
+      ctx.fill();
     }
   }
 
@@ -103,15 +121,16 @@
     private width: number = 0;
     private height: number = 0;
     private raindrops: RainDrop[] = [];
-    private ripples: Ripple[] = [];
-    private splashes: Splash[] = [];
-    private maxDrops: number = 200;
+    private sparkles: Sparkle[] = [];
+    private stars: Star[] = [];
+    private maxDrops: number = 150;
+    private maxSparkles: number = 100;
     private wind: number = 0;
     private windTarget: number = 0;
-    private mouseX: number = 0;
-    private mouseY: number = 0;
+    private lastMouseX: number = 0;
+    private lastMouseY: number = 0;
+    private lastMouseTime: number = 0;
     private isVisible: boolean = true;
-    private lastTime: number = 0;
 
     constructor(canvas: HTMLCanvasElement) {
       this.canvas = canvas;
@@ -120,6 +139,7 @@
       this.ctx = ctx;
       this.resize();
       this.initRain();
+      this.initStars();
       this.setupEvents();
     }
 
@@ -137,61 +157,66 @@
       }
     }
 
+    private initStars() {
+      this.stars = [];
+      const starCount = Math.floor((this.width * this.height) / 15000);
+      for (let i = 0; i < Math.min(starCount, 100); i++) {
+        this.stars.push(new Star(this.width, this.height));
+      }
+    }
+
     private setupEvents() {
-      window.addEventListener('resize', () => this.resize());
+      window.addEventListener('resize', () => {
+        this.resize();
+        this.initStars();
+      });
 
       document.addEventListener('visibilitychange', () => {
         this.isVisible = document.visibilityState === 'visible';
       });
 
       this.canvas.addEventListener('mousemove', (e) => {
-        this.mouseX = e.clientX;
-        this.mouseY = e.clientY;
+        const now = Date.now();
+        const dx = e.clientX - this.lastMouseX;
+        const dy = e.clientY - this.lastMouseY;
+        const dt = Math.max(1, now - this.lastMouseTime);
+        const speed = Math.sqrt(dx * dx + dy * dy) / dt * 16;
 
-        if (Math.random() > 0.7) {
-          this.ripples.push(new Ripple(this.mouseX, this.mouseY));
+        if (speed > 0.5 && Math.random() > 0.3) {
+          const count = Math.min(Math.floor(speed * 0.5) + 1, 5);
+          for (let i = 0; i < count; i++) {
+            if (this.sparkles.length < this.maxSparkles) {
+              this.sparkles.push(new Sparkle(e.clientX, e.clientY, dx / dt * 16, dy / dt * 16));
+            }
+          }
+
+          // Dispatch event for sound
+          window.dispatchEvent(new CustomEvent('rain-sparkle', {
+            detail: { x: e.clientX, y: e.clientY, speed }
+          }));
         }
+
+        this.lastMouseX = e.clientX;
+        this.lastMouseY = e.clientY;
+        this.lastMouseTime = now;
       });
 
       this.canvas.addEventListener('click', (e) => {
         const x = e.clientX;
         const y = e.clientY;
 
-        for (let i = 0; i < 3; i++) {
-          const offsetX = (Math.random() - 0.5) * 40;
-          const offsetY = (Math.random() - 0.5) * 40;
-          this.ripples.push(new Ripple(x + offsetX, y + offsetY));
+        // Create burst of sparkles
+        for (let i = 0; i < 15; i++) {
+          const angle = (Math.PI * 2 * i) / 15;
+          const speed = Math.random() * 4 + 2;
+          const sparkle = new Sparkle(x, y, Math.cos(angle) * speed, Math.sin(angle) * speed);
+          sparkle.life = sparkle.maxLife;
+          this.sparkles.push(sparkle);
         }
 
-        this.splashes.push(new Splash(x, y));
-
-        window.dispatchEvent(new CustomEvent('rain-splash', {
+        window.dispatchEvent(new CustomEvent('rain-burst', {
           detail: { x, y }
         }));
-      });
-
-      this.canvas.addEventListener('touchmove', (e) => {
-        if (e.touches.length > 0) {
-          const touch = e.touches[0];
-          this.mouseX = touch.clientX;
-          this.mouseY = touch.clientY;
-          if (Math.random() > 0.6) {
-            this.ripples.push(new Ripple(this.mouseX, this.mouseY));
-          }
-        }
-      });
-
-      this.canvas.addEventListener('touchstart', (e) => {
-        if (e.touches.length > 0) {
-          const touch = e.touches[0];
-          for (let i = 0; i < 2; i++) {
-            this.ripples.push(new Ripple(
-              touch.clientX + (Math.random() - 0.5) * 30,
-              touch.clientY + (Math.random() - 0.5) * 30
-            ));
-          }
-          this.splashes.push(new Splash(touch.clientX, touch.clientY));
-        }
       });
     }
 
@@ -219,49 +244,20 @@
       });
     }
 
-    private drawRipples() {
-      const ctx = this.ctx;
-
-      this.ripples = this.ripples.filter(ripple => {
-        const isAlive = ripple.update();
-
-        ripple.rings.forEach((ringOffset, i) => {
-          const r = ripple.radius + ringOffset * 20;
-          if (r > 0 && r < ripple.maxRadius) {
-            const ringOpacity = ripple.opacity * (1 - r / ripple.maxRadius) * 0.5;
-            ctx.beginPath();
-            ctx.arc(ripple.x, ripple.y, r, 0, Math.PI * 2);
-            ctx.strokeStyle = `rgba(6, 182, 212, ${ringOpacity})`;
-            ctx.lineWidth = 1.5 - (r / ripple.maxRadius);
-            ctx.stroke();
-          }
-        });
-
-        if (ripple.radius < 10) {
-          ctx.beginPath();
-          ctx.arc(ripple.x, ripple.y, 3, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(6, 182, 212, ${ripple.opacity * 0.5})`;
-          ctx.fill();
-        }
-
-        return isAlive;
+    private drawStars() {
+      this.stars.forEach(star => {
+        star.update();
+        star.draw(this.ctx);
       });
     }
 
-    private drawSplashes() {
-      const ctx = this.ctx;
-
-      this.splashes = this.splashes.filter(splash => {
-        const isAlive = splash.update();
-
-        splash.particles.forEach(p => {
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(6, 182, 212, ${p.life * 0.6})`;
-          ctx.fill();
-        });
-
-        return isAlive;
+    private drawSparkles() {
+      this.sparkles = this.sparkles.filter(sparkle => {
+        const alive = sparkle.update();
+        if (alive) {
+          sparkle.draw(this.ctx);
+        }
+        return alive;
       });
     }
 
@@ -270,30 +266,20 @@
       this.wind += (this.windTarget - this.wind) * 0.02;
     }
 
-    animate(currentTime: number) {
+    animate() {
       if (!this.isVisible) {
-        requestAnimationFrame((t) => this.animate(t));
+        requestAnimationFrame(() => this.animate());
         return;
       }
-
-      const deltaTime = currentTime - this.lastTime;
-      this.lastTime = currentTime;
 
       this.ctx.clearRect(0, 0, this.width, this.height);
 
       this.updateWind();
+      this.drawStars();
       this.drawRain();
-      this.drawRipples();
-      this.drawSplashes();
+      this.drawSparkles();
 
-      requestAnimationFrame((t) => this.animate(t));
-    }
-
-    resize() {
-      this.width = window.innerWidth;
-      this.height = window.innerHeight;
-      this.canvas.width = this.width;
-      this.canvas.height = this.height;
+      requestAnimationFrame(() => this.animate());
     }
   }
 
@@ -303,7 +289,7 @@
     if (!container || !canvas) return;
 
     const rainSystem = new RainSystem(canvas);
-    rainSystem.animate(0);
+    rainSystem.animate();
 
     (window as any).rainSystem = rainSystem;
   }
@@ -327,7 +313,7 @@
   #rain-canvas {
     width: 100%;
     height: 100%;
-    cursor: crosshair;
+    cursor: pointer;
     pointer-events: auto;
   }
 </style>

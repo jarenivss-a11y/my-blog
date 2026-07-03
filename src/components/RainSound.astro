@@ -1,5 +1,5 @@
 ---
-// RainSound - Professional multi-layered rain soundscape
+// RainSound - Soft ambient rain with chime sounds
 ---
 
 <script>
@@ -7,7 +7,6 @@
     private audioContext: AudioContext | null = null;
     private masterGain: GainNode | null = null;
     private isInitialized: boolean = false;
-    private nodes: AudioNode[] = [];
 
     async init() {
       if (this.isInitialized) return;
@@ -15,7 +14,7 @@
       try {
         this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
         this.masterGain = this.audioContext.createGain();
-        this.masterGain.gain.value = 0.5;
+        this.masterGain.gain.value = 0.4;
 
         const compressor = this.audioContext.createDynamicsCompressor();
         compressor.threshold.value = -20;
@@ -27,7 +26,7 @@
         this.masterGain.connect(compressor);
         compressor.connect(this.audioContext.destination);
 
-        this.createRainLayers();
+        this.createAmbientRain();
         this.isInitialized = true;
       } catch (e) {
         console.warn('RainAudio init failed:', e);
@@ -45,14 +44,12 @@
 
         for (let i = 0; i < bufferSize; i++) {
           const white = Math.random() * 2 - 1;
-
           b0 = 0.99886 * b0 + white * 0.0555179;
           b1 = 0.99332 * b1 + white * 0.0750759;
           b2 = 0.96900 * b2 + white * 0.1538520;
           b3 = 0.86650 * b3 + white * 0.3104856;
           b4 = 0.55000 * b4 + white * 0.5329522;
           b5 = -0.7616 * b5 - white * 0.0168980;
-
           data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
           b6 = white * 0.115926;
         }
@@ -61,21 +58,18 @@
       return buffer;
     }
 
-    private createRainLayers() {
+    private createAmbientRain() {
       const ctx = this.audioContext!;
 
-      // Heavy rain base layer
-      this.createLayer('heavy', 0.4, 200, 8000, 0.08);
-      // Medium rain
-      this.createLayer('medium', 0.25, 400, 6000, 0.06);
-      // Light drizzle
-      this.createLayer('light', 0.15, 2000, 4000, 0.04);
-
-      // Distant thunder rumble
+      // Soft rain layer 1
+      this.createRainLayer(0.25, 100, 3000, 0.05);
+      // Soft rain layer 2
+      this.createRainLayer(0.15, 500, 5000, 0.03);
+      // Distant thunder
       this.createThunder();
     }
 
-    private createLayer(name: string, gain: number, freq: number, maxFreq: number, detune: number) {
+    private createRainLayer(gain: number, freq: number, maxFreq: number, detune: number) {
       const ctx = this.audioContext!;
 
       const buffer = this.createNoiseBuffer(8);
@@ -96,13 +90,13 @@
       const gainNode = ctx.createGain();
       gainNode.gain.value = gain;
 
-      // LFO for natural variation
+      // LFO for variation
       const lfo = ctx.createOscillator();
       lfo.type = 'sine';
-      lfo.frequency.value = 0.1 + Math.random() * 0.1;
+      lfo.frequency.value = 0.05 + Math.random() * 0.05;
 
       const lfoGain = ctx.createGain();
-      lfoGain.gain.value = gain * 0.3;
+      lfoGain.gain.value = gain * 0.2;
 
       lfo.connect(lfoGain);
       lfoGain.connect(gainNode.gain);
@@ -113,8 +107,6 @@
       highpass.connect(gainNode);
       gainNode.connect(this.masterGain!);
       source.start();
-
-      this.nodes.push(source, filter, highpass, gainNode, lfo, lfoGain);
     }
 
     private createThunder() {
@@ -129,7 +121,7 @@
           out = (out + (0.02 * white)) / 1.02;
           const t = i / ctx.sampleRate;
           const envelope = Math.sin(t * Math.PI / 6) * 0.5 + 0.5;
-          data[i] = out * 8.0 * envelope * 0.1;
+          data[i] = out * 8.0 * envelope * 0.05;
         }
       }
 
@@ -140,108 +132,102 @@
 
       const filter = ctx.createBiquadFilter();
       filter.type = 'lowpass';
-      filter.frequency.value = 100;
+      filter.frequency.value = 80;
 
       const gain = ctx.createGain();
-      gain.gain.value = 0.6;
+      gain.gain.value = 0.4;
 
       source.connect(filter);
       filter.connect(gain);
       gain.connect(this.masterGain!);
       source.start();
-
-      this.nodes.push(source, filter, gain);
     }
 
-    playDrip(x: number, y: number) {
+    playChime(x: number, y: number, speed: number) {
       if (!this.audioContext || !this.isInitialized) return;
 
       const ctx = this.audioContext;
       const now = ctx.currentTime;
 
-      const osc = ctx.createOscillator();
-      osc.type = 'sine';
-      const baseFreq = 600 + (x / window.innerWidth) * 800;
-      osc.frequency.setValueAtTime(baseFreq, now);
-      osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.3, now + 0.15);
+      // Random pitch chime
+      const baseFreq = 400 + Math.random() * 600;
+      const harmonics = [1, 2, 3, 4.2];
+      const volumes = [1, 0.5, 0.25, 0.1];
 
-      const filter = ctx.createBiquadFilter();
-      filter.type = 'lowpass';
-      filter.frequency.value = 1500;
-
-      const gain = ctx.createGain();
-      gain.gain.setValueAtTime(0.06, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
-
-      osc.connect(filter);
-      filter.connect(gain);
-      gain.connect(this.masterGain!);
-
-      osc.start(now);
-      osc.stop(now + 0.2);
-    }
-
-    playSplash(x: number, y: number) {
-      if (!this.audioContext || !this.isInitialized) return;
-
-      const ctx = this.audioContext;
-
-      for (let i = 0; i < 6; i++) {
-        const now = ctx.currentTime + i * 0.015;
-
+      harmonics.forEach((h, i) => {
         const osc = ctx.createOscillator();
         osc.type = 'sine';
-        const freq = 400 + Math.random() * 600;
-        osc.frequency.setValueAtTime(freq, now);
-        osc.frequency.exponentialRampToValueAtTime(200, now + 0.2);
-
-        const filter = ctx.createBiquadFilter();
-        filter.type = 'bandpass';
-        filter.frequency.value = 800;
-        filter.Q.value = 1;
+        osc.frequency.setValueAtTime(baseFreq * h, now);
+        osc.frequency.exponentialRampToValueAtTime(baseFreq * h * 0.98, now + 0.8);
 
         const gain = ctx.createGain();
-        gain.gain.setValueAtTime(0.04, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+        const volume = volumes[i] * Math.min(speed * 0.1, 0.5) * 0.08;
+        gain.gain.setValueAtTime(volume, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 1);
+
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.value = 2000;
 
         osc.connect(filter);
         filter.connect(gain);
         gain.connect(this.masterGain!);
 
         osc.start(now);
-        osc.stop(now + 0.25);
+        osc.stop(now + 1.1);
+      });
+    }
+
+    playBurst(x: number, y: number) {
+      if (!this.audioContext || !this.isInitialized) return;
+
+      const ctx = this.audioContext;
+
+      // Magical shimmer burst
+      for (let i = 0; i < 8; i++) {
+        const now = ctx.currentTime + i * 0.03;
+        const freq = 300 + Math.random() * 800;
+
+        const osc = ctx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now);
+        osc.frequency.exponentialRampToValueAtTime(freq * 0.5, now + 0.5);
+
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.06, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+
+        osc.connect(gain);
+        gain.connect(this.masterGain!);
+
+        osc.start(now);
+        osc.stop(now + 0.7);
       }
 
-      const bufferSize = ctx.sampleRate * 0.3;
+      // Soft noise burst
+      const bufferSize = ctx.sampleRate * 0.5;
       const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
       const data = buffer.getChannelData(0);
       for (let i = 0; i < bufferSize; i++) {
         const t = i / bufferSize;
-        data[i] = (Math.random() * 2 - 1) * Math.exp(-t * 8) * 0.3;
+        data[i] = (Math.random() * 2 - 1) * Math.exp(-t * 6) * 0.2;
       }
 
       const noise = ctx.createBufferSource();
       noise.buffer = buffer;
 
-      const noiseFilter = ctx.createBiquadFilter();
-      noiseFilter.type = 'bandpass';
-      noiseFilter.frequency.value = 2000;
-      noiseFilter.Q.value = 0.5;
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.value = 1500;
+      filter.Q.value = 0.5;
 
       const noiseGain = ctx.createGain();
-      noiseGain.gain.setValueAtTime(0.08, ctx.currentTime);
-      noiseGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+      noiseGain.gain.value = 0.15;
 
-      noise.connect(noiseFilter);
-      noiseFilter.connect(noiseGain);
+      noise.connect(filter);
+      filter.connect(noiseGain);
       noiseGain.connect(this.masterGain!);
       noise.start();
-    }
-
-    setVolume(vol: number) {
-      if (this.masterGain) {
-        this.masterGain.gain.value = Math.max(0, Math.min(1, vol)) * 0.5;
-      }
     }
   }
 
@@ -259,21 +245,22 @@
 
   document.addEventListener('click', initAudio, { once: true });
   document.addEventListener('keydown', initAudio, { once: true });
-  document.addEventListener('touchstart', initAudio, { once: true });
 
-  let lastDripX = 0;
-  document.addEventListener('mousemove', (e) => {
-    if (Math.random() > 0.85 && Math.abs(e.clientX - lastDripX) > 20) {
-      rainAudio.playDrip(e.clientX, e.clientY);
-      lastDripX = e.clientX;
+  document.addEventListener('rain-sparkle', (e: any) => {
+    if (Math.random() > 0.4) {
+      rainAudio.playChime(e.detail.x, e.detail.y, e.detail.speed);
     }
   });
 
-  document.addEventListener('rain-splash', (e: any) => {
-    rainAudio.playSplash(e.detail.x, e.detail.y);
+  document.addEventListener('rain-burst', (e: any) => {
+    rainAudio.playBurst(e.detail.x, e.detail.y);
   });
 
   (window as any).rainAudio = {
-    setVolume: (v: number) => rainAudio.setVolume(v)
+    setVolume: (v: number) => {
+      if (rainAudio.masterGain) {
+        rainAudio.masterGain.gain.value = Math.max(0, Math.min(1, v)) * 0.4;
+      }
+    }
   };
 </script>
