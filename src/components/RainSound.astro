@@ -262,28 +262,40 @@
 
   const rainSound = new RainSound();
 
-  // Initialize on first user interaction
+  // Initialize on page load (audio context requires user interaction in modern browsers)
   function initAudio() {
     rainSound.init();
-    document.removeEventListener('click', initAudio);
-    document.removeEventListener('keydown', initAudio);
   }
+
+  // Try to initialize immediately, if blocked by browser policy, will init on interaction
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAudio);
+  } else {
+    initAudio();
+  }
+
+  // Also init on any user interaction as fallback
   document.addEventListener('click', initAudio, { once: true });
   document.addEventListener('keydown', initAudio, { once: true });
+  document.addEventListener('touchstart', initAudio, { once: true });
 
-  // Mouse ripple sounds
-  document.addEventListener('rain-drop', (e: any) => {
-    if (Math.random() > 0.7) {
-      rainSound.playDrip(e.detail.x, 0);
+  // Mouse movement drip sounds
+  let lastDripTime = 0;
+  document.addEventListener('mousemove', (e) => {
+    const now = Date.now();
+    if (now - lastDripTime > 50 && Math.random() > 0.85) {
+      rainSound.playDrip(e.clientX, e.clientY);
+      lastDripTime = now;
     }
   });
 
   // Click splash sounds
   document.addEventListener('click', (e) => {
-    if ((e.target as HTMLElement).closest('#rain-canvas')) {
+    const target = e.target as HTMLElement;
+    if (target.closest('#rain-container') || target.closest('#rain-canvas')) {
       rainSound.playSplash();
     }
-  }, true);
+  });
 
   // Expose API globally
   (window as any).rainSound = {
