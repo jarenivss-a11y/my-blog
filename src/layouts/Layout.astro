@@ -1,6 +1,6 @@
 ---
-import RainBackground from '../components/RainBackground.astro';
-import RainSound from '../components/RainSound.astro';
+import OceanWebGL from '../components/OceanWebGL.astro';
+import OceanAudio from '../components/OceanAudio.astro';
 import BackToTop from '../components/BackToTop.astro';
 import ReadingProgress from '../components/ReadingProgress.astro';
 import VisitorStats from '../components/VisitorStats.astro';
@@ -125,9 +125,9 @@ const currentPath = Astro.url.pathname;
     <!-- Reading Progress Bar -->
     <ReadingProgress />
 
-    <!-- Rain Background -->
-    <RainBackground />
-    <RainSound />
+    <!-- Ocean Background -->
+    <OceanWebGL />
+    <OceanAudio />
 
     <!-- Navigation - Ocean theme -->
     <header id="navbar" class="sticky top-0 z-50 backdrop-blur-md bg-[rgba(8,8,12,0.85)] border-b border-[rgba(80,128,176,0.2)]">
