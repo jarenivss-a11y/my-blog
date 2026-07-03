@@ -175,7 +175,8 @@
         this.isVisible = document.visibilityState === 'visible';
       });
 
-      this.canvas.addEventListener('mousemove', (e) => {
+      // Use document-level mouse events for full screen interaction
+      document.addEventListener('mousemove', (e) => {
         const now = Date.now();
         const dx = e.clientX - this.lastMouseX;
         const dy = e.clientY - this.lastMouseY;
@@ -201,7 +202,7 @@
         this.lastMouseTime = now;
       });
 
-      this.canvas.addEventListener('click', (e) => {
+      document.addEventListener('click', (e) => {
         const x = e.clientX;
         const y = e.clientY;
 
