@@ -2,6 +2,15 @@
 // RainSound - Soft ambient rain with chime sounds
 ---
 
+<div id="audio-prompt" class="fixed bottom-4 right-4 z-50 opacity-0 pointer-events-none transition-opacity duration-500">
+  <button id="enable-audio-btn" class="flex items-center gap-2 px-4 py-2 bg-cyan-500/90 hover:bg-cyan-400 text-white text-sm font-medium rounded-full shadow-lg backdrop-blur-sm transition-all">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/>
+    </svg>
+    点击开启音效
+  </button>
+</div>
+
 <script>
   class RainAudio {
     public audioContext: AudioContext | null = null;
@@ -232,34 +241,47 @@
   }
 
   const rainAudio = new RainAudio();
+  let audioEnabled = false;
 
-  function initAudio() {
-    rainAudio.init();
-    // Try to resume audio context immediately (browsers may block this)
-    setTimeout(() => {
-      if (rainAudio.audioContext && rainAudio.audioContext.state === 'suspended') {
-        rainAudio.audioContext.resume();
-      }
-    }, 100);
+  function showAudioPrompt() {
+    const prompt = document.getElementById('audio-prompt');
+    const btn = document.getElementById('enable-audio-btn');
+    if (!prompt || !btn) return;
+
+    // Show prompt
+    prompt.classList.remove('opacity-0', 'pointer-events-none');
+
+    // Click handler to enable audio
+    const enableHandler = () => {
+      rainAudio.init();
+      setTimeout(() => {
+        if (rainAudio.audioContext && rainAudio.audioContext.state === 'suspended') {
+          rainAudio.audioContext.resume();
+        }
+      }, 100);
+      audioEnabled = true;
+      prompt.classList.add('opacity-0', 'pointer-events-none');
+      document.removeEventListener('click', enableHandler);
+    };
+
+    btn.addEventListener('click', enableHandler, { once: true });
+    document.addEventListener('click', enableHandler, { once: true });
+    document.addEventListener('keydown', enableHandler, { once: true });
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initAudio);
-  } else {
-    initAudio();
-  }
-
-  document.addEventListener('click', initAudio, { once: true });
-  document.addEventListener('keydown', initAudio, { once: true });
+  // Show audio prompt after a short delay
+  setTimeout(showAudioPrompt, 800);
 
   document.addEventListener('rain-sparkle', (e: any) => {
-    if (Math.random() > 0.4) {
+    if (audioEnabled && Math.random() > 0.4) {
       rainAudio.playChime(e.detail.x, e.detail.y, e.detail.speed);
     }
   });
 
   document.addEventListener('rain-burst', (e: any) => {
-    rainAudio.playBurst(e.detail.x, e.detail.y);
+    if (audioEnabled) {
+      rainAudio.playBurst(e.detail.x, e.detail.y);
+    }
   });
 
   (window as any).rainAudio = {
