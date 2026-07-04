@@ -4,7 +4,7 @@
 
 <script>
   class RainAudio {
-    private audioContext: AudioContext | null = null;
+    public audioContext: AudioContext | null = null;
     private masterGain: GainNode | null = null;
     private isInitialized: boolean = false;
 
@@ -235,6 +235,12 @@
 
   function initAudio() {
     rainAudio.init();
+    // Try to resume audio context immediately (browsers may block this)
+    setTimeout(() => {
+      if (rainAudio.audioContext && rainAudio.audioContext.state === 'suspended') {
+        rainAudio.audioContext.resume();
+      }
+    }, 100);
   }
 
   if (document.readyState === 'loading') {
