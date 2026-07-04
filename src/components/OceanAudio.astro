@@ -7,7 +7,6 @@
     let audioContext = null;
     let isInitialized = false;
     let masterGain = null;
-    let isAudioStarted = false;
 
     function createOceanAudio() {
       if (isInitialized) return;
@@ -15,11 +14,9 @@
 
       audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
-      // Create master gain with compressor for natural dynamics
       masterGain = audioContext.createGain();
       masterGain.gain.value = 0.5;
 
-      // Add a compressor for more natural sound
       const compressor = audioContext.createDynamicsCompressor();
       compressor.threshold.value = -24;
       compressor.knee.value = 30;
@@ -30,14 +27,13 @@
       masterGain.connect(compressor);
       compressor.connect(audioContext.destination);
 
-      // === Deep Ocean Rumble (foundation) ===
+      // === Deep Ocean Rumble ===
       const deepRumbleBuffer = audioContext.createBuffer(2, audioContext.sampleRate * 12, audioContext.sampleRate);
       for (let channel = 0; channel < 2; channel++) {
         const data = deepRumbleBuffer.getChannelData(channel);
         let out = 0;
         for (let i = 0; i < data.length; i++) {
           const white = Math.random() * 2 - 1;
-          // Brown noise (deeper than pink)
           out = (out + (0.02 * white)) / 1.02;
           data[i] = out * 6.0;
         }
@@ -56,19 +52,16 @@
       deepGain.connect(masterGain);
       deepRumble.start();
 
-      // === Tidal Swell (main rhythmic wave pattern) ===
-      // 15-second primary tidal cycle
+      // === Tidal Swell ===
       const tidalBuffer = audioContext.createBuffer(2, audioContext.sampleRate * 20, audioContext.sampleRate);
       for (let channel = 0; channel < 2; channel++) {
         const data = tidalBuffer.getChannelData(channel);
         let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
         for (let i = 0; i < data.length; i++) {
           const t = i / audioContext.sampleRate;
-          // Natural tidal envelope - longer rising tide, shorter fall
           const tidePhase = Math.sin(t * Math.PI / 7.5);
           const envelope = Math.pow(Math.max(0, tidePhase * 0.5 + 0.5), 1.2);
 
-          // Pink noise with tidal modulation
           const white = Math.random() * 2 - 1;
           b0 = 0.99886 * b0 + white * 0.0555179;
           b1 = 0.99332 * b1 + white * 0.0750759;
@@ -98,7 +91,6 @@
       tidalGain.connect(masterGain);
       tidalSource.start();
 
-      // Tidal LFO - slow 20-second cycle for natural variation
       const tidalLfo = audioContext.createOscillator();
       const tidalLfoGain = audioContext.createGain();
       tidalLfo.type = 'sine';
@@ -108,14 +100,13 @@
       tidalLfoGain.connect(tidalGain.gain);
       tidalLfo.start();
 
-      // === Wave Crash Layer (breaking waves) ===
+      // === Wave Crash Layer ===
       const waveBuffer = audioContext.createBuffer(2, audioContext.sampleRate * 10, audioContext.sampleRate);
       for (let channel = 0; channel < 2; channel++) {
         const data = waveBuffer.getChannelData(channel);
         let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
         for (let i = 0; i < data.length; i++) {
           const t = i / audioContext.sampleRate;
-          // 8-second wave cycle with asymmetric shape
           const wavePhase = Math.sin(t * Math.PI / 4);
           const envelope = Math.pow(Math.max(0, wavePhase * 0.5 + 0.5), 2.5);
 
@@ -148,7 +139,6 @@
       waveGain.connect(masterGain);
       waveSource.start();
 
-      // Wave LFO - creates natural variation
       const waveLfo = audioContext.createOscillator();
       const waveLfoGain = audioContext.createGain();
       waveLfo.type = 'sine';
@@ -158,14 +148,13 @@
       waveLfoGain.connect(waveGain.gain);
       waveLfo.start();
 
-      // === Foam & Bubbles (high frequency texture) ===
+      // === Foam & Bubbles ===
       const foamBuffer = audioContext.createBuffer(2, audioContext.sampleRate * 8, audioContext.sampleRate);
       for (let channel = 0; channel < 2; channel++) {
         const data = foamBuffer.getChannelData(channel);
         let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
         for (let i = 0; i < data.length; i++) {
           const t = i / audioContext.sampleRate;
-          // Faster modulation for foam
           const envelope = Math.pow(Math.sin(t * Math.PI / 4) * 0.5 + 0.5, 3.5);
           const white = Math.random() * 2 - 1;
           b0 = 0.99886 * b0 + white * 0.0555179;
@@ -195,7 +184,6 @@
       foamGain.connect(masterGain);
       foamSource.start();
 
-      // Foam LFO
       const foamLfo = audioContext.createOscillator();
       const foamLfoGain = audioContext.createGain();
       foamLfo.type = 'sine';
@@ -205,14 +193,13 @@
       foamLfoGain.connect(foamGain.gain);
       foamLfo.start();
 
-      // === Shore Rush (low frequency surge) ===
+      // === Shore Rush ===
       const shoreBuffer = audioContext.createBuffer(2, audioContext.sampleRate * 15, audioContext.sampleRate);
       for (let channel = 0; channel < 2; channel++) {
         const data = shoreBuffer.getChannelData(channel);
         let out = 0;
         for (let i = 0; i < data.length; i++) {
           const t = i / audioContext.sampleRate;
-          // Very slow cycle for shore rush
           const envelope = Math.pow(Math.sin(t * Math.PI / 6) * 0.5 + 0.5, 1.5);
           const white = Math.random() * 2 - 1;
           out = (out + (0.01 * white)) / 1.01;
@@ -232,14 +219,13 @@
       shoreGain.connect(masterGain);
       shoreSource.start();
 
-      // === Wind Over Water (subtle high frequency) ===
+      // === Wind Over Water ===
       const windBuffer = audioContext.createBuffer(2, audioContext.sampleRate * 10, audioContext.sampleRate);
       for (let channel = 0; channel < 2; channel++) {
         const data = windBuffer.getChannelData(channel);
         for (let i = 0; i < data.length; i++) {
           const t = i / audioContext.sampleRate;
           const envelope = Math.pow(Math.sin(t * Math.PI / 12) * 0.5 + 0.5, 1.2);
-          // Filtered white noise for wind
           data[i] = (Math.random() * 2 - 1) * envelope * 0.12;
         }
       }
@@ -257,28 +243,14 @@
       windGain.connect(masterGain);
       windSource.start();
 
-      // Start audio on first interaction
-      isAudioStarted = true;
+      // Auto-resume audio context
       if (audioContext.state === 'suspended') {
         audioContext.resume();
       }
     }
 
-    // Create audio nodes immediately (they'll play when context resumes)
+    // Initialize immediately on page load
     createOceanAudio();
-
-    // Resume on any user interaction
-    const startAudio = () => {
-      if (audioContext && audioContext.state === 'suspended') {
-        audioContext.resume();
-      }
-      document.removeEventListener('click', startAudio);
-      document.removeEventListener('keydown', startAudio);
-      document.removeEventListener('touchstart', startAudio);
-    };
-    document.addEventListener('click', startAudio, { once: true });
-    document.addEventListener('keydown', startAudio, { once: true });
-    document.addEventListener('touchstart', startAudio, { once: true });
 
     // === Dynamic mouse ripple sounds ===
     let lastRipple = 0;
@@ -299,13 +271,11 @@
 
       if (intensity < 0.1) return;
 
-      // Ripple oscillator - water droplet effect
       const osc = audioContext.createOscillator();
       const osc2 = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
       const filter = audioContext.createBiquadFilter();
 
-      // Frequency based on position (left = lower, right = higher)
       const baseFreq = 200 + (x / window.innerWidth) * 400;
       const freqMod = speed * 200;
 
@@ -338,14 +308,12 @@
     function playSplash(x, y, intensity) {
       if (!audioContext || audioContext.state !== 'running') return;
 
-      // Noise-based splash
       const bufferSize = audioContext.sampleRate * 0.5;
       const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
       const data = buffer.getChannelData(0);
 
       for (let i = 0; i < bufferSize; i++) {
         const t = i / bufferSize;
-        // Attack-decay envelope
         const envelope = Math.exp(-t * 5) * (1 - Math.exp(-t * 50));
         data[i] = (Math.random() * 2 - 1) * envelope;
       }
@@ -386,7 +354,6 @@
       lastMouseY = e.clientY;
       lastRipple = now;
 
-      // Play ripple based on movement speed
       if (speed > 0.5 && Math.random() > 0.6) {
         playWaterRipple(e.clientX, e.clientY, mouseSpeedX, mouseSpeedY);
       }
@@ -435,7 +402,6 @@
     // Reinitialize on page swap
     document.addEventListener('astro:after-swap', function() {
       isInitialized = false;
-      isAudioStarted = false;
       createOceanAudio();
       lastRipple = 0;
     });
