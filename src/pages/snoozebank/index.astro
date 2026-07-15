@@ -9,13 +9,9 @@ const BASE = '/my-blog';
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Snoozebank — 睡眠债务交易所</title>
   <meta name="description" content="将睡眠从个人生理需求重新定义为可量化、可存储、可流通的社会资源。" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&family=Noto+Sans+SC:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
-  <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&family=Noto+Sans+SC:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" /></noscript>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #0a0e1a; color: #e2e8f0; font-family: 'Inter', 'Noto Sans SC', sans-serif; min-height: 100vh; }
+    body { background: #0a0e1a; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', sans-serif; min-height: 100vh; }
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: rgba(6, 182, 212, 0.3); border-radius: 2px; }
@@ -168,12 +164,10 @@ const BASE = '/my-blog';
       totalTrades: 0,
 
       init() {
-        // Seed some initial virtual market depth
         this.totalUsers = 1247 + Math.floor(Math.random() * 200);
         this.totalTrades = 3821 + Math.floor(Math.random() * 500);
       },
 
-      // Simulate a matching transaction when user deposits
       simulateMatch(coins) {
         this.totalTrades++;
         const virtualUser = this.virtualUsers[Math.floor(Math.random() * this.virtualUsers.length)];
@@ -209,7 +203,6 @@ const BASE = '/my-blog';
         else if (page === 'about') this.renderAbout();
       },
 
-      // Nav component
       nav(page) {
         return `
           <nav class="sticky top-0 z-50 backdrop-blur-md bg-[#0a0e1a]/80 border-b border-white/5">
@@ -237,7 +230,6 @@ const BASE = '/my-blog';
         });
       },
 
-      // ============ HOME PAGE ============
       renderHome() {
         const records = Store.getRecords();
         const balance = Store.getBalance();
@@ -246,7 +238,6 @@ const BASE = '/my-blog';
         this.app.innerHTML = `
           ${this.nav('home')}
           <main class="min-h-screen">
-            <!-- Hero -->
             <section class="relative min-h-screen flex items-center justify-center overflow-hidden">
               <div class="absolute inset-0 bg-gradient-to-b from-[#0a0e1a] via-[#0f1a2e] to-[#0a0e1a]"></div>
               <div class="absolute inset-0">
@@ -259,7 +250,7 @@ const BASE = '/my-blog';
                   <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 glow"></span>
                   α版 · ${Market.totalUsers} 已加入
                 </div>
-                <h1 class="text-5xl md:text-6xl font-light tracking-tight text-white mb-4 font-['Playfair_Display']">Snoozebank</h1>
+                <h1 class="text-5xl md:text-6xl font-light tracking-tight text-white mb-4" style="font-family:Georgia, 'Noto Serif SC', serif">Snoozebank</h1>
                 <p class="text-base text-cyan-200/50 font-light italic mb-2">"你的困意，值得被看见。"</p>
                 <p class="text-sm text-slate-500 mb-8 leading-relaxed max-w-sm mx-auto">
                   将睡眠重新定义为<br class="hidden md:block" />
@@ -275,7 +266,6 @@ const BASE = '/my-blog';
                   </a>
                 </div>
 
-                <!-- Stats -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-xl mx-auto text-center">
                   <div class="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
                     <div class="text-xl font-light text-white">${Market.totalUsers}</div>
@@ -297,10 +287,9 @@ const BASE = '/my-blog';
               </div>
             </section>
 
-            <!-- How it works -->
             <section class="py-20 px-6">
               <div class="max-w-3xl mx-auto">
-                <h2 class="text-2xl font-light text-white text-center mb-2 font-['Playfair_Display']">运作方式</h2>
+                <h2 class="text-2xl font-light text-white text-center mb-2" style="font-family:Georgia, 'Noto Serif SC', serif">运作方式</h2>
                 <p class="text-slate-600 text-sm text-center mb-12">每一次睡眠，都是一笔交易</p>
                 <div class="grid md:grid-cols-3 gap-5">
                   ${['记录睡眠', '量化价值', '存入或取出'].map((title, i) => `
@@ -314,7 +303,6 @@ const BASE = '/my-blog';
               </div>
             </section>
 
-            <!-- Philosophy -->
             <section class="py-16 px-6 border-t border-white/[0.03]">
               <div class="max-w-lg mx-auto text-center">
                 <p class="text-sm text-slate-500 italic leading-relaxed mb-6">
@@ -327,7 +315,6 @@ const BASE = '/my-blog';
         this.bindNav();
       },
 
-      // ============ LEDGER PAGE ============
       renderLedger() {
         const records = Store.getRecords();
         const today = new Date().toISOString().split('T')[0];
@@ -336,12 +323,11 @@ const BASE = '/my-blog';
           ${this.nav('ledger')}
           <main class="max-w-3xl mx-auto px-4 py-10">
             <div class="mb-8">
-              <h1 class="text-2xl font-light text-white mb-1 font-['Playfair_Display']">睡眠记账本</h1>
+              <h1 class="text-2xl font-light text-white mb-1" style="font-family:Georgia, 'Noto Serif SC', serif">睡眠记账本</h1>
               <p class="text-xs text-slate-500">记录每一次睡眠，量化你的睡眠资产</p>
             </div>
 
             <div class="grid md:grid-cols-5 gap-6">
-              <!-- Form -->
               <div class="md:col-span-2">
                 <div class="p-4 rounded-xl bg-white/[0.03] border border-white/[0.06]">
                   <h3 class="text-xs font-medium text-slate-500 mb-4">新记录</h3>
@@ -387,7 +373,6 @@ const BASE = '/my-blog';
                 </div>
               </div>
 
-              <!-- History -->
               <div class="md:col-span-3">
                 <div class="p-4 rounded-xl bg-white/[0.03] border border-white/[0.06]">
                   <h3 class="text-xs font-medium text-slate-500 mb-3">历史记录</h3>
@@ -426,7 +411,6 @@ const BASE = '/my-blog';
       },
 
       bindLedgerForm() {
-        // Quality selector
         let quality = 3;
         document.querySelectorAll('[data-q]').forEach(btn => {
           btn.addEventListener('click', () => {
@@ -476,7 +460,6 @@ const BASE = '/my-blog';
             Store.deposit(id, coins);
             const match = Market.simulateMatch(coins);
             UI.renderLedger();
-            // Show notification
             const toast = document.createElement('div');
             toast.className = 'fixed bottom-4 right-4 z-50 px-4 py-2 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-xs text-cyan-400 fade-in';
             toast.textContent = match.message;
@@ -486,7 +469,6 @@ const BASE = '/my-blog';
         });
       },
 
-      // ============ EXCHANGE PAGE ============
       renderExchange() {
         const balance = Store.getBalance();
         const txs = Store.getTransactions();
@@ -495,17 +477,15 @@ const BASE = '/my-blog';
           ${this.nav('exchange')}
           <main class="max-w-3xl mx-auto px-4 py-10">
             <div class="mb-8">
-              <h1 class="text-2xl font-light text-white mb-1 font-['Playfair_Display']">睡眠交易所</h1>
+              <h1 class="text-2xl font-light text-white mb-1" style="font-family:Georgia, 'Noto Serif SC', serif">睡眠交易所</h1>
               <p class="text-xs text-slate-500">将盈余存入，在需要时取出</p>
             </div>
 
             <div class="grid md:grid-cols-5 gap-6">
-              <!-- Market + Balance -->
               <div class="md:col-span-3 space-y-4">
-                <!-- Market overview -->
                 <div class="p-4 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                  <h3 class="text-xs font-medium text-slate-500">市场概况</h3>
                   <div class="flex items-center justify-between mb-3">
-                    <h3 class="text-xs font-medium text-slate-500">市场概况</h3>
                     <span class="text-[10px] text-cyan-400/50 flex items-center gap-1">
                       <span class="w-1 h-1 rounded-full bg-cyan-400 glow"></span>
                       Live
@@ -531,7 +511,6 @@ const BASE = '/my-blog';
                   </div>
                 </div>
 
-                <!-- Trade panel -->
                 <div class="p-4 rounded-xl bg-white/[0.03] border border-white/[0.06]">
                   <h3 class="text-xs font-medium text-slate-500 mb-4">交易操作</h3>
                   <div class="text-center mb-4">
@@ -544,7 +523,6 @@ const BASE = '/my-blog';
                     <button id="tab-wd" class="tab-btn flex-1 py-1.5 rounded-md text-xs bg-transparent text-slate-500 border border-white/10 hover:text-cyan-400 transition-all">取出</button>
                   </div>
 
-                  <!-- Deposit available records -->
                   <div id="deposit-tab">
                     ${(() => {
                       const undeposited = Store.getRecords().filter(r => !r.deposited && r.coins > 0);
@@ -562,7 +540,6 @@ const BASE = '/my-blog';
                     })()}
                   </div>
 
-                  <!-- Withdraw tab (hidden) -->
                   <div id="withdraw-tab" class="hidden">
                     <p class="text-[10px] text-slate-600 mb-3">从市场提取睡眠币</p>
                     <div class="flex gap-2">
@@ -577,7 +554,6 @@ const BASE = '/my-blog';
                 </div>
               </div>
 
-              <!-- Transaction History -->
               <div class="md:col-span-2">
                 <div class="p-4 rounded-xl bg-white/[0.03] border border-white/[0.06]">
                   <h3 class="text-xs font-medium text-slate-500 mb-3">交易记录</h3>
@@ -656,13 +632,12 @@ const BASE = '/my-blog';
         });
       },
 
-      // ============ ABOUT PAGE ============
       renderAbout() {
         this.app.innerHTML = `
           ${this.nav('about')}
           <main class="max-w-lg mx-auto px-4 py-16">
             <div class="text-center mb-10">
-              <div class="text-4xl font-light text-white mb-2 font-['Playfair_Display']">Snoozebank</div>
+              <div class="text-4xl font-light text-white mb-2" style="font-family:Georgia, 'Noto Serif SC', serif">Snoozebank</div>
               <p class="text-xs text-slate-500 italic">你的困意，值得被看见</p>
             </div>
 
