@@ -1,0 +1,713 @@
+---
+const BASE = '/my-blog';
+---
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Snoozebank — 睡眠债务交易所</title>
+  <meta name="description" content="将睡眠从个人生理需求重新定义为可量化、可存储、可流通的社会资源。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&family=Noto+Sans+SC:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['Playfair Display', 'serif'],
+            sans: ['Inter', 'Noto Sans SC', 'sans-serif'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0a0e1a; color: #e2e8f0; font-family: 'Inter', 'Noto Sans SC', sans-serif; min-height: 100vh; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(6, 182, 212, 0.3); border-radius: 2px; }
+    ::selection { background: rgba(6, 182, 212, 0.3); }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pulse-glow { 0%, 100% { opacity: 0.4; } 50% { opacity: 0.8; } }
+    .fade-in { animation: fadeIn 0.5s ease-out; }
+    .glow { animation: pulse-glow 3s ease-in-out infinite; }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+
+  <script>
+    // =====================================================
+    // Sleep Calculation Engine
+    // =====================================================
+    const ENGINE = {
+      STANDARD_HOURS: 8,
+      COINS_PER_HOUR: 10,
+      NIGHT_MULTIPLIER: 1.5,
+      DEEP_BONUS: 1.2,
+
+      calcHours(bedtime, wakeTime) {
+        const [bh, bm] = bedtime.split(':').map(Number);
+        const [wh, wm] = wakeTime.split(':').map(Number);
+        let start = bh * 60 + bm;
+        let end = wh * 60 + wm;
+        if (end <= start) end += 1440;
+        return (end - start) / 60;
+      },
+
+      calcDeepHours(hours, quality) {
+        return hours * (0.1 + (quality / 5) * 0.25);
+      },
+
+      calcDebt(hours) {
+        return Math.max(0, this.STANDARD_HOURS - hours);
+      },
+
+      calcSurplus(hours) {
+        return Math.max(0, hours - this.STANDARD_HOURS);
+      },
+
+      calcCoins(hours, quality, bedtime) {
+        const surplus = this.calcSurplus(hours);
+        const deepRatio = hours > 0 ? this.calcDeepHours(hours, quality) / hours : 0;
+        let coins = surplus * this.COINS_PER_HOUR;
+        const [bh] = bedtime.split(':').map(Number);
+        if (bh >= 23 || bh < 5) coins *= this.NIGHT_MULTIPLIER;
+        if (deepRatio > 0.2) coins *= this.DEEP_BONUS;
+        return Math.round(coins * 10) / 10;
+      },
+
+      calcScore(hours, quality, bedtime) {
+        const hoursScore = Math.min(100, (hours / this.STANDARD_HOURS) * 60);
+        const qualityScore = (quality / 5) * 30;
+        const [bh] = bedtime.split(':').map(Number);
+        const bedtimeScore = (bh >= 22 && bh <= 23) ? 10 : (bh >= 21 && bh <= 0) ? 5 : 0;
+        return Math.round(Math.min(100, hoursScore + qualityScore + bedtimeScore));
+      },
+
+      calcSleepDebtTotal(records) {
+        let totalDebt = 0;
+        records.forEach(r => {
+          const h = this.calcHours(r.bedtime, r.wakeTime);
+          totalDebt += this.calcDebt(h);
+        });
+        return Math.round(totalDebt * 10) / 10;
+      }
+    };
+
+    // =====================================================
+    // Data Store (localStorage)
+    // =====================================================
+    const Store = {
+      key: 'snoozebank_data',
+
+      load() {
+        try {
+          const raw = localStorage.getItem(this.key);
+          if (raw) return JSON.parse(raw);
+        } catch {}
+        return { records: [], balance: 0, transactions: [] };
+      },
+
+      save(data) {
+        localStorage.setItem(this.key, JSON.stringify(data));
+      },
+
+      addRecord(record) {
+        const data = this.load();
+        const hours = ENGINE.calcHours(record.bedtime, record.wakeTime);
+        const coins = ENGINE.calcCoins(hours, record.quality, record.bedtime);
+        const score = ENGINE.calcScore(hours, record.quality, record.bedtime);
+        const debt = ENGINE.calcDebt(hours);
+        const full = { ...record, id: Date.now().toString(36), hours, coins, score, debt, deposited: false, createdAt: new Date().toISOString() };
+        data.records.unshift(full);
+        this.save(data);
+        return full;
+      },
+
+      getRecords() {
+        return this.load().records;
+      },
+
+      getBalance() {
+        const data = this.load();
+        const deposits = data.transactions.filter(t => t.type === 'deposit').reduce((s, t) => s + t.amount, 0);
+        const withdrawals = data.transactions.filter(t => t.type === 'withdraw').reduce((s, t) => s + t.amount, 0);
+        return deposits - withdrawals;
+      },
+
+      deposit(recordId, coins) {
+        const data = this.load();
+        const record = data.records.find(r => r.id === recordId);
+        if (record) record.deposited = true;
+        data.transactions.push({ id: Date.now().toString(36), type: 'deposit', amount: coins, createdAt: new Date().toISOString() });
+        this.save(data);
+      },
+
+      withdraw(coins) {
+        const data = this.load();
+        const balance = this.getBalance();
+        if (coins > balance) return false;
+        data.transactions.push({ id: Date.now().toString(36), type: 'withdraw', amount: coins, createdAt: new Date().toISOString() });
+        this.save(data);
+        return true;
+      },
+
+      getTransactions() {
+        return this.load().transactions;
+      },
+
+      resetAll() {
+        localStorage.removeItem(this.key);
+      }
+    };
+
+    // =====================================================
+    // Virtual Market Simulator
+    // =====================================================
+    const Market = {
+      virtualUsers: [
+        '夜行猫头鹰', '晨跑大叔', '程序员阿杰', '学生小陈',
+        '新手妈妈', '退休老李', '自由插画师', '医生王姐'
+      ],
+
+      totalUsers: 0,
+      totalTrades: 0,
+
+      init() {
+        // Seed some initial virtual market depth
+        this.totalUsers = 1247 + Math.floor(Math.random() * 200);
+        this.totalTrades = 3821 + Math.floor(Math.random() * 500);
+      },
+
+      // Simulate a matching transaction when user deposits
+      simulateMatch(coins) {
+        this.totalTrades++;
+        const virtualUser = this.virtualUsers[Math.floor(Math.random() * this.virtualUsers.length)];
+        return {
+          counterparty: virtualUser,
+          matchedCoins: Math.round(coins * (0.75 + Math.random() * 0.2) * 10) / 10,
+          message: `${virtualUser} 提取了你的睡眠币`,
+        };
+      },
+
+      getMarketDepth() {
+        return Math.floor(120 + Math.random() * 60);
+      },
+
+      getDailyVolume() {
+        return Math.floor(80 + Math.random() * 40);
+      }
+    };
+
+    Market.init();
+
+    // =====================================================
+    // UI Renderer
+    // =====================================================
+    const UI = {
+      app: document.getElementById('app'),
+
+      show(page, params) {
+        this.app.innerHTML = '';
+        if (page === 'home') this.renderHome();
+        else if (page === 'ledger') this.renderLedger();
+        else if (page === 'exchange') this.renderExchange();
+        else if (page === 'about') this.renderAbout();
+      },
+
+      // Nav component
+      nav(page) {
+        return `
+          <nav class="sticky top-0 z-50 backdrop-blur-md bg-[#0a0e1a]/80 border-b border-white/5">
+            <div class="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between">
+              <a href="#" data-nav="home" class="text-sm ${page === 'home' ? 'text-cyan-400' : 'text-slate-400'} hover:text-cyan-400 transition-colors font-light">
+                Snoozebank
+              </a>
+              <div class="flex items-center gap-5 text-sm">
+                <a href="#" data-nav="ledger" class="${page === 'ledger' ? 'text-cyan-400' : 'text-slate-400'} hover:text-cyan-400 transition-colors">记账本</a>
+                <a href="#" data-nav="exchange" class="${page === 'exchange' ? 'text-cyan-400' : 'text-slate-400'} hover:text-cyan-400 transition-colors">交易所</a>
+                <a href="#" data-nav="about" class="${page === 'about' ? 'text-cyan-400' : 'text-slate-400'} hover:text-cyan-400 transition-colors">关于</a>
+              </div>
+            </div>
+          </nav>
+        `;
+      },
+
+      bindNav() {
+        document.querySelectorAll('[data-nav]').forEach(el => {
+          el.addEventListener('click', (e) => {
+            e.preventDefault();
+            const page = el.dataset.nav;
+            UI.show(page);
+          });
+        });
+      },
+
+      // ============ HOME PAGE ============
+      renderHome() {
+        const records = Store.getRecords();
+        const balance = Store.getBalance();
+        const totalDebt = ENGINE.calcSleepDebtTotal(records);
+
+        this.app.innerHTML = `
+          ${this.nav('home')}
+          <main class="min-h-screen">
+            <!-- Hero -->
+            <section class="relative min-h-screen flex items-center justify-center overflow-hidden">
+              <div class="absolute inset-0 bg-gradient-to-b from-[#0a0e1a] via-[#0f1a2e] to-[#0a0e1a]"></div>
+              <div class="absolute inset-0">
+                <div class="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-cyan-500/10 blur-[128px]"></div>
+                <div class="absolute bottom-1/3 right-1/4 w-80 h-80 rounded-full bg-indigo-500/10 blur-[128px]"></div>
+              </div>
+
+              <div class="relative z-10 text-center px-6 max-w-lg mx-auto">
+                <div class="mb-6 inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-cyan-500/20 bg-cyan-500/5 text-cyan-400 text-xs">
+                  <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 glow"></span>
+                  α版 · ${Market.totalUsers} 已加入
+                </div>
+                <h1 class="text-5xl md:text-6xl font-light tracking-tight text-white mb-4 font-['Playfair_Display']">Snoozebank</h1>
+                <p class="text-base text-cyan-200/50 font-light italic mb-2">"你的困意，值得被看见。"</p>
+                <p class="text-sm text-slate-500 mb-8 leading-relaxed max-w-sm mx-auto">
+                  将睡眠重新定义为<br class="hidden md:block" />
+                  <span class="text-cyan-400/70">可量化、可存储、可流通</span> 的社会资源
+                </p>
+
+                <div class="flex items-center justify-center gap-3 mb-12">
+                  <a href="#" data-nav="ledger" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-cyan-600 text-white text-sm hover:from-cyan-400 hover:to-cyan-500 transition-all shadow-lg shadow-cyan-500/25">
+                    开始记录睡眠
+                  </a>
+                  <a href="#" data-nav="exchange" class="px-6 py-2.5 rounded-xl border border-slate-600 text-slate-400 text-sm hover:border-cyan-500/50 hover:text-cyan-300 transition-all">
+                    进入交易所
+                  </a>
+                </div>
+
+                <!-- Stats -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-xl mx-auto text-center">
+                  <div class="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                    <div class="text-xl font-light text-white">${Market.totalUsers}</div>
+                    <div class="text-[10px] text-slate-600 mt-0.5">睡眠账户</div>
+                  </div>
+                  <div class="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                    <div class="text-xl font-light text-cyan-300">${Math.floor(balance)}</div>
+                    <div class="text-[10px] text-slate-600 mt-0.5">我的睡眠币</div>
+                  </div>
+                  <div class="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                    <div class="text-xl font-light text-white">${Market.totalTrades}</div>
+                    <div class="text-[10px] text-slate-600 mt-0.5">市场交易</div>
+                  </div>
+                  <div class="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                    <div class="text-xl font-light text-amber-400/80">${totalDebt}h</div>
+                    <div class="text-[10px] text-slate-600 mt-0.5">睡眠债</div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- How it works -->
+            <section class="py-20 px-6">
+              <div class="max-w-3xl mx-auto">
+                <h2 class="text-2xl font-light text-white text-center mb-2 font-['Playfair_Display']">运作方式</h2>
+                <p class="text-slate-600 text-sm text-center mb-12">每一次睡眠，都是一笔交易</p>
+                <div class="grid md:grid-cols-3 gap-5">
+                  ${['记录睡眠', '量化价值', '存入或取出'].map((title, i) => `
+                    <div class="p-5 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-cyan-500/20 transition-all group fade-in" style="animation-delay:${i * 0.1}s">
+                      <div class="w-8 h-8 rounded-full bg-cyan-500/10 flex items-center justify-center text-cyan-400/70 text-xs mb-3">0${i + 1}</div>
+                      <h3 class="text-white text-sm mb-2">${title}</h3>
+                      <p class="text-xs text-slate-500 leading-relaxed">${['录入上床时间和睡眠质量，系统自动计算你的睡眠债。', '深度睡眠和规律作息换算为睡眠币，每一次好觉都有价格。', '盈余时存入，欠债时取出。AI 系统自动匹配供需。'][i]}</p>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            </section>
+
+            <!-- Philosophy -->
+            <section class="py-16 px-6 border-t border-white/[0.03]">
+              <div class="max-w-lg mx-auto text-center">
+                <p class="text-sm text-slate-500 italic leading-relaxed mb-6">
+                  "最荒诞也最真实的洞察：<br />当睡眠都可以被'交易'，说明我们已经活在一个<br />连最本能的休息都被异化的时代。"
+                </p>
+              </div>
+            </section>
+          </main>
+        `;
+        this.bindNav();
+      },
+
+      // ============ LEDGER PAGE ============
+      renderLedger() {
+        const records = Store.getRecords();
+        const today = new Date().toISOString().split('T')[0];
+
+        this.app.innerHTML = `
+          ${this.nav('ledger')}
+          <main class="max-w-3xl mx-auto px-4 py-10">
+            <div class="mb-8">
+              <h1 class="text-2xl font-light text-white mb-1 font-['Playfair_Display']">睡眠记账本</h1>
+              <p class="text-xs text-slate-500">记录每一次睡眠，量化你的睡眠资产</p>
+            </div>
+
+            <div class="grid md:grid-cols-5 gap-6">
+              <!-- Form -->
+              <div class="md:col-span-2">
+                <div class="p-4 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                  <h3 class="text-xs font-medium text-slate-500 mb-4">新记录</h3>
+                  <div class="space-y-3">
+                    <div>
+                      <label class="block text-[10px] text-slate-600 mb-1">日期</label>
+                      <input type="date" id="f-date" value="${today}"
+                        class="w-full px-3 py-2 rounded-lg bg-white/[0.03] border border-white/10 text-white text-xs focus:outline-none focus:border-cyan-500/40 transition-colors" />
+                    </div>
+                    <div>
+                      <label class="block text-[10px] text-slate-600 mb-1">上床时间</label>
+                      <input type="time" id="f-bedtime" value="23:00"
+                        class="w-full px-3 py-2 rounded-lg bg-white/[0.03] border border-white/10 text-white text-xs focus:outline-none focus:border-cyan-500/40 transition-colors" />
+                    </div>
+                    <div>
+                      <label class="block text-[10px] text-slate-600 mb-1">起床时间</label>
+                      <input type="time" id="f-waketime" value="07:00"
+                        class="w-full px-3 py-2 rounded-lg bg-white/[0.03] border border-white/10 text-white text-xs focus:outline-none focus:border-cyan-500/40 transition-colors" />
+                    </div>
+                    <div>
+                      <label class="block text-[10px] text-slate-600 mb-1">质量</label>
+                      <div class="flex gap-1.5" id="quality-selector">
+                        ${[1,2,3,4,5].map(q => `
+                          <button type="button" data-q="${q}"
+                            class="flex-1 py-1.5 rounded-md text-xs border border-white/10 text-slate-500 hover:border-cyan-500/30 transition-all ${q === 3 ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30' : ''}">${q}</button>
+                        `).join('')}
+                      </div>
+                    </div>
+                    <div>
+                      <label class="block text-[10px] text-slate-600 mb-1">备注</label>
+                      <input type="text" id="f-notes" placeholder="昨晚睡得怎么样？"
+                        class="w-full px-3 py-2 rounded-lg bg-white/[0.03] border border-white/10 text-white text-xs placeholder:text-slate-700 focus:outline-none focus:border-cyan-500/40 transition-colors" />
+                    </div>
+                    <div id="live-preview" class="hidden p-2 rounded-lg bg-white/[0.02] border border-white/5 text-[10px] space-y-0.5">
+                      <div class="flex justify-between"><span class="text-slate-600">时长</span><span class="text-slate-300" id="pv-hours">-</span></div>
+                      <div class="flex justify-between"><span class="text-slate-600">评分</span><span class="text-cyan-400" id="pv-score">-</span></div>
+                      <div class="flex justify-between"><span class="text-slate-600">睡眠币</span><span class="text-cyan-300" id="pv-coins">-</span></div>
+                    </div>
+                    <button id="btn-save" class="w-full py-2 rounded-lg bg-gradient-to-r from-cyan-500 to-cyan-600 text-white text-xs hover:from-cyan-400 hover:to-cyan-500 transition-all shadow-lg shadow-cyan-500/20">
+                      记录
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- History -->
+              <div class="md:col-span-3">
+                <div class="p-4 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                  <h3 class="text-xs font-medium text-slate-500 mb-3">历史记录</h3>
+                  <div id="history-list">
+                    ${records.length === 0 ? '<div class="text-center text-slate-700 text-xs py-8">还没有记录</div>' : ''}
+                    ${records.map(r => `
+                      <div class="p-3 rounded-lg bg-white/[0.02] border border-white/5 hover:border-cyan-500/20 transition-all mb-2 fade-in">
+                        <div class="flex items-center justify-between mb-1.5">
+                          <span class="text-[10px] text-slate-500">${new Date(r.date).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })}</span>
+                          <div class="flex items-center gap-2">
+                            <span class="text-[10px] ${r.score >= 70 ? 'text-cyan-400' : r.score >= 50 ? 'text-amber-400' : 'text-red-400'}">${r.score}分</span>
+                            ${!r.deposited ? `<button class="deposit-btn text-[10px] text-cyan-500/50 hover:text-cyan-400 transition-colors" data-id="${r.id}" data-coins="${r.coins}">存入</button>` : '<span class="text-[10px] text-slate-600">已存</span>'}
+                          </div>
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
+                          <span class="text-slate-300">${r.bedtime} → ${r.wakeTime}</span>
+                          <span class="text-slate-500">${r.hours.toFixed(1)}h</span>
+                        </div>
+                        <div class="flex items-center justify-between mt-1">
+                          <span class="text-[10px] text-slate-600">${'★'.repeat(r.quality)}${'☆'.repeat(5 - r.quality)}</span>
+                          <span class="text-[10px] ${r.coins >= 0 ? 'text-cyan-400/70' : 'text-amber-400/70'}">${r.coins > 0 ? '+' : ''}${r.coins}</span>
+                        </div>
+                        ${r.notes ? `<div class="text-[10px] text-slate-600 mt-1">${r.notes}</div>` : ''}
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </main>
+        `;
+
+        this.bindNav();
+        this.bindLedgerForm();
+        this.bindLedgerDeposit();
+      },
+
+      bindLedgerForm() {
+        // Quality selector
+        let quality = 3;
+        document.querySelectorAll('[data-q]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            quality = parseInt(btn.dataset.q);
+            document.querySelectorAll('[data-q]').forEach(b => {
+              b.classList.remove('bg-cyan-500/10', 'text-cyan-400', 'border-cyan-500/30');
+            });
+            btn.classList.add('bg-cyan-500/10', 'text-cyan-400', 'border-cyan-500/30');
+            updatePreview();
+          });
+        });
+
+        function updatePreview() {
+          const bedtime = document.getElementById('f-bedtime')?.value;
+          const wakeTime = document.getElementById('f-waketime')?.value;
+          if (!bedtime || !wakeTime) return;
+          const hours = ENGINE.calcHours(bedtime, wakeTime);
+          const score = ENGINE.calcScore(hours, quality, bedtime);
+          const coins = ENGINE.calcCoins(hours, quality, bedtime);
+          document.getElementById('pv-hours').textContent = hours.toFixed(1) + 'h';
+          document.getElementById('pv-score').textContent = score;
+          document.getElementById('pv-coins').textContent = coins;
+          document.getElementById('live-preview').classList.remove('hidden');
+        }
+
+        document.getElementById('f-bedtime')?.addEventListener('change', updatePreview);
+        document.getElementById('f-waketime')?.addEventListener('change', updatePreview);
+
+        document.getElementById('btn-save')?.addEventListener('click', () => {
+          const date = document.getElementById('f-date').value;
+          const bedtime = document.getElementById('f-bedtime').value;
+          const wakeTime = document.getElementById('f-waketime').value;
+          const notes = document.getElementById('f-notes').value;
+          if (!bedtime || !wakeTime) return alert('请填写时间');
+
+          Store.addRecord({ date, bedtime, wakeTime, quality, notes });
+          UI.renderLedger();
+        });
+      },
+
+      bindLedgerDeposit() {
+        document.querySelectorAll('.deposit-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = btn.dataset.id;
+            const coins = parseFloat(btn.dataset.coins);
+            if (!confirm(`将 ${coins} 睡眠币存入市场？`)) return;
+            Store.deposit(id, coins);
+            const match = Market.simulateMatch(coins);
+            UI.renderLedger();
+            // Show notification
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-4 right-4 z-50 px-4 py-2 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-xs text-cyan-400 fade-in';
+            toast.textContent = match.message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+          });
+        });
+      },
+
+      // ============ EXCHANGE PAGE ============
+      renderExchange() {
+        const balance = Store.getBalance();
+        const txs = Store.getTransactions();
+
+        this.app.innerHTML = `
+          ${this.nav('exchange')}
+          <main class="max-w-3xl mx-auto px-4 py-10">
+            <div class="mb-8">
+              <h1 class="text-2xl font-light text-white mb-1 font-['Playfair_Display']">睡眠交易所</h1>
+              <p class="text-xs text-slate-500">将盈余存入，在需要时取出</p>
+            </div>
+
+            <div class="grid md:grid-cols-5 gap-6">
+              <!-- Market + Balance -->
+              <div class="md:col-span-3 space-y-4">
+                <!-- Market overview -->
+                <div class="p-4 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                  <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-xs font-medium text-slate-500">市场概况</h3>
+                    <span class="text-[10px] text-cyan-400/50 flex items-center gap-1">
+                      <span class="w-1 h-1 rounded-full bg-cyan-400 glow"></span>
+                      Live
+                    </span>
+                  </div>
+                  <div class="grid grid-cols-2 gap-2">
+                    <div class="p-2 rounded-lg bg-white/[0.02] border border-white/5">
+                      <div class="text-[10px] text-slate-600">睡眠币/时</div>
+                      <div class="text-sm text-cyan-300">10.00</div>
+                    </div>
+                    <div class="p-2 rounded-lg bg-white/[0.02] border border-white/5">
+                      <div class="text-[10px] text-slate-600">夜间溢价</div>
+                      <div class="text-sm text-cyan-300">×1.5</div>
+                    </div>
+                    <div class="p-2 rounded-lg bg-white/[0.02] border border-white/5">
+                      <div class="text-[10px] text-slate-600">待匹配</div>
+                      <div class="text-sm text-white">${Market.getMarketDepth()}</div>
+                    </div>
+                    <div class="p-2 rounded-lg bg-white/[0.02] border border-white/5">
+                      <div class="text-[10px] text-slate-600">24h成交</div>
+                      <div class="text-sm text-white">${Market.getDailyVolume()}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Trade panel -->
+                <div class="p-4 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                  <h3 class="text-xs font-medium text-slate-500 mb-4">交易操作</h3>
+                  <div class="text-center mb-4">
+                    <div class="text-[10px] text-slate-600 mb-1">可用睡眠币</div>
+                    <div class="text-3xl font-light text-white">${balance}</div>
+                  </div>
+
+                  <div class="flex gap-2 mb-4">
+                    <button id="tab-dep" class="tab-btn flex-1 py-1.5 rounded-md text-xs bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 transition-all">存入</button>
+                    <button id="tab-wd" class="tab-btn flex-1 py-1.5 rounded-md text-xs bg-transparent text-slate-500 border border-white/10 hover:text-cyan-400 transition-all">取出</button>
+                  </div>
+
+                  <!-- Deposit available records -->
+                  <div id="deposit-tab">
+                    ${(() => {
+                      const undeposited = Store.getRecords().filter(r => !r.deposited && r.coins > 0);
+                      if (undeposited.length === 0) return '<div class="text-center text-slate-700 text-xs py-4">没有可存入的记录</div>';
+                      return undeposited.map(r => `
+                        <div class="flex items-center justify-between p-2 rounded-lg bg-white/[0.02] border border-white/5 mb-1.5">
+                          <div>
+                            <div class="text-xs text-slate-300">${new Date(r.date).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })}</div>
+                            <div class="text-[10px] text-slate-500">${r.coins} 睡眠币</div>
+                          </div>
+                          <button class="exchange-deposit-btn px-2.5 py-1 rounded-md bg-cyan-500/10 text-cyan-400 text-[10px] hover:bg-cyan-500/20 transition-all"
+                            data-id="${r.id}" data-coins="${r.coins}">存入</button>
+                        </div>
+                      `).join('');
+                    })()}
+                  </div>
+
+                  <!-- Withdraw tab (hidden) -->
+                  <div id="withdraw-tab" class="hidden">
+                    <p class="text-[10px] text-slate-600 mb-3">从市场提取睡眠币</p>
+                    <div class="flex gap-2">
+                      <input type="number" id="wd-amount" placeholder="数量" min="1" max="${balance}"
+                        class="flex-1 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/10 text-white text-xs placeholder:text-slate-700 focus:outline-none focus:border-cyan-500/40 transition-colors" />
+                      <button id="btn-withdraw"
+                        class="px-4 py-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs hover:from-amber-400 hover:to-orange-400 transition-all shadow-lg shadow-amber-500/20">
+                        取出
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Transaction History -->
+              <div class="md:col-span-2">
+                <div class="p-4 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                  <h3 class="text-xs font-medium text-slate-500 mb-3">交易记录</h3>
+                  <div id="tx-list">
+                    ${txs.length === 0 ? '<div class="text-center text-slate-700 text-xs py-8">等待第一笔交易...</div>' :
+                      txs.slice().reverse().map(t => `
+                        <div class="flex items-center justify-between p-2 rounded-lg bg-white/[0.02] mb-1">
+                          <div>
+                            <div class="text-[10px] ${t.type === 'deposit' ? 'text-cyan-400' : 'text-amber-400'}">${t.type === 'deposit' ? '存入' : '取出'}</div>
+                            <div class="text-[10px] text-slate-600">${new Date(t.createdAt).toLocaleString('zh-CN')}</div>
+                          </div>
+                          <div class="text-xs ${t.type === 'deposit' ? 'text-cyan-300' : 'text-amber-300'}">${t.type === 'deposit' ? '+' : '-'}${t.amount}</div>
+                        </div>
+                      `).join('')
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+          </main>
+        `;
+
+        this.bindNav();
+        this.bindExchangeTabs();
+        this.bindExchangeActions();
+      },
+
+      bindExchangeTabs() {
+        document.getElementById('tab-dep')?.addEventListener('click', () => {
+          document.getElementById('tab-dep').classList.add('bg-cyan-500/10', 'text-cyan-400', 'border-cyan-500/30');
+          document.getElementById('tab-dep').classList.remove('text-slate-500');
+          document.getElementById('tab-wd').classList.remove('bg-cyan-500/10', 'text-cyan-400', 'border-cyan-500/30');
+          document.getElementById('tab-wd').classList.add('text-slate-500');
+          document.getElementById('deposit-tab').classList.remove('hidden');
+          document.getElementById('withdraw-tab').classList.add('hidden');
+        });
+        document.getElementById('tab-wd')?.addEventListener('click', () => {
+          document.getElementById('tab-wd').classList.add('bg-cyan-500/10', 'text-cyan-400', 'border-cyan-500/30');
+          document.getElementById('tab-wd').classList.remove('text-slate-500');
+          document.getElementById('tab-dep').classList.remove('bg-cyan-500/10', 'text-cyan-400', 'border-cyan-500/30');
+          document.getElementById('tab-dep').classList.add('text-slate-500');
+          document.getElementById('deposit-tab').classList.add('hidden');
+          document.getElementById('withdraw-tab').classList.remove('hidden');
+        });
+      },
+
+      bindExchangeActions() {
+        document.querySelectorAll('.exchange-deposit-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = btn.dataset.id;
+            const coins = parseFloat(btn.dataset.coins);
+            Store.deposit(id, coins);
+            const match = Market.simulateMatch(coins);
+            UI.renderExchange();
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-4 right-4 z-50 px-4 py-2 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-xs text-cyan-400 fade-in';
+            toast.textContent = match.message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+          });
+        });
+
+        document.getElementById('btn-withdraw')?.addEventListener('click', () => {
+          const amount = parseFloat(document.getElementById('wd-amount').value);
+          if (!amount || amount <= 0) return alert('请输入有效数量');
+          if (Store.withdraw(amount)) {
+            UI.renderExchange();
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-4 right-4 z-50 px-4 py-2 rounded-lg bg-amber-500/10 border border-amber-500/30 text-xs text-amber-400 fade-in';
+            toast.textContent = `成功提取 ${amount} 睡眠币`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+          } else {
+            alert('睡眠币不足');
+          }
+        });
+      },
+
+      // ============ ABOUT PAGE ============
+      renderAbout() {
+        this.app.innerHTML = `
+          ${this.nav('about')}
+          <main class="max-w-lg mx-auto px-4 py-16">
+            <div class="text-center mb-10">
+              <div class="text-4xl font-light text-white mb-2 font-['Playfair_Display']">Snoozebank</div>
+              <p class="text-xs text-slate-500 italic">你的困意，值得被看见</p>
+            </div>
+
+            <div class="space-y-4 text-xs text-slate-500 leading-relaxed">
+              <p>Snoozebank 是一个关于"睡眠交易"的观念艺术项目。</p>
+              <p>它的荒诞之处在于：当睡眠都可以被量化、存储和交易，说明我们已经活在一个连最本能的休息都被异化的时代。</p>
+              <p>但荒诞之外，它试图探讨几个真实的问题：</p>
+              <ul class="space-y-2 pl-4">
+                <li>• 健康资源的不平等——有人困到崩溃，有人睡到空虚</li>
+                <li>• 量化时代的焦虑——连睡觉都要"达标"了吗？</li>
+                <li>• 人与人之间能否建立新的互助机制？</li>
+              </ul>
+              <p class="pt-4">数据仅存储在本地浏览器中，不上传任何服务器。</p>
+              <p class="text-slate-600 pt-4">Snoozebank · α 版 · 2026</p>
+
+              <button id="btn-reset" class="mt-8 text-[10px] text-slate-700 hover:text-red-400 transition-colors">清除所有数据</button>
+            </div>
+          </main>
+        `;
+        this.bindNav();
+        document.getElementById('btn-reset')?.addEventListener('click', () => {
+          if (confirm('确定清除所有睡眠数据？此操作不可恢复。')) {
+            Store.resetAll();
+            UI.renderAbout();
+          }
+        });
+      }
+    };
+
+    // =====================================================
+    // Init
+    // =====================================================
+    UI.show('home');
+  </script>
+</body>
+</html>
